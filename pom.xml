@@ -6,7 +6,7 @@
 	<groupId>io.greenbus</groupId>
 	<artifactId>greenbus-parent</artifactId>
 	<packaging>pom</packaging>
-	<version>3.0.0</version>
+	<version>3.0.1-SNAPSHOT</version>
 
 	<properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -25,7 +25,7 @@
         <maven-protoc-plugin.version>0.1.11</maven-protoc-plugin.version>
         <qpid.version>0.20</qpid.version>
 
-		<greenbus.version>3.0.0</greenbus.version>
+		<greenbus.version>3.0.1-SNAPSHOT</greenbus.version>
         <squeryl.version>0.9.5-6</squeryl.version>
         <cglib.version>2.2</cglib.version>
         <commons-dbcp.version>1.4</commons-dbcp.version>
