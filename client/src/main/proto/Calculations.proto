@@ -1,0 +1,290 @@
+/**
+ * Copyright 2011-2016 Green Energy Corp.
+ *
+ * Licensed to Green Energy Corp (www.greenenergycorp.com) under one or more
+ * contributor license agreements. See the NOTICE file distributed with this
+ * work for additional information regarding copyright ownership. Green Energy
+ * Corp licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+package greenbus.client;
+
+option java_package = "io.greenbus.client.service.proto";
+option java_outer_classname = "Calculations";
+
+import "ServiceEnvelopes.proto";
+import "Model.proto";
+import "Measurements.proto";
+
+
+/*
+    Describes how and why evaluation of the calculation is initiated. Calculations can be evaluated periodically or whenever notified
+    of a change to an input.
+
+    One field must be provided.
+*/
+message TriggerStrategy {
+
+    /*
+        Specifies that the calculation is to be evaluated periodically. The value represents the period in milliseconds
+        between evaluations.
+
+        @optional
+    */
+    optional uint64       period_ms  = 1;
+
+    /*
+        If `true`, specifies that any change to an input should trigger the evaluation of the calculation. A value of
+        `false` has no meaning.
+
+        @optional
+    */
+    optional bool         update_any = 3;
+}
+
+
+/*
+    Describes the range of time-series values used as inputs for the calculation.
+*/
+message MeasurementRange {
+
+    /*
+        If set to `true`, the input does not retrieve Measurement history and instead begins accumulating
+        time-series values from the time the calculation endpoint came online.
+
+        @optional
+    */
+    optional  bool        since_last = 4;
+
+    /*
+        Specifies an offset in milliseconds to the beginning of a time window of Measurement history to use
+        for this input. An offset to past times should be negative. For example, a value of `-5000` will create
+        a range that includes all Measurements since five seconds before the current time.
+
+        If the number of Measurements in that time window exceeds the `limit` field, the latest Measurements
+        will be used.
+
+        @optional
+    */
+    optional  uint64      from_ms = 1;
+
+    /*
+        Provides a limit on the size of the Measurement sequence retained for the calculation input. The
+        limit will also apply to the request for Measurement history when the calculation is initialized.
+
+        If not specified, the measurement calculator will use a default value.
+
+        @optional
+    */
+    optional  uint32      limit   = 3;
+}
+
+/*
+    Describes the strategy for calculation inputs that are a single value.
+*/
+message SingleMeasurement {
+
+    /*
+        Enumeration of strategies.
+    */
+    enum MeasurementStrategy{
+        MOST_RECENT = 1;    // Use the most recent value.
+    }
+
+    /*
+        Specifies the strategy for interpreting Measurements as calculation inputs.
+
+        @required
+    */
+    optional MeasurementStrategy  strategy = 1;
+}
+
+/*
+    Describes an input to a calculation. Contains a reference to another Point in the system, its mapping to a
+    variable in the calculation formula, and the range of Measurement values relevant to the calculation.
+
+    One of `range` or `single` must be specified.
+*/
+message CalculationInput {
+
+    /*
+        UUID of the Point for the input.
+
+        @required
+    */
+    optional ModelUUID          point_uuid         = 1;
+
+    /*
+        Variable name of this input, to be referenced in the formula.
+
+        @required
+    */
+    optional string            variable_name = 2;
+
+    /*
+        Specifies parameters for inputs that include multiple time-series Measurement values.
+
+        @optional
+    */
+    optional MeasurementRange  range         = 3;
+
+    /*
+        Specifies parameters for inputs that are singular.
+
+        @optional
+    */
+    optional SingleMeasurement single        = 4;
+}
+
+/*
+    Describes how the quality of inputs should affect the calculation.
+*/
+message InputQuality {
+
+    /*
+        Enumerates the strategies for handling input quality.
+    */
+    enum Strategy {
+
+        /*
+            Measurements of any quality will be used as inputs.
+        */
+        ACCEPT_ALL       = 1;
+
+        /*
+            Only evaluate the calculation when all input Measurements have `GOOD` quality.
+        */
+        ONLY_WHEN_ALL_OK       = 2;
+
+        /*
+            Removes bad quality Measurements from the inputs and evaluates the calculation. For singular inputs,
+            this will result in an input not being present and the calculation not being evaluated. For ranged inputs,
+            only the poor quality Measurements in the range will be filtered out, and the calculation will proceed.
+        */
+        REMOVE_BAD_AND_CALC    = 3;
+    }
+
+    /*
+        Specifies the strategy for handling input quality.
+    */
+    optional Strategy strategy        = 1;
+}
+
+/*
+    Contains the strategy for determining the quality of the Measurement generated by the calculation.
+*/
+message OutputQuality {
+
+    /*
+        Enumeration for the strategies for determining the quality of the Measurement generated by the calculation.
+    */
+    enum Strategy{
+        WORST_QUALITY = 1;  // Uses the "worst" quality of the input Measurements.
+        ALWAYS_OK     = 2;  // Calculated Measurements always have good quality.
+    }
+
+    /*
+        Specifies the strategy for determining the quality of the Measurement generated by the calculation.
+
+        @required
+    */
+    optional Strategy strategy        = 1;
+}
+
+/*
+    Describes the inputs, the conditions for evaluation, the formula to be evaluated, and the output format
+    of a calculation.
+*/
+message CalculationDescriptor {
+
+    /*
+        Specifies a unit to be attached to the resulting Measurement. If not provided, no unit will be attached.
+
+        @optional
+    */
+    optional string            unit               = 2;
+
+    /*
+        Determines how and why evaluation of the calculation is initiated.
+
+        @required
+    */
+    optional TriggerStrategy   triggering         = 4;
+
+    /*
+        Specifies the inputs to the calculation, including the mapping to a variable in the formula and strategies for
+        acquiring and interpreting Measurement values.
+
+        @required
+    */
+    repeated CalculationInput  calc_inputs        = 5;
+
+    /*
+        Specifies the strategy for handling the quality of input Measurements.
+
+        @required
+    */
+    optional InputQuality      triggering_quality = 6;
+
+    /*
+        Specifies the strategy for determining the quality of the Measurement generated by the calculation.
+
+        @required
+    */
+    optional OutputQuality     quality_output     = 7;
+
+    /*
+        Specifies the formula to be evaluated.
+
+        @required
+    */
+    optional string            formula            = 9;
+
+}
+
+/*
+    Association between a Point and a description of a calculation that generates Measurements for it.
+*/
+message Calculation {
+
+    /*
+        UUID of the Point this Calculation is associated with.
+
+        @required
+    */
+    optional ModelUUID          point_uuid         = 1;
+
+    /*
+        Description of the calculation to be performed.
+
+        @required
+    */
+    optional CalculationDescriptor   calculation        = 8;
+}
+
+
+/*
+    Notification of a change to the Calculation for a Point.
+*/
+message CalculationNotification {
+
+    /*
+        Whether object was added, removed, or modified.
+    */
+    optional greenbus.client.envelope.SubscriptionEventType event_type = 1;
+
+    /*
+        Updated state of the object.
+    */
+    optional Calculation value = 2;
+}
+

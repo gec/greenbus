@@ -1,0 +1,95 @@
+/**
+ * Copyright 2011-2016 Green Energy Corp.
+ *
+ * Licensed to Green Energy Corp (www.greenenergycorp.com) under one or more
+ * contributor license agreements. See the NOTICE file distributed with this
+ * work for additional information regarding copyright ownership. Green Energy
+ * Corp licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+package greenbus.client.envelope;
+
+option java_package = "io.greenbus.client.proto";
+option java_outer_classname = "Envelope";
+
+/*
+    Common classifier for notifications of changes in service objects.
+*/
+enum SubscriptionEventType{
+    ADDED     = 1;
+    MODIFIED  = 2;
+    REMOVED   = 3;
+}
+
+/*
+    Represents the status of service responses. Modeled on HTTP status codes.
+
+    - The 200 range are successful responses.
+    - The 400 range represent request rejections.
+    - The 500 range represent internal errors.
+
+    For more information on the HTTP status codes:
+
+    http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+*/
+enum Status {
+    OK            = 200;
+    CREATED       = 201;
+    UPDATED       = 202;
+    DELETED       = 204;
+    NOT_MODIFIED   = 205;
+    BAD_REQUEST    = 400;
+    UNAUTHORIZED  = 401;    // No valid user authentication provided.
+    FORBIDDEN       = 403;  // A valid user has attempted to exceed their privileges.
+    LOCKED        = 423;
+    INTERNAL_ERROR = 500;
+    LOCAL_ERROR         = 501;
+    UNEXPECTED_RESPONSE = 502;
+    RESPONSE_TIMEOUT    = 503;
+    BUS_UNAVAILABLE     = 504;
+}
+
+/*
+    Header structure for providing extra information in service requests. Uses a
+    key-value format.
+*/
+message RequestHeader{
+    optional string key   = 1;
+    optional string value = 2;
+}
+
+/*
+    Outermost envelope for service requests. Contains request headers and an opaque
+    payload.
+
+    Relies on out-of-band information (the communication channel, a header) to
+    determine the format of the payload.
+*/
+message ServiceRequest{
+    repeated RequestHeader headers         = 1;
+    optional bytes         payload         = 2;
+}
+
+/*
+    Outermost envelope for service responses. Status may be a success or an error.
+    If the response is an error, the error_message field will contain additional
+    information. If the status is a success, the payload field contains the
+    response object(s).
+
+    Relies on out-of-band information (the communication channel, a header) to
+    determine the format of the payload.
+*/
+message ServiceResponse{
+    optional Status status        = 1; // Status code, check for 2-- or print error message.
+    optional string error_message = 2; // Error message if applicable.
+    optional bytes  payload       = 3; // Can be one or many depending on request.
+}

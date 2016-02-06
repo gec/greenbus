@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+
+    Copyright 2011-2016 Green Energy Corp.
+
+    Licensed to Green Energy Corp (www.greenenergycorp.com) under one or more
+    contributor license agreements. See the NOTICE file distributed with this
+    work for additional information regarding copyright ownership. Green Energy
+    Corp licenses this file to you under the GNU Affero General Public License
+    Version 3.0 (the "License"); you may not use this file except in compliance
+    with the License. You may obtain a copy of the License at
+
+    http://www.gnu.org/licenses/agpl.html
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations under
+    the License.
+
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="xml.ldr.greenbus.io"
+					 xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+					 targetNamespace="xml.ldr.greenbus.io"
+					 elementFormDefault="unqualified" jaxb:version="1.0">
+
+	<xs:include schemaLocation="modelHierarchy.xsd"/>
+
+	<!-- This uses the additional vendor specific features provided by the JAXB RI
+				They are defined in the "http://java.sun.com/xml/ns/jaxb/xjc" namespace -->
+	<xs:annotation>
+		<xs:appinfo>
+			<jaxb:globalBindings generateIsSetMethod="true"/>
+		</xs:appinfo>
+	</xs:annotation>
+
+	<!-- ___________________ root element  ___________________ -->
+	<xs:element name="configuration">
+		<xs:annotation>
+			<xs:documentation>
+				<p class="elementDef">
+					The root element of the entire configuration file. It also contains the main sections of the
+					configuration file -<span class="elementStyle">messageModel</span>,<span class="elementStyle">
+					actionModel</span>,<span class="elementStyle">equipmentModel</span>, and<span class="elementStyle">
+					communicationsModel</span>.
+				</p>
+			</xs:documentation>
+		</xs:annotation>
+
+		<xs:complexType>
+			<xs:all>
+				<xs:element ref="equipmentModel" minOccurs="0"/>
+				<xs:element ref="endpointModel" minOccurs="0"/>
+			</xs:all>
+			<xs:attribute name="version" use="required">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="1.0"/>
+						<!-- Add new versions here and keep old versions that are backwards compatible -->
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>

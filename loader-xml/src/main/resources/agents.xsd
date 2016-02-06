@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+
+    Copyright 2011-2016 Green Energy Corp.
+
+    Licensed to Green Energy Corp (www.greenenergycorp.com) under one or more
+    contributor license agreements. See the NOTICE file distributed with this
+    work for additional information regarding copyright ownership. Green Energy
+    Corp licenses this file to you under the GNU Affero General Public License
+    Version 3.0 (the "License"); you may not use this file except in compliance
+    with the License. You may obtain a copy of the License at
+
+    http://www.gnu.org/licenses/agpl.html
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations under
+    the License.
+
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="auth.xml.ldr.greenbus.io"
+					 xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+					 targetNamespace="auth.xml.ldr.greenbus.io"
+					 elementFormDefault="qualified" jaxb:version="1.0">
+
+	<!-- This uses the additional vendor specific features provided by the JAXB RI
+				They are defined in the "http://java.sun.com/xml/ns/jaxb/xjc" namespace -->
+
+	<xs:element name="argument">
+		<xs:complexType>
+			<xs:attribute name="value" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="selector">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="argument" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="style" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="resource">
+		<xs:complexType>
+			<xs:attribute name="name" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="action">
+		<xs:complexType>
+			<xs:attribute name="name" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="permissionType">
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:annotation>
+				<xs:appinfo>
+					<jaxb:property name="elements"/>
+				</xs:appinfo>
+			</xs:annotation>
+			<xs:element ref="resource" minOccurs="0"/>
+			<xs:element ref="action" minOccurs="0"/>
+			<xs:element ref="selector" minOccurs="0"/>
+		</xs:choice>
+	</xs:complexType>
+
+	<xs:element name="allow">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="permissionType"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="deny">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="permissionType"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="permissionSet">
+		<xs:complexType>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:appinfo>
+						<jaxb:property name="permissions"/>
+					</xs:appinfo>
+				</xs:annotation>
+				<xs:element ref="allow" minOccurs="0"/>
+				<xs:element ref="deny" minOccurs="0"/>
+			</xs:choice>
+			<xs:attribute name="name" type="xs:string" use="required"/>
+			<xs:attribute name="id" type="xs:string" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+
+
+	<xs:element name="agent">
+		<xs:complexType>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="permissionSet" minOccurs="0">
+					<xs:complexType>
+						<xs:attribute name="name" type="xs:string" use="required"/>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+			<xs:attribute name="name" type="xs:string" use="required"/>
+			<xs:attribute name="uuid" type="xs:string" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="permissionSets">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="permissionSet" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="agents">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="agent" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<!-- ___________________ root element  ___________________ -->
+	<xs:element name="authorization">
+		<xs:complexType>
+			<xs:all>
+				<xs:element ref="permissionSets"/>
+				<xs:element ref="agents"/>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>

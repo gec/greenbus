@@ -1,0 +1,184 @@
+/**
+ * Copyright 2011-2016 Green Energy Corp.
+ *
+ * Licensed to Green Energy Corp (www.greenenergycorp.com) under one or more
+ * contributor license agreements. See the NOTICE file distributed with this
+ * work for additional information regarding copyright ownership. Green Energy
+ * Corp licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+package greenbus.client;
+
+option java_package = "io.greenbus.client.service.proto";
+option java_outer_classname = "MeasurementRequests";
+option java_generic_services = false;
+
+import "google/protobuf/descriptor.proto";
+import "CompilerExtensions.proto";
+
+import "Measurements.proto";
+import "Model.proto";
+import "services/ModelRequests.proto";
+
+
+/*
+    Specifies a sequence of historical Measurement values for a Point by time-order, with constraints.
+
+    The resulting sequence of Measurements is always returned in ascending time-order (oldest to newest).
+*/
+message MeasurementHistoryQuery {
+
+    /*
+        UUID of Point to find Measurements for.
+
+        @required
+    */
+    optional ModelUUID point_uuid = 1;
+
+    /*
+        Boundary of earliest time, exclusive, in the window of Measurements to return.
+
+        If not included, the beginning of the time window is unbounded, or practically, bounded to the
+        first Measurement published.
+
+        Time is measured in milliseconds since midnight, January 1, 1970 UTC.
+
+        @optional
+    */
+    optional uint64 time_from = 2;
+
+    /*
+        Boundary of latest time, inclusive, in the window of Measurements to return.
+
+        If not included, the end of the time window is unbounded, or practically, bounded to the current time.
+
+        Time is measured in milliseconds since midnight, January 1, 1970 UTC.
+
+        @optional
+    */
+    optional uint64 time_to = 3;
+
+    /*
+        Maximum number of Measurement values to return.
+
+        If not specified, the server provides a default value.
+
+        @optional
+    */
+    optional uint32 limit = 4;
+
+    /*
+        If the number of Measurements in the time window exceeds the limit on the number of Measurements to be
+        returned by the query, the sequence of Measurements will be justified to either the lower or higher
+        boundary of the window.
+
+        - If `false`, the returned Measurements will begin with the first in the time window and proceed until the time window
+            ends or the limit is met. Paging using this method would move forward in time.
+        - If `true`, the sequence of returned Measurements begins at the `limit`th value below the high boundary of the time window,
+            and proceeds to the high boundary. Paging using this method would move backward in time.
+
+        In both cases, the sequence of Measurements is returned in ascending time-order (oldest to newest).
+
+        The default value is `false`.
+
+        @optional
+    */
+    optional bool latest = 5;
+}
+
+/*
+    Selects Measurement batches to subscribe to. Can be narrowed by the UUIDs of Endpoints. If no Endpoints are
+    specified, subscribes to all notifications.
+*/
+message MeasurementBatchSubscriptionQuery {
+
+    /*
+        UUIDs of Endpoint to receive batch notifications for.
+
+        @required
+    */
+    repeated ModelUUID endpoint_uuids = 1;
+}
+
+
+message GetCurrentValuesRequest {
+    repeated ModelUUID point_uuids = 1;
+}
+message GetCurrentValuesResponse {
+    repeated PointMeasurementValue results = 1;
+}
+
+message GetMeasurementHistoryRequest {
+    optional MeasurementHistoryQuery request = 1;
+}
+message GetMeasurementHistoryResponse {
+    optional PointMeasurementValues result = 2;
+}
+
+message GetCurrentValuesAndSubscribeRequest {
+    repeated ModelUUID point_uuids = 1;
+}
+message GetCurrentValuesAndSubscribeResponse {
+    repeated PointMeasurementValue results = 1;
+}
+
+message SubscribeToBatchesRequest {
+    optional MeasurementBatchSubscriptionQuery query = 1;
+}
+message SubscribeToBatchesResponse {
+}
+
+message PostMeasurementsRequest {
+    optional MeasurementBatch batch = 1;
+}
+message PostMeasurementsResponse {
+}
+
+service MeasurementService {
+    option (scala_package) = "io.greenbus.client.service";
+    option (java_package) = "io.greenbus.japi.client.service";
+
+    /*
+        Gets current Measurement values for Points specified by UUID.
+    */
+    rpc get_current_values(GetCurrentValuesRequest) returns (GetCurrentValuesResponse);
+
+    /*
+        Queries for a time series of previous Measurement values.
+    */
+    rpc get_history(GetMeasurementHistoryRequest) returns (GetMeasurementHistoryResponse);
+
+    /*
+        Gets current Measurement values for Points specified by UUID, and subscribes to subsequent Measurements for
+        those Points.
+    */
+    rpc get_current_values_and_subscribe(GetCurrentValuesAndSubscribeRequest) returns (GetCurrentValuesAndSubscribeResponse) {
+        option (subscription_type) = "greenbus.client.MeasurementNotification";
+    }
+
+    /*
+        Subscribes to notifications for batches of Measurements. Measurements are in the batches they were published
+        to the measurement processor.
+
+        The subscription can be filtered by the UUIDs of the Endpoints they are associated with.
+    */
+    rpc subscribe_to_batches(SubscribeToBatchesRequest) returns (SubscribeToBatchesResponse) {
+        option (subscription_type) = "greenbus.client.MeasurementBatchNotification";
+    }
+
+    /*
+        Posts a batch of Measurements to a measurement processor.
+    */
+    rpc post_measurements(PostMeasurementsRequest) returns (PostMeasurementsResponse) {
+        option (addressed) = ALWAYS;
+    }
+}

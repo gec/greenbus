@@ -1,0 +1,1288 @@
+/**
+ * Copyright 2011-2016 Green Energy Corp.
+ *
+ * Licensed to Green Energy Corp (www.greenenergycorp.com) under one or more
+ * contributor license agreements. See the NOTICE file distributed with this
+ * work for additional information regarding copyright ownership. Green Energy
+ * Corp licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+package greenbus.client;
+
+option java_package = "io.greenbus.client.service.proto";
+option java_outer_classname = "ModelRequests";
+option java_generic_services = false;
+
+import "google/protobuf/descriptor.proto";
+import "CompilerExtensions.proto";
+
+import "Model.proto";
+import "ServiceEnvelopes.proto";
+
+/*
+    Contains common parameters for specifying paging in model queries.
+*/
+message EntityPagingParams {
+
+    /*
+        If `true` results are sorted by name. If `false` results are sorted by UUID.
+
+        Default is `true`.
+
+        @optional
+    */
+    optional bool page_by_name = 12;
+
+    /*
+        Last UUID (in the returned sorted order) of a previous result set. This result set will be the
+        page beginning from the next UUID.
+
+        @optional
+    */
+    optional ModelUUID last_uuid = 14;
+
+    /*
+        Last name (in the returned sorted order) of a previous result set. This result set will be the
+        page beginning from the next name.
+
+        @optional
+    */
+    optional string last_name = 13;
+
+    /*
+        The number of elements to return. Used to limit the size of result sets in large models. If not set,
+        a server-determined page size will be used.
+
+        If the size of the result set equals the page size, there may be more data available.
+
+        @optional
+    */
+    optional uint32 page_size = 15;
+}
+
+/*
+    Description used to create or modify an Entity.
+
+    New Entities are created by using a template with no UUID, identified by name and with a set of types. The UUID for the Entity 
+    will be generated on the server. 
+
+    Including a UUID will either create a new Entity with a pre-defined UUID (e.g. imported), or modify the name and types
+    of an existing Entity.   
+*/
+message EntityTemplate {
+
+    /*
+        Identifies a pre-existing Entity, or provides a pre-determined UUID for a new Entity.
+
+        @optional
+    */
+    optional ModelUUID uuid = 1;
+
+    /*
+        Identifies a pre-existing Entity, provides a name for a created Entity, or a new name for an existing Entity.
+
+        - If a UUID is not provided and the Entity does not exist an Entity will be created with this name.
+        - If a UUID is not provided and the Entity exists, the Entity will be identified and only the types will be (potentially) modified.
+        - If a UUID is provided and the Entity does not exist, an Entity will be created with this name.
+        - If a UUID is provided and the Entity already exists, the Entity will be renamed to this name.
+
+        @required
+    */
+    optional string name = 2;
+
+    /*
+        The set of types for the Entity. 
+
+        - If the Entity is being created, all types will be added. 
+        - If the Entity is being modified, types not in this field will be removed and types in this field and not previously in the Entity will be added.
+        - An empty set of types (including if the field is uninitialized) will result in the Entity containing no types.
+
+        @required
+    */
+    repeated string types = 3;
+}
+
+/*
+    Collection of keys that identify a set of Entities.
+*/
+message EntityKeySet {
+
+    /*
+        UUIDs of Entities.
+
+        @optional
+    */
+    repeated ModelUUID uuids = 1;
+
+    /*
+        Names of Entities.
+
+        @optional
+    */
+    repeated string names = 2;
+}
+
+/*
+    Parameters to match Entities based on their types.
+*/
+message EntityTypeParams {
+
+    /*
+        Any Entity that has a type in this set will be included.
+
+        @optional
+    */
+    repeated string include_types = 2;
+
+    /*
+        If non-empty, an Entity must have all types in this set to be included.
+
+        @optional
+    */
+    repeated string match_types = 5;
+
+    /*
+        Entities that have a type in this set will be excluded.
+
+        @optional
+    */
+    repeated string filter_out_types = 6;
+}
+
+/*
+    Query parameters to select a set of Entities.
+
+    Including no search parameters will return all Entities in the system.
+
+    Uses paging to handle large result sets.
+*/
+message EntityQuery {
+
+    /*
+        Parameters to match Entities based on their types.
+
+        @optional
+        @nested
+    */
+    optional EntityTypeParams type_params = 1;
+
+    /*
+        Parameters to narrow the result sets for queries.
+
+        @optional
+        @nested
+    */
+    optional EntityPagingParams paging_params = 14;
+}
+
+/*
+    Subscription parameters for Entities. Entity notifications can be filtered by key.
+
+    - Including key parameters will return the current state of those Entities and subscribe to notifications for them.
+    - Including no parameters will subscribe to all Entity notifications, but return no immediate results.
+
+    __Note__: Entity notifications are filtered by UUID, not name. Using a name parameter resolves
+    the UUID of the Entity associated with that name at the time of the request, and is
+    equivalent to the client resolving the UUID before making the request. As a result, if the 
+    Entity a particular name refers to changes (due to a deletion/addition or two renames) notifications will be delivered
+    for only for the original Entity.
+
+*/
+message EntitySubscriptionQuery {
+
+    /*
+        UUIDs of Entities.
+
+        @optional
+    */
+    repeated ModelUUID uuids = 1;
+
+    /*
+        Names of Entities.
+
+        @optional
+    */
+    repeated string names = 2;
+}
+
+/*
+    Queries for a result set of Entities based on their relationship in the graph model to a "start" set. 
+    The start set can include multiple Entities, including those only specified by reference to their 
+    type, and the query can reach across derived edges to return Entities connected through transitive 
+    relationships. However, the service returns a flat result set, so the mapping between Entities in the result 
+    set and Entities in the start set is not preserved. To get information about the relationships between 
+    parents and children in the graph model, see *ModelService.edge_query*.
+
+    The query may be directed in either direction; from parents to children or vice versa.
+
+    The cost of the query does not increase with depth. 
+
+    Uses paging to handle large result sets. 
+
+*/
+message EntityRelationshipFlatQuery {
+
+    /*
+        Specifies UUIDs of Entities to include in the start set.
+
+        One or more of start_uuids, start_names, or start_types must be specified.
+
+        @optional
+    */
+    repeated ModelUUID start_uuids = 1;
+
+    /*
+        Specifies names of Entities to include in the start set.
+
+        One or more of start_uuids, start_names, or start_types must be specified.
+
+        @optional
+    */
+    repeated string start_names = 2;
+
+    /*
+        Entities having one or more of the specified types will be included in the start set. Note that Entities
+        with the same type may appear at different levels in the same hierachy, and so may also be in the 
+        result set.
+
+        Entities specified by UUID or name do not have to include these types; the start set is the union of 
+        the result of all three sets of parameters. 
+
+        One or more of start_uuids, start_names, or start_types must be specified.
+
+        @optional
+    */
+    repeated string start_types = 3;
+
+    /*
+        Relationship type between parents and children. 
+
+        @required
+    */
+    optional string relationship = 10;
+
+    /*
+        Specifies the direction of the query.
+
+        - If true, the Entities in the start set are the parents and the result set are the children.
+        - If false, the Entities in the start set are the children and the result set are the parents.
+
+        @required
+    */
+    optional bool descendant_of = 11;
+
+    /*
+        Narrows the result set of Entities to only those with one of the specified types.
+
+        - If types are specified, only Entities with one or more of the types in the list will be included in the result set.
+        - If no types are specified, all Entities will be included in the result set.
+
+        @optional
+    */
+    repeated string end_types = 12;
+
+    /*
+        Provides an optional limit to the depth of the query. Relationships in the graph are transitive, and
+        by default the query will return all Entities with immediate and derived edges for the given relationship.
+        Setting a depth limit will only return Entities at a distance up to and including that depth.
+
+        Example:
+
+        <pre><code>   
+            Entity tree: A -> B -> C -> D 
+            Start set: ( A )
+
+            No depth limit:     ( B, C, D )
+            Depth limit = 1:    ( B )
+            Depth limit = 2:    ( B, C )
+        </code></pre>
+
+        @optional
+    */
+    optional uint32 depth_limit = 13;
+
+    /*
+        Parameters to narrow the result sets for queries.
+
+        @optional
+        @nested
+    */
+    optional EntityPagingParams paging_params = 14;
+}
+
+/*
+    Queries for edges in the graph model. Can search according to parents, children, relationship types,
+    and depth.
+
+    Including no search parameters will return all edges in the graph model. Including only
+    `depth_limit = 1` will return all immediate edges, which is sufficient to reconstruct the model.
+
+    Enables querying for derived edges, but the intermediate path will not necessarily be included.
+
+    The cost of the query does not increase with depth.
+
+    Uses paging to handle large result sets.
+*/
+message EntityEdgeQuery {
+
+    /*
+        Filters results by parent UUIDs.
+
+        @optional
+    */
+    repeated ModelUUID parent_uuids = 1;
+
+    /*
+        Filters results by child UUIDs.
+
+        @optional
+    */
+    repeated ModelUUID child_uuids = 2;
+
+    /*
+        Filters results by relationships.
+
+        - If not specified, edges of any relationship will be returned.
+        - If specified, only edges with one of the listed relationships will be returned.
+
+        @optional
+    */
+    repeated string relationships = 3;
+
+    /*
+        Provides an optional limit to the depth of the query. By default, the query will return any and all
+        derived edges (`distance > 1`). Setting a depth limit will return only edges up to and including that
+        depth.
+
+        Example:
+
+        <pre><code>
+            Entity tree: A -> B -> C -> D
+            Parent: ( A )
+
+            No depth limit:     ( (A -> B), (A -> C), (A -> D) )
+            Depth limit = 1:    ( (A -> B) )
+            Depth limit = 2:    ( (A -> B), (A -> C) )
+        </code></pre>
+
+        Note that intermediate edges are not necessarily provided (unless they are otherwise part of the result set).
+        In other words, in the example above, `(B -> C)`, `(B -> D)`, and `(C -> D)` are all unstated. The same result
+        would hold in an alternate scenario where `C` and `D` were immediate children of `B`.
+
+        @optional
+    */
+    optional uint32 depth_limit = 4;
+
+    /*
+        Last ID (in the returned sorted order) of a previous result set. This result set will be the
+        page beginning from the next ID.
+
+        @optional
+    */
+    optional ModelID last_id = 21;
+
+    /*
+        The number of elements to return. Used to limit the size of result sets in large models. If not set,
+        a server-determined page size will be used.
+
+        If the size of the result set equals the page size, there may be more data available.
+
+        @optional
+    */
+    optional uint32 page_size = 22;
+}
+
+/*
+    Describes a filter for EntityEdges.
+
+    An EntityEdge that is added or removed must match all specified fields to be
+    included by this filter.
+*/
+message EntityEdgeFilter {
+
+    /*
+        Filter EntityEdges with this parent UUID.
+
+        @optional
+    */
+    optional ModelUUID parent_uuid = 1;
+
+    /*
+        Filter EntityEdges with this child UUID.
+
+        @optional
+    */
+    optional ModelUUID child_uuid = 2;
+
+    /*
+        Filter EntityEdges with this relationship.
+
+        @optional
+    */
+    optional string relationship = 3;
+
+    /*
+        Filter EntityEdges at this distance.
+
+        Most likely to be useful for filtering for immediate edges, or `distance = 1`.
+
+        @optional
+    */
+    optional uint32 distance = 4;
+}
+
+/*
+    Query for subscribing to notifications for a set of EntityEdges.
+
+    Including no parameters will subscribe to all EntityEdge notifications.
+*/
+message EntityEdgeSubscriptionQuery {
+
+    /*
+        A set of filters for EntityEdges for which to be notified of changes.
+
+        Notifications will be sent if an EntityEdge that is added or removed matches one or
+        more of these filters.
+
+        @optional
+        @nested
+    */
+    repeated EntityEdgeFilter filters = 2;
+}
+
+/*
+    Describes an immediate edge in the graph model. All immediate edges are unique for the combined values of these
+    fields.
+*/
+message EntityEdgeDescriptor {
+
+    /*
+        UUID of parent Entity for this edge.
+
+        @required
+    */
+    optional ModelUUID parent_uuid = 1;
+
+    /*
+        UUID of child Entity for this edge.
+
+        @required
+    */
+    optional ModelUUID child_uuid = 2;
+
+    /*
+        Relationship type for this edge.
+
+        @required
+    */
+    optional string relationship = 3;
+}
+
+
+/*
+    Description used to create or modify a Point.
+*/
+message PointTemplate {
+
+    /*
+        Description of the Entity information for this Point.
+
+        @required
+        @nested
+    */
+    optional EntityTemplate entity_template = 1;
+
+    /*
+        Specifies a high-level category for the data of Measurements associated with this Point.
+
+        @required
+    */
+    optional PointCategory point_category = 5;
+
+    /*
+        Specifies the unit of Measurements associated with this Point.
+
+        @required
+    */
+    optional string unit = 6;
+}
+
+/*
+    Query parameters to select a set of Points.
+
+    Points can be matched by their Entity types or Point-specific fields.
+    Including no search parameters will return all Points in the system.
+
+    Uses paging to handle large result sets.
+*/
+message PointQuery {
+
+    /*
+        Parameters to match Points based on their Entity types.
+
+        @optional
+        @nested
+    */
+    optional EntityTypeParams type_params = 1;
+
+    /*
+        Parameters to match Points based on PointCategory. Points with one of any of the specified PointCategories will be matched.
+
+        @optional
+    */
+    repeated PointCategory point_categories = 5;
+
+    /*
+        Parameters to match Points based on unit. Points with one of any of the specified units will be matched.
+
+        @optional
+    */
+    repeated string units = 6;
+
+    /*
+        Parameters to narrow the result sets for queries.
+
+        @optional
+        @nested
+    */
+    optional EntityPagingParams paging_params = 14;
+}
+
+
+/*
+    Subscription parameters for Points. Notifications can be filtered by key or by Endpoint associations.
+
+    - Including key parameters (and no Endpoint UUIDs) will return the current state of those Points
+        and subscribe to notifications for them.
+    - Including Endpoint UUIDs will subscribe to notifications for Points associated with those Endpoints,
+        but return no immediate results.
+    - Including no parameters will subscribe to notifications for all Points, but return no immediate results.
+
+    __Note__: Point notifications are filtered by UUID, not name. Using a name parameter resolves
+    the UUID of the Point associated with that name at the time of the request, and is
+    equivalent to the client resolving the UUID before making the request. As a result, if the
+    Point a particular name refers to changes (due to a deletion/addition or two renames) notifications will be delivered
+    for only for the original Point.
+
+    Endpoint UUIDs are _not_ resolved to a set of Points at request time, and updates in the system model to associations between Points
+    and Endpoints will affect what notifications are delivered to the subscription.
+*/
+message PointSubscriptionQuery {
+
+    /*
+        UUIDs of Points to subscribe to notifications for.
+
+        @optional
+    */
+    repeated ModelUUID uuids = 1;
+
+    /*
+        Names of Points to subscribe to notifications for.
+
+        @optional
+    */
+    repeated string names = 2;
+
+    /*
+        UUIDs of Endpoints whose associated Points should be subscribed to notifications for.
+
+        @optional
+    */
+    repeated ModelUUID endpoint_uuids = 3;
+}
+
+/*
+    Description used to create or modify a Command.
+*/
+message CommandTemplate {
+
+    /*
+        Description of the Entity information for this Command.
+
+        @required
+        @nested
+    */
+    optional EntityTemplate entity_template = 1;
+
+    /*
+        Specifies an explicative name that does not need to be globally unique.
+
+        @required
+    */
+    optional string display_name = 3;
+
+    /*
+        Specifies whether CommandRequests associated with a Command contain a value, and what data type the value is.
+
+        @required
+    */
+    optional CommandCategory category = 7;
+}
+
+/*
+    Query parameters to select a set of Commands.
+
+    Commands can be matched by their Entity types or Command-specific fields.
+    Including no search parameters will return all Commands in the system.
+
+    Uses paging to handle large result sets.
+*/
+message CommandQuery {
+
+    /*
+        Parameters to match Commands based on their Entity types.
+
+        @optional
+        @nested
+    */
+    optional EntityTypeParams type_params = 1;
+
+    /*
+        Parameters to match Commands based on CommandCategory. Commands with one of any of the specified CommandCategorys will be matched.
+
+        @optional
+    */
+    repeated CommandCategory command_categories = 5;
+
+    /*
+        Parameters to narrow the result sets for queries.
+
+        @optional
+        @nested
+    */
+    optional EntityPagingParams paging_params = 14;
+}
+
+/*
+    Subscription parameters for Commands. Notifications can be filtered by key or by Endpoint associations.
+
+    - Including key parameters (and no Endpoint UUIDs) will return the current state of those Commands
+        and subscribe to notifications for them.
+    - Including Endpoint UUIDs will subscribe to notifications for Commands associated with those Endpoints,
+        but return no immediate results.
+    - Including no parameters will subscribe to notifications for all Commands, but return no immediate results.
+
+    __Note__: Command notifications are filtered by UUID, not name. Using a name parameter resolves
+    the UUID of the Command associated with that name at the time of the request, and is
+    equivalent to the client resolving the UUID before making the request. As a result, if the
+    Command a particular name refers to changes (due to a deletion/addition or two renames) notifications will be delivered
+    for only for the original Command.
+
+    Endpoint UUIDs are _not_ resolved to a set of Commands at request time, and updates in the system model to associations between Commands
+    and Endpoints will affect what notifications are delivered to the subscription.
+*/
+message CommandSubscriptionQuery {
+
+    /*
+        UUIDs of Commands to subscribe to notifications for.
+
+        @optional
+    */
+    repeated ModelUUID uuids = 1;
+
+    /*
+        Names of Commands to subscribe to notifications for.
+
+        @optional
+    */
+    repeated string names = 2;
+
+    /*
+        UUIDs of Endpoints whose associated Commands should be subscribed to notifications for.
+
+        @optional
+    */
+    repeated ModelUUID endpoint_uuids = 3;
+}
+
+/*
+    Description used to create or modify an Endpoint.
+*/
+message EndpointTemplate {
+
+    /*
+        Description of the Entity information for this Endpoint.
+
+        @required
+        @nested
+    */
+    optional EntityTemplate entity_template = 1;
+
+    /*
+        Identifies the type of front-end that is intended to service the Points and Commands
+        associated with this Endpoint.
+
+        @required
+    */
+    optional string protocol = 3;
+
+    /*
+        Specifies whether an Endpoint has been disabled, so that Measurements will not be published and Commands
+        will not be processed for it.
+
+        The default value for new Endpoints is `false`. If not specified, modifications to existing Endpoints will not change the
+        disabled value.
+
+        @optional
+    */
+    optional bool disabled = 4;
+}
+
+/*
+    Query parameters to select a set of Endpoints.
+
+    Endpoints can be matched by their Entity types or Endpoint-specific fields.
+    Including no search parameters will return all Endpoints in the system.
+
+    Uses paging to handle large result sets.
+*/
+message EndpointQuery {
+
+    /*
+        Parameters to match Endpoints based on their Entity types.
+
+        @optional
+        @nested
+    */
+    optional EntityTypeParams type_params = 1;
+
+    /*
+        Parameters to match Endpoints based on protocol. Endpoints with one of any of the specified protocols will be matched.
+
+        @optional
+    */
+    repeated string protocols = 4;
+
+    /*
+        Parameter to filter Endpoints by the state of their `disabled` field. If set to `true`, only matches Endpoints marked as disabled.
+        If set to `false`, only matches Endpoints not marked as disabled.
+
+        @optional
+    */
+    optional bool   disabled = 5;
+
+    /*
+        Parameters to narrow the result sets for queries.
+
+        @optional
+        @nested
+    */
+    optional EntityPagingParams paging_params = 14;
+}
+
+/*
+    Subscription parameters for Endpoints. Notifications can be filtered by key or by protocol.
+
+    - Including key parameters  will return the current state of those Endpoints
+        and subscribe to notifications for them.
+    - Including protocol parameters will subscribe to notifications for Endpoints associated with those Endpoints,
+        but return no immediate results.
+    - Including no parameters will subscribe to notifications for all Endpoints, but return no immediate results.
+
+    __Note__: Endpoint notifications are filtered by UUID, not name. Using a name parameter resolves
+    the UUID of the Endpoint associated with that name at the time of the request, and is
+    equivalent to the client resolving the UUID before making the request. As a result, if the
+    Endpoint a particular name refers to changes (due to a deletion/addition or two renames) notifications will be delivered
+    for only for the original Endpoint.
+*/
+message EndpointSubscriptionQuery {
+
+    /*
+        UUIDs of Endpoints to subscribe to notifications for.
+
+        @optional
+    */
+    repeated ModelUUID uuids = 1;
+
+    /*
+        Names of Endpoints to subscribe to notifications for.
+
+        @optional
+    */
+    repeated string names = 2;
+
+    /*
+        Parameters for subscribing to notifications by Endpoints' protocols.
+
+        @optional
+    */
+    repeated string protocols = 3;
+}
+
+/*
+    Represents a modification to an Endpoint's enabled/disabled state.
+*/
+message EndpointDisabledUpdate {
+
+    /*
+        UUID of the Endpoint to be modified.
+
+        @required
+    */
+    optional ModelUUID endpoint_uuid = 1;
+
+    /*
+        Whether the Endpoint's state should be disabled or not.
+
+        - If `true`, the Endpoint will be disabled.
+        - If `false`, the Endpoint will be enabled.
+
+        @required
+    */
+    optional bool disabled = 2;
+}
+
+/*
+    Represents the identify of an EntityKeyValue, the combination of the model object's UUID and the key.
+*/
+message EntityKeyPair {
+
+    /*
+        UUID of the model object the key-value is associated with.
+
+        @required
+    */
+    optional ModelUUID uuid = 1;
+
+    /*
+        Key string for the key-value.
+
+        @required
+    */
+    optional string key = 2;
+}
+
+/*
+    Subscription parameters for Endpoints. Notifications can be filtered by UUIDs, UUID/key pairs, or the UUIDs of the Endpoints associated
+    with the model objects.
+*/
+message EntityKeyValueSubscriptionQuery {
+
+    /*
+        UUIDs of EntityKeyValues to subscribe to notifications for.
+
+        @optional
+    */
+    repeated ModelUUID uuids = 1;
+
+    /*
+        UUID and key combinations to subscribe to notifications for.
+
+        @optional
+    */
+    repeated EntityKeyPair key_pairs = 2;
+
+    /*
+        UUIDs of Endpoints whose associated EntityKeyValues should be subscribed to notifications for.
+
+        @optional
+    */
+    repeated ModelUUID endpoint_uuids = 3;
+}
+
+message GetEntitiesRequest {
+    optional EntityKeySet request = 1;
+}
+message GetEntitiesResponse {
+    repeated Entity results = 1;
+}
+message EntityQueryRequest {
+    optional EntityQuery query = 1;
+}
+message EntityQueryResponse {
+    repeated Entity results = 1;
+}
+
+message SubscribeEntitiesRequest {
+    optional EntitySubscriptionQuery query = 1;
+}
+message SubscribeEntitiesResponse {
+    repeated Entity results = 1;
+}
+
+
+message EntityRelationshipFlatQueryRequest {
+    optional EntityRelationshipFlatQuery query = 1;
+}
+message EntityRelationshipFlatQueryResponse {
+    repeated Entity results = 1;
+}
+
+message PutEntitiesRequest {
+    repeated EntityTemplate entities = 1;
+}
+message PutEntitiesResponse {
+    repeated Entity results = 1;
+}
+message DeleteEntitiesRequest {
+    repeated ModelUUID entity_uuids = 1;
+}
+message DeleteEntitiesResponse {
+    repeated Entity results = 1;
+}
+
+
+message GetEntityKeyValuesRequest {
+    repeated EntityKeyPair request = 1;
+}
+message GetEntityKeyValuesResponse {
+    repeated EntityKeyValue results = 1;
+}
+
+message GetKeysForEntitiesRequest {
+    repeated ModelUUID request = 1;
+}
+message GetKeysForEntitiesResponse {
+    repeated EntityKeyPair results = 1;
+}
+
+message PutEntityKeyValuesRequest {
+    repeated EntityKeyValue key_values = 1;
+}
+message PutEntityKeyValuesResponse {
+    repeated EntityKeyValue results = 1;
+}
+
+message DeleteEntityKeyValuesRequest {
+    repeated EntityKeyPair request = 1;
+}
+message DeleteEntityKeyValuesResponse {
+    repeated EntityKeyValue results = 1;
+}
+
+message SubscribeEntityKeyValuesRequest {
+    optional EntityKeyValueSubscriptionQuery query = 1;
+}
+message SubscribeEntityKeyValuesResponse {
+    repeated EntityKeyValue results = 1;
+}
+
+message EntityEdgeQueryRequest {
+    optional EntityEdgeQuery query = 1;
+}
+message EntityEdgeQueryResponse {
+    repeated EntityEdge results = 1;
+}
+
+message PutEntityEdgesRequest {
+    repeated EntityEdgeDescriptor descriptors = 1;
+}
+message PutEntityEdgesResponse {
+    repeated EntityEdge results = 1;
+}
+message DeleteEntityEdgesRequest {
+    repeated EntityEdgeDescriptor descriptors = 1;
+}
+message DeleteEntityEdgesResponse {
+    repeated EntityEdge results = 1;
+}
+message SubscribeEntityEdgesRequest {
+    optional EntityEdgeSubscriptionQuery query = 1;
+}
+message SubscribeEntityEdgesResponse {
+    repeated EntityEdge results = 1;
+}
+
+message GetPointsRequest {
+    optional EntityKeySet request = 1;
+}
+message GetPointsResponse {
+    repeated Point results = 1;
+}
+message PointQueryRequest {
+    optional PointQuery request = 1;
+}
+message PointQueryResponse {
+    repeated Point results = 1;
+}
+message PutPointsRequest {
+    repeated PointTemplate templates = 1;
+}
+message PutPointsResponse {
+    repeated Point results = 1;
+}
+message DeletePointsRequest {
+    repeated ModelUUID point_uuids = 1;
+}
+message DeletePointsResponse {
+    repeated Point results = 1;
+}
+message SubscribePointsRequest {
+    optional PointSubscriptionQuery request = 1;
+}
+message SubscribePointsResponse {
+    repeated Point results = 1;
+}
+
+message GetCommandsRequest {
+    optional EntityKeySet request = 1;
+}
+message GetCommandsResponse {
+    repeated Command results = 1;
+}
+message CommandQueryRequest {
+    optional CommandQuery request = 1;
+}
+message CommandQueryResponse {
+    repeated Command results = 1;
+}
+message PutCommandsRequest {
+    repeated CommandTemplate templates = 1;
+}
+message PutCommandsResponse {
+    repeated Command results = 1;
+}
+message DeleteCommandsRequest {
+    repeated ModelUUID command_uuids = 1;
+}
+message DeleteCommandsResponse {
+    repeated Command results = 1;
+}
+message SubscribeCommandsRequest {
+    optional CommandSubscriptionQuery request = 1;
+}
+message SubscribeCommandsResponse {
+    repeated Command results = 1;
+}
+
+message GetEndpointsRequest {
+    optional EntityKeySet request = 1;
+}
+message GetEndpointsResponse {
+    repeated Endpoint results = 1;
+}
+message EndpointQueryRequest {
+    optional EndpointQuery request = 1;
+}
+message EndpointQueryResponse {
+    repeated Endpoint results = 1;
+}
+message PutEndpointsRequest {
+    repeated EndpointTemplate templates = 1;
+}
+message PutEndpointsResponse {
+    repeated Endpoint results = 1;
+}
+message DeleteEndpointsRequest {
+    repeated ModelUUID endpoint_uuids = 1;
+}
+message DeleteEndpointsResponse {
+    repeated Endpoint results = 1;
+}
+message SubscribeEndpointsRequest {
+    optional EndpointSubscriptionQuery request = 1;
+}
+message SubscribeEndpointsResponse {
+    repeated Endpoint results = 1;
+}
+message PutEndpointDisabledRequest {
+    repeated EndpointDisabledUpdate updates = 1;
+}
+message PutEndpointDisabledResponse {
+    repeated Endpoint results = 1;
+}
+
+/*
+
+
+*/
+service ModelService {
+    option (scala_package) = "io.greenbus.client.service";
+    option (java_package) = "io.greenbus.japi.client.service";
+
+    /*
+        Returns a set of Entities identified specifically by UUID or name.
+    */
+    rpc get(GetEntitiesRequest) returns (GetEntitiesResponse);
+
+    /*
+        Returns all Entities or those matching query parameters. Uses paging to
+        handle large result sets.
+    */
+    rpc entity_query(EntityQueryRequest) returns (EntityQueryResponse);
+
+    /*
+        Subscribes to Entity notifications, and returns the current state of the Entities.
+    */
+    rpc subscribe(SubscribeEntitiesRequest) returns (SubscribeEntitiesResponse) {
+        option (subscription_type) = "greenbus.client.EntityNotification";
+    }
+
+    /*
+        Uses the graph model to return a set of Entities specified by their relationships.
+    */
+    rpc relationship_flat_query(EntityRelationshipFlatQueryRequest) returns (EntityRelationshipFlatQueryResponse);
+
+    /*
+        Creates or modifies a set of Entities. 
+
+        May not be used to modify Entities that have a more specific service type (Agent, Point, etc.). See the associated
+        service for those types.
+    */
+    rpc put(PutEntitiesRequest) returns (PutEntitiesResponse);
+
+    /*
+        Deletes a set of Entities specified by UUID. Returns the final state of the deleted Entities.
+    */
+    rpc delete(DeleteEntitiesRequest) returns (DeleteEntitiesResponse);
+
+    /*
+        Returns a set of EntityEdges that represents some subset of the graph model.
+    */
+    rpc edge_query(EntityEdgeQueryRequest) returns (EntityEdgeQueryResponse);
+
+    /*
+        Creates a set of EntityEdges. EntityEdges are value types and cannot be modified, only deleted.
+        Putting already existing EntityEdges will succeed with no effect.
+
+        Only immediate edges (`distance = 1`) can be added by clients. Derived edges are maintained
+        automatically.
+    */
+    rpc put_edges(PutEntityEdgesRequest) returns (PutEntityEdgesResponse);
+
+    /*
+        Deletes a set of EntityEdges.
+
+        Only immediate edges (`distance = 1`) can be removed by clients. Derived edges are removed
+        automatically.
+    */
+    rpc delete_edges(DeleteEntityEdgesRequest) returns (DeleteEntityEdgesResponse);
+
+    /*
+        Subscribes to notifications for a set of EntityEdges.
+
+        Because the result set cannot be constrained, no current values of EntityEdges are returned.
+    */
+    rpc subscribe_to_edges(SubscribeEntityEdgesRequest) returns (SubscribeEntityEdgesResponse) {
+        option (subscription_type) = "greenbus.client.EntityEdgeNotification";
+    }
+
+
+    /*
+        Returns a set of Points identified specifically by UUID or name.
+    */
+    rpc get_points(GetPointsRequest) returns (GetPointsResponse);
+
+    /*
+        Returns all Points or those matching query parameters. Uses paging to
+        handle large result sets.
+    */
+    rpc point_query(PointQueryRequest) returns (PointQueryResponse);
+
+    /*
+        Creates or modifies a set of Points.
+    */
+    rpc put_points(PutPointsRequest) returns (PutPointsResponse);
+
+    /*
+        Deletes a set of Points identified by UUID. Returns the final state of the deleted Points.
+    */
+    rpc delete_points(DeletePointsRequest) returns (DeletePointsResponse);
+
+    /*
+        Subscribes to Point notifications, and returns the current state of the Points.
+    */
+    rpc subscribe_to_points(SubscribePointsRequest) returns (SubscribePointsResponse) {
+        option (subscription_type) = "greenbus.client.PointNotification";
+    }
+
+
+    /*
+        Returns a set of Commands identified specifically by UUID or name.
+    */
+    rpc get_commands(GetCommandsRequest) returns (GetCommandsResponse);
+
+    /*
+        Returns all Commands or those matching query parameters. Uses paging to
+        handle large result sets.
+    */
+    rpc command_query(CommandQueryRequest) returns (CommandQueryResponse);
+
+    /*
+        Creates or modifies a set of Commands.
+    */
+    rpc put_commands(PutCommandsRequest) returns (PutCommandsResponse);
+
+    /*
+        Deletes a set of Commands identified by UUID. Returns the final state of the deleted Commands.
+    */
+    rpc delete_commands(DeleteCommandsRequest) returns (DeleteCommandsResponse);
+
+    /*
+        Subscribes to Command notifications, and returns the current state of the Commands.
+    */
+    rpc subscribe_to_commands(SubscribeCommandsRequest) returns (SubscribeCommandsResponse) {
+        option (subscription_type) = "greenbus.client.CommandNotification";
+    }
+
+
+    /*
+        Returns a set of Endpoints identified specifically by UUID or name.
+    */
+    rpc get_endpoints(GetEndpointsRequest) returns (GetEndpointsResponse);
+
+    /*
+        Returns all Endpoints or those matching query parameters. Uses paging to
+        handle large result sets.
+    */
+    rpc endpoint_query(EndpointQueryRequest) returns (EndpointQueryResponse);
+
+    /*
+        Creates or modifies a set of Endpoints.
+    */
+    rpc put_endpoints(PutEndpointsRequest) returns (PutEndpointsResponse);
+
+    /*
+        Deletes a set of Endpoints identified by UUID. Returns the final state of the deleted Endpoints.
+    */
+    rpc delete_endpoints(DeleteEndpointsRequest) returns (DeleteEndpointsResponse);
+
+    /*
+        Subscribes to Endpoint notifications, and returns the current state of the Endpoints.
+    */
+    rpc subscribe_to_endpoints(SubscribeEndpointsRequest) returns (SubscribeEndpointsResponse) {
+        option (subscription_type) = "greenbus.client.EndpointNotification";
+    }
+
+    /*
+        Sets whether a set of Endpoints are enabled or disabled.
+    */
+    rpc put_endpoint_disabled(PutEndpointDisabledRequest) returns (PutEndpointDisabledResponse);
+
+    /*
+        Returns a set of Entity key values identified by UUID and key.
+    */
+    rpc get_entity_key_values(GetEntityKeyValuesRequest) returns (GetEntityKeyValuesResponse);
+
+    /*
+        Returns a set of Entity keys associated with the specified UUIDs.
+    */
+    rpc get_entity_keys(GetKeysForEntitiesRequest) returns (GetKeysForEntitiesResponse);
+
+    /*
+        Creates or modifies a set of Entity key values.
+    */
+    rpc put_entity_key_values(PutEntityKeyValuesRequest) returns (PutEntityKeyValuesResponse);
+
+    /*
+        Deletes a set of Entity key values identified by UUID and key. Returns the final state of the deleted values.
+    */
+    rpc delete_entity_key_values(DeleteEntityKeyValuesRequest) returns (DeleteEntityKeyValuesResponse);
+
+    /*
+        Subscribes to Entity key value notifications, and returns the current state of the Entity key values.
+    */
+    rpc subscribe_to_entity_key_values(SubscribeEntityKeyValuesRequest) returns (SubscribeEntityKeyValuesResponse) {
+        option (subscription_type) = "greenbus.client.EntityKeyValueNotification";
+    }
+
+}

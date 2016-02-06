@@ -1,0 +1,436 @@
+/**
+ * Copyright 2011-2016 Green Energy Corp.
+ *
+ * Licensed to Green Energy Corp (www.greenenergycorp.com) under one or more
+ * contributor license agreements. See the NOTICE file distributed with this
+ * work for additional information regarding copyright ownership. Green Energy
+ * Corp licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+package greenbus.client;
+
+option java_package = "io.greenbus.client.service.proto";
+option java_outer_classname = "Model";
+
+import "ServiceEnvelopes.proto";
+
+/*
+    Represents the universally unique identifier for a modeled service object. UUIDs
+    are intended to be unique across all model objects in the system regardless of type
+    (Point, Endpoint, etc.) and barring the importing of pre-existing UUID values, will
+    be unique across multiple systems as well.
+
+    @simple
+*/
+message ModelUUID {
+    required string value = 1; // Opaque value, should not be interpreted by the client.
+}
+
+/*
+    Used to identify individual records for service objects not part of the model (i.e.
+    Events). Not unique across different types of service objects.
+    
+    @simple
+*/
+message ModelID {
+    required string value = 1; // Opaque value, should not be interpreted by the client.
+}
+
+/*
+    Represents a component of the system model.
+
+    Entities fall into two categories: those that are user-defined, and those with more
+    specific built-in representations (i.e. Points, Commands, Endpoints). Built-in Entities
+    are viewable using Entity queries but must be modified through their specific service interfaces.
+    User-defined Entities can be used to provide structure to the otherwise flat list of inputs
+    and outputs (Points and Commands) in the telemetry model.
+
+    The meaning of an Entity can be defined by its name, a list of types that
+    categorize it, or its relationships to other Entities and modeled objects in
+    the system model graph.
+*/
+message Entity {
+
+    /*
+        Unique identifier across all Entities.
+    */
+    optional ModelUUID uuid = 1;
+
+    /*
+        Unique name across all Entities.
+    */
+    optional string name = 2;
+
+    /*
+        Set of types to provide semantic meaning for role of Entity.
+    */
+    repeated string types = 3;
+}
+
+/*
+    Represents a directed edge between Entities. Together, Entities and edges form a graph
+    data structure with the following constraints:
+
+    - There are no cycles (following parent to child edges will never arrive back at a previous parent).
+    - There is only one path between any two nodes (there are no "diamonds").
+
+    Note that unlike simple trees, Entities may have multiple parents, as long as those parents do not
+    have a common ancestor.
+
+    Edges are additionally partitioned by relationship type. Edges of different relationships have no
+    effect on each other and thus are entirely separate graphs/trees, but exist potentially on the same
+    set of nodes (Entities). The name of the relationship is used to provide semantic meaning for
+    these structures.
+
+    To enable querying for children of children without multiple queries, derived edges (`distance > 1`)
+    are stored with immediate edges (`distance = 1`). Service requests only interact (put, delete)
+    immediate edges; derived edges are maintained by the system.
+*/
+message EntityEdge {
+
+    /*
+        ID for this edge, for quick identification.
+    */
+    optional ModelID id = 1;
+
+    /*
+        Parent Entity UUID.
+    */
+    optional ModelUUID parent = 2;
+
+    /*
+        Child Entity UUID.
+    */
+    optional ModelUUID child = 3;
+
+    /*
+        Specific relationship structure this edge is a part of.
+    */
+    optional string relationship = 4;
+
+    /*
+        Entities this edge spans; immediate edges have `distance = 1`.
+    */
+    optional uint32 distance = 5;
+}
+
+/*
+    Enumerates how the value of Measurements associated with a Point should be interpreted.
+*/
+enum PointCategory {
+    ANALOG         = 1; // Point is a scalar value.
+    COUNTER        = 2; // Point is an integer value representing an accumulation.
+    STATUS         = 3; // Point is one of an enumeration of defined value states (e.g. a boolean value).
+}
+
+/*
+    Enumerates whether CommandRequests associated with a Command contain a value, and what data type the value is.
+
+    Commands without values are referred to as _controls_ and Commands with values are referred to as _setpoints_.
+*/
+enum CommandCategory {
+    CONTROL         = 1;    // CommandRequests contain no values.
+    SETPOINT_INT    = 2;    // CommandRequests contain an integer value.
+    SETPOINT_DOUBLE = 3;    // CommandRequests contain a double floating-point value.
+    SETPOINT_STRING = 4;    // CommandRequests contain a string value.
+}
+
+/*
+    Represents a data input for the system.
+*/
+message Point {
+
+    /*
+        Unique identifier across all Entities.
+    */
+    optional ModelUUID uuid = 1;
+
+    /*
+        Unique name across all Entities.
+    */
+    optional string  name = 2;
+
+    /*
+        Set of types to provide semantic meaning for role of a Point.
+    */
+    repeated string types = 3;
+
+    /*
+        A high-level category for the data of Measurements associated with this Point
+    */
+    optional PointCategory point_category = 4;
+
+    /*
+        The unit of Measurements associated with this Point.
+    */
+    optional string unit = 5;
+
+    /*
+        Endpoint this Point is associated with.
+
+        @optional
+    */
+    optional ModelUUID endpoint_uuid = 10;
+}
+
+/*
+    Represents a registered control or output for the system.
+*/
+message Command {
+
+    /*
+        Unique identifier across all Entities.
+    */
+    optional ModelUUID uuid = 1;
+
+    /*
+        Unique name across all Entities.
+    */
+    optional string  name = 2;
+
+    /*
+        Set of types to provide semantic meaning for role of a Command.
+    */
+    repeated string types = 3;
+
+    /*
+        An explicative name that does not need to be globally unique.
+    */
+    optional string display_name = 5;
+
+    /*
+        Specifies whether CommandRequests associated with a Command contain a value, and what data type the value is.
+    */
+    optional CommandCategory command_category = 7;
+
+    /*
+        Endpoint this Command is associated with.
+
+        @optional
+    */
+    optional ModelUUID endpoint_uuid = 10;
+}
+
+/*
+    Represents a source of Commands and Points. Endpoints divide the input and output of the system into
+    groups by front-end type (`protocol`) and ultimate source.
+*/
+message Endpoint {
+
+    /*
+        Unique identifier across all Entities.
+    */
+    optional ModelUUID uuid = 1;
+
+    /*
+        Unique name across all Entities.
+    */
+    optional string name = 2;
+
+    /*
+        Set of types to provide semantic meaning for role of an Endpoint.
+    */
+    repeated string types = 3;
+
+    /*
+        Identifies the type of front-end (the _protocol_) that is intended to service the Points and Commands
+        associated with this Endpoint.
+    */
+    optional string protocol = 5;
+
+    /*
+        Specifies whether an Endpoint has been disabled, so that Measurements will not be published and Commands
+        will not be processed for it.
+    */
+    optional bool   disabled = 6;
+}
+
+/*
+    Holds a value of some specified type. Only one of the value types should be present.
+*/
+message StoredValue {
+
+    /*
+        Boolean value.
+
+        @optional
+    */
+    optional bool bool_value = 5;
+
+    /*
+        32-bit signed integer value.
+
+        @optional
+    */
+    optional int32 int32_value = 6;
+
+    /*
+        64-bit signed integer value.
+
+        @optional
+    */
+    optional int64 int64_value = 7;
+
+    /*
+        32-bit unsigned integer value.
+
+        @optional
+    */
+    optional uint32 uint32_value = 8;
+
+    /*
+        64-bit unsigned integer value.
+
+        @optional
+    */
+    optional uint64 uint64_value = 9;
+
+    /*
+        64-bit floating point value.
+
+        @optional
+    */
+    optional double double_value = 10;
+
+    /*
+        String value.
+
+        @optional
+    */
+    optional string string_value = 11;
+
+    /*
+        Byte array value.
+
+        @optional
+    */
+    optional bytes byte_array_value = 12;
+}
+
+/*
+    Represents a key-value pair associated with a model object's UUID. Each combination of UUIDs
+    and keys are unique.
+*/
+message EntityKeyValue {
+
+    /*
+        UUID of the model object the key-value is associated with.
+    */
+    optional ModelUUID uuid = 1;
+
+    /*
+        Key string for the key-value.
+    */
+    optional string key = 2;
+
+    /*
+        Holds value for the key-value, may be one of several data types.
+    */
+    optional StoredValue value = 3;
+}
+
+/*
+    Notification of a change to an EntityKeyValue.
+*/
+message EntityKeyValueNotification {
+
+    /*
+        Whether object was added, removed, or modified.
+    */
+    optional greenbus.client.envelope.SubscriptionEventType event_type = 1;
+
+    /*
+        Updated state of the object.
+    */
+    optional EntityKeyValue value= 3;
+}
+
+
+/*
+    Notification of a change to an Entity.
+*/
+message EntityNotification {
+
+    /*
+        Whether object was added, removed, or modified.
+    */
+    optional greenbus.client.envelope.SubscriptionEventType event_type = 1;
+
+    /*
+        Updated state of the object.
+    */
+    optional Entity value = 2;
+}
+
+/*
+    Notification of a change to an EntityEdge.
+*/
+message EntityEdgeNotification {
+
+    /*
+        Whether object was added, removed, or modified.
+    */
+    optional greenbus.client.envelope.SubscriptionEventType event_type = 1;
+
+    /*
+        Updated state of the object.
+    */
+    optional EntityEdge value = 2;
+}
+
+/*
+    Notification of a change to an Endpoint.
+*/
+message EndpointNotification {
+
+    /*
+        Whether object was added, removed, or modified.
+    */
+    optional greenbus.client.envelope.SubscriptionEventType event_type = 1;
+
+    /*
+        Updated state of the object.
+    */
+    optional Endpoint value = 2;
+}
+
+/*
+    Notification of a change to a Point.
+*/
+message PointNotification {
+
+    /*
+        Whether object was added, removed, or modified.
+    */
+    optional greenbus.client.envelope.SubscriptionEventType event_type = 1;
+
+    /*
+        Updated state of the object.
+    */
+    optional Point value = 2;
+}
+
+/*
+    Notification of a change to a Command.
+*/
+message CommandNotification {
+
+    /*
+        Whether object was added, removed, or modified.
+    */
+    optional greenbus.client.envelope.SubscriptionEventType event_type = 1;
+
+    /*
+        Updated state of the object.
+    */
+    optional Command value = 2;
+}

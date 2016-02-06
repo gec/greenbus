@@ -1,0 +1,461 @@
+/**
+ * Copyright 2011-2016 Green Energy Corp.
+ *
+ * Licensed to Green Energy Corp (www.greenenergycorp.com) under one or more
+ * contributor license agreements. See the NOTICE file distributed with this
+ * work for additional information regarding copyright ownership. Green Energy
+ * Corp licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+package greenbus.client;
+
+option java_package = "io.greenbus.client.service.proto";
+option java_outer_classname = "Processing";
+
+import "ServiceEnvelopes.proto";
+import "Model.proto";
+import "Measurements.proto";
+
+
+/*
+    Provide the ability to block new Measurements from being published, and to optionally
+    replace the latest value provided by a front end with a user-specified override value. Blocked (not in service)
+    Measurements will not be stored in the current value and historian databases, and will not be published to the
+    Measurement notification stream.
+*/
+message MeasOverride {
+
+    /*
+        UUID for the Point to be overridden.
+
+        @required
+    */
+    optional ModelUUID point_uuid = 1;
+
+    /*
+        If provided, will appear as the latest Measurement value for the point.
+
+        @optional
+    */
+    optional Measurement measurement = 2;
+
+    /*
+        If a Measurement is present, specifies that the replacement value should be
+        processed as if it were a communications value.
+
+        Does nothing if a Measurement value is not provided.
+
+        @optional
+    */
+    optional bool test_value = 3;
+}
+
+/*
+    Describes both the current and previous value of a condition necessary to take some action.
+*/
+enum ActivationType {
+    HIGH       = 1; // Activated whenever the condition `true`.
+    LOW        = 2; // Activated whenever the condition is `false`.
+    RISING     = 3; // Activated whenever the condition is `true` _and_ the previous state of the condition was `false`.
+    FALLING    = 4; // Activated whenever the condition is `false` _and_ the previous state of the condition was `true`.
+    TRANSITION = 5; // Activated whenever the latest condition value does not match the previous state of the condition.
+}
+
+/*
+    Describes a transformation of the Measurement, or an Event to be generated.
+
+    An Action is only taken when the current value of the Trigger condition and the previous value match the ActivationType.
+
+    One of the action types must be specified.
+*/
+message Action {
+
+    /*
+        Name of the action, for logging purposes.
+
+        @required
+    */
+    optional string action_name = 1;
+
+    /*
+        Describes under what conditions (current and previous) the action is to be taken.
+
+        @required
+    */
+    optional ActivationType type = 2;
+
+    /*
+        Specifies whether the Action is temporarily disabled.
+
+        @optional
+    */
+    optional bool disabled = 3;
+
+    /*
+        Type of action that prevents the Measurement from being stored or published.
+
+        @optional
+    */
+    optional bool                                     suppress = 5;
+
+    /*
+        Type of action that performs a linear transformation on the analog value of the Measurement.
+
+        @optional
+    */
+    optional LinearTransform                          linear_transform = 10;
+
+    /*
+        Type of action that gives the Measurement the specified Quality.
+
+        @optional
+    */
+    optional Quality                                  quality_annotation = 11;
+
+    /*
+        Type of action that strips the value of the Measurement before it is stored/published.
+
+        @optional
+    */
+    optional bool                                     strip_value = 12;
+
+    /*
+        Type of action that sets the Measurement value to the specified boolean value.
+
+        @optional
+    */
+    optional bool                                     set_bool = 13;
+
+    /*
+        Type of action that publishes an Event related to the Measurement's Point.
+
+        @optional
+    */
+    optional EventGeneration                          event = 15;
+
+    /*
+        Type of action that transforms a boolean Measurement value to a string value.
+
+        @optional
+    */
+    optional BoolEnumTransform                        bool_transform   =  16;
+
+    /*
+        Type of action that transforms an integer Measurement value to a string value.
+
+        @optional
+    */
+    optional IntEnumTransform                         int_transform    =  17;
+}
+
+/*
+    Describes a linear transformation on an analog value.
+
+    The transformation, where `x` is the original value:
+
+    `trans(x) = scale * x + offset`
+*/
+message LinearTransform {
+
+    /*
+        Scaling factor of the input.
+
+        @required
+    */
+    optional double scale = 2;
+
+    /*
+        Addition operation performed after the scaling.
+
+        @required
+    */
+    optional double offset = 3;
+
+    /*
+        Specifies whether integer analog values should be converted to floating point values in the resulting Measurement.
+
+        Defaults to `false`.
+
+        @optional
+    */
+    optional bool   forceToDouble = 4 [default = false];
+}
+
+/*
+    Describes an Event to generate from a Measurement.
+*/
+message EventGeneration {
+
+    /*
+        Specifies the Event type. Corresponds to the types configured in the Event/Alarm subsystem.
+
+        @required
+    */
+    optional string event_type   = 1;
+}
+
+/*
+    Describes the transformation of boolean values to string values by specifying strings for both `true` and `false`.
+*/
+message BoolEnumTransform {
+
+    /*
+        String value to attach to the Measurement when its boolean value is `true`.
+
+        @required
+    */
+    optional string true_string  = 1;
+
+    /*
+        String value to attach to the Measurement when its boolean value is `false`.
+
+        @required
+    */
+    optional string false_string = 2;
+}
+
+/*
+    Describes the transformation of integer values to string values by specifying a set of mappings between integers and strings.
+
+    If a mapping does not exist for the Measurement's integer value, the Measurement will not be changed.
+*/
+message IntEnumTransform {
+
+    /*
+        Associations between integers and strings.
+
+        @required
+    */
+    repeated IntToStringMapping mappings = 1;
+
+    /*
+        Value to use if no mappings match.
+
+        @optional
+    */
+    optional string default_value = 2;
+}
+
+message IntToStringMapping {
+
+    /*
+        Integer input value.
+
+        @required
+    */
+    optional sint64 value       = 1;
+
+    /*
+        Resulting string value.
+
+        @required
+    */
+    optional string string      = 2;
+}
+
+/*
+    Description of a condition and a set of Actions.
+
+    For every new Measurement value, the current boolean value of the condition is evaluated. The current value
+    and the previous value are compared to the ActivationType of each Action to determine if the Action should
+    be taken.
+
+    When multiple condition types are specified, the boolean value is the logical _and_ of all conditions.
+*/
+message Trigger {
+
+    /*
+        Name that identifies the Trigger uniquely in the TriggerSet
+
+        @required
+    */
+    optional string              trigger_name = 2;
+
+    /*
+        If the activation type is matched no further Triggers in the TriggerSet will be evaluated.
+
+        @optional
+    */
+    optional ActivationType      stop_processing_when = 3;
+
+    /*
+        Sequence of Actions to be evaluated.
+
+        @required
+    */
+    repeated Action              actions = 9;
+
+    /*
+        Condition describing boundaries for analog values in Measurements.
+
+        @optional
+    */
+    optional AnalogLimit                                    analog_limit = 10;
+
+    /*
+        Condition matching Quality annotations of Measurements. Will be triggered if any fields set in the Trigger
+        Quality match the values of the same field set in the Measurement Quality.
+
+        @optional
+    */
+    optional Quality                                        quality = 12;
+
+    /*
+        Condition triggered when the Measurement value type enumeration matches this value.
+
+        @optional
+    */
+    optional Measurement.Type                               value_type = 14;
+
+    /*
+        Condition triggered when the Measurement has a boolean value that matches this value.
+
+        @optional
+    */
+    optional bool                                           bool_value = 15;
+
+    /*
+        Condition triggered when the Measurement has a string value that matches this value.
+
+        @optional
+    */
+    optional string                                         string_value = 16;
+
+    /*
+        Condition triggered when the Measurement has an integer value that matches this value.
+
+        @optional
+    */
+    optional sint64                                         int_value    = 17;
+
+    /*
+        Condition triggered when the Measurement value and quality are not the same as the
+        previously published/stored Measurement.
+
+        @optional
+    */
+    optional Filter                                         filter = 18;
+}
+
+/*
+    Associates a set of Triggers with a Point. The sequence of Triggers describe the conditional evaluation of
+    transformations of Measurement value and quality, as well as the generation of Events.
+
+    The sequence of Triggers are evaluated in order. Triggers may have as one of their side effects that no further
+    Triggers will be processed, at which point the rest of the sequence is ignored.
+*/
+message TriggerSet {
+
+    /*
+        Sequence of Triggers to evaluate for Measurements associated with the Point.
+
+        @required
+    */
+    repeated Trigger triggers = 2;
+}
+
+/*
+    Describes boundary conditions for analog values. Can include both upper and lower limits, or just one
+    of either.
+
+    When the condition had been previously triggered (the value was outside of the nominal range), the optional deadband
+    field describes how far the value must return within the nominal range to no longer be triggering the condition. This
+    can be used to prevent a value oscillating near the limit from repeatedly triggering the condition.
+*/
+message AnalogLimit {
+
+    /*
+        Upper limit; the nominal range is defined to be below this value.
+
+        @optional
+    */
+    optional double upper_limit = 1;
+
+    /*
+        Lower limit; the nominal range is defined to be above this value.
+
+        @optional
+    */
+    optional double lower_limit = 2;
+
+    /*
+        Once the condition was triggered, distance the value must return within the nominal range for the condition to
+        no longer be triggered.
+
+        @optional
+    */
+    optional double deadband    = 3;
+}
+
+/*
+    Describes a condition that triggers when a new Measurement has the same value and quality as the most recent
+    Measurement that did _not_ trigger the condition.
+
+    Optionally, a deadband can be provided to suppress minor changes in analog values.
+*/
+message Filter {
+
+    /*
+        Enumeration for whether the condition triggers for exact duplicates or contains a deadband.
+    */
+    enum FilterType {
+        DUPLICATES_ONLY       = 1;  // Recognize exact duplicates.
+        DEADBAND              = 2;  // Recognize values that have changed within a deadband.
+    }
+
+    /*
+        Specifies whether the condition triggers for exact duplicates or contains a deadband.
+
+        @required
+    */
+    optional FilterType type        = 1;
+
+    /*
+        If set, the condition will only be triggered if a Measurement has an analog value where the difference between it and
+        the previously stored value exceeds the deadband.
+
+        @optional
+    */
+    optional double deadband_value    = 2;
+}
+
+/*
+    Notification of a change to the MeasOverride of a Point.
+*/
+message OverrideNotification {
+
+    /*
+        Whether object was added, removed, or modified.
+    */
+    optional greenbus.client.envelope.SubscriptionEventType event_type = 1;
+
+    /*
+        Updated state of the object.
+    */
+    optional MeasOverride value = 2;
+}
+
+/*
+    Notification of a change to the TriggerSet of a Point.
+*/
+message TriggerSetNotification {
+
+    /*
+        Whether object was added, removed, or modified.
+    */
+    optional greenbus.client.envelope.SubscriptionEventType event_type = 1;
+
+    /*
+        Updated state of the object.
+    */
+    optional TriggerSet value = 2;
+}

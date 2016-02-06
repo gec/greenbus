@@ -1,0 +1,360 @@
+/**
+ * Copyright 2011-2016 Green Energy Corp.
+ *
+ * Licensed to Green Energy Corp (www.greenenergycorp.com) under one or more
+ * contributor license agreements. See the NOTICE file distributed with this
+ * work for additional information regarding copyright ownership. Green Energy
+ * Corp licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+package greenbus.client;
+
+option java_package = "io.greenbus.client.service.proto";
+option java_outer_classname = "Measurements";
+
+import "Model.proto";
+
+
+/*
+    Detailed quality flags, based on the notion of quality in IEC 61850.
+*/
+message DetailQual {
+
+    /*
+        Representation overflow, value can't be trusted.
+
+        @optional
+    */
+	optional bool overflow = 1 [default = false];
+
+    /*
+        Occurs when value is outside a predefined range.
+
+        @optional
+    */
+	optional bool out_of_range = 2 [default = false];
+
+    /*
+        Value may not be correct due to a reference being out of calibration.
+
+        @optional
+    */
+	optional bool bad_reference = 3 [default = false];
+
+    /*
+        Value is rapidly changing and some values may have be suppressed.
+
+        @optional
+    */
+	optional bool oscillatory = 4 [default = false];
+
+    /*
+        A supervision function has detected an internal or external failure.
+
+        @optional
+    */
+	optional bool failure = 5 [default = false];
+
+    /*
+        An update was not made during a specific time internal.
+
+        @optional
+    */
+	optional bool old_data = 6 [default = false];
+
+    /*
+        An evaluation function has detected an inconsistency.
+
+        @optional
+    */
+	optional bool inconsistent = 7 [default = false];
+
+    /*
+        Value does not meet the stated accuracy of the source.
+
+        @optional
+    */
+	optional bool inaccurate = 8 [default = false];
+}
+
+
+/*
+    Quality for a Measurement value. Based on IEC 61850.
+*/
+message Quality {
+
+    /*
+        Enumerates possible validities for a Measurement.
+    */
+	enum Validity {
+		GOOD = 0;		// No abnormal condition of the acquisition function or the information source is detected.
+		INVALID = 1;		// Abnormal condition.
+		QUESTIONABLE = 2;	// Supervision function detects abnormal behavior, however value could still be valid. Up to client how to interpret.
+	}
+
+    /*
+        Enumeration to distinguish between values part of the normal system process and those substituted.
+        (e.g. not in service or a measurement override).
+    */
+	enum Source {
+		PROCESS = 0;	 // Value is provided by an input function from the process I/O or calculated by an application.
+		SUBSTITUTED = 1; // Value is provided by input on an operator or by an automatic source.
+	}
+
+    /*
+        Overall validity of the Measurement value.
+
+        Default is `GOOD`.
+
+        @optional
+    */
+	optional Validity validity = 1 [default = GOOD];
+
+	/*
+	    Distinguishes between values resulting from normal system processes and those substituted.
+
+	    Default is `PROCESS`.
+
+	    @optional.
+	*/
+	optional Source source = 2 [default = PROCESS];
+
+    /*
+        Provides extra information when `validity` is `INVALID` or `QUESTIONABLE`.
+
+        @optional
+    */
+	optional DetailQual detail_qual = 3;
+
+	/*
+        Classifies a value as a test value, not to be used for operational purposes.
+
+        Default is `false`.
+
+        @optional
+	*/
+	optional bool test = 4 [default = false];
+
+	/*
+        Further update of the value has been blocked by an operator. If set, `DetailQual.old_data` should be set to true.
+
+        Default is `false`.
+
+        @optional
+	*/
+	optional bool operator_blocked = 5 [default = false];
+}
+
+
+/*
+    Represents a value at a particular point in time, with annotations for quality and unit of measurement.
+*/
+message Measurement {
+
+    /*
+        Enumeration of possible data types stored in the Measurement.
+    */
+	enum Type {
+		INT = 0;     // Corresponds to `int_val` in Measurement.
+		DOUBLE = 1;  // Corresponds to `double_val` in Measurement.
+		BOOL = 2;    // Corresponds to `bool_val` in Measurement.
+		STRING = 3;  // Corresponds to `string_val` in Measurement.
+		NONE = 4;    // No data type.
+	}
+
+	/*
+	    Determines the data type of the Measurement. The values of the enumeration correspond to the
+	    `int_val`, `double_val`, `bool_val` and `string_val` fields. The selected field type must be
+	    present.
+
+	    More than one of these fields may be present (possibly due to a transformation); if so this type
+	    field specifies to primary data type.
+
+	    @required
+	*/
+	required Type type = 2;
+
+    /*
+        Integer (64-bit) data value.
+
+        @optional
+    */
+	optional sint64 int_val = 3;
+
+    /*
+        Double (64-bit) floating-point data value.
+
+        @optional
+    */
+	optional double double_val = 4;
+
+    /*
+        Boolean data value.
+
+        @optional
+    */
+	optional bool bool_val = 5;
+
+    /*
+        String data value.
+
+        @optional
+    */
+	optional string string_val = 6;
+
+    /*
+        Annotation of health/validity of this value.
+
+        Not specifying a quality is generally equivalent to good quality.
+
+        @optional
+    */
+	optional Quality quality = 7;
+
+	// measurement time of occurrence information, both times are unix style time stamps
+	// "best known time" of occurrence, this should be measured as close to the field as possible. If the protocol
+	// is able to collect or assign a "good field time" to the measurement then is_device_time should be set, this
+	// indicates that the time should be considered to be accurate (but possibly in a slightly different stream from
+	// measurements that are not device_time)
+
+	/*
+        Time of occurrence for the measurement value.
+
+        Time is measured in milliseconds since midnight, January 1, 1970 UTC.
+
+        @required
+	*/
+	optional uint64 time = 9 [default = 0];
+
+	/*
+        True if `time` field is a device timestamp, false or unset if it represents wall time.
+
+        @optional
+	*/
+	optional bool is_device_time = 10 [default = false];
+
+	/*
+	    The time when the measurement was processed into the system. The difference this and the `time` field
+	    may be an approximate measurement of delay in the measurement stream or a measure of clock differences between
+	    the field devices and the system.
+
+        Time is measured in milliseconds since midnight, January 1, 1970 UTC.
+
+        @optional
+	*/
+	optional uint64 system_time = 11 [default = 0];
+}
+
+/*
+    Associates a Measurement value with a Point identified by name.
+*/
+message NamedMeasurementValue {
+    optional string point_name = 1; // Point name.
+    optional Measurement value = 2; // Measurement value.
+}
+
+/*
+    Associates a sequence of Measurement values with a Point identified by name.
+*/
+message NamedMeasurementValues {
+    optional string point_name = 1; // Point name.
+    repeated Measurement value = 2; // Sequence of Measurement values.
+}
+
+/*
+    Associates a Measurement value with a Point identified by UUID.
+*/
+message PointMeasurementValue {
+    optional ModelUUID point_uuid = 1; // Point UUID.
+    optional Measurement value = 2; // Measurement value.
+}
+
+/*
+    Associates a sequence of Measurement values with a Point identified by UUID.
+*/
+message PointMeasurementValues {
+    optional ModelUUID point_uuid = 1; // Point UUID.
+    repeated Measurement value = 2; // Sequence of Measurement values.
+}
+
+/*
+    Batch of Measurements to be published simultaneously. Measurements in the batch are associated with
+    Points identified by UUID or name.
+
+    At least one Measurement must be included.
+*/
+message MeasurementBatch {
+
+    /*
+        Measurements associated with Points by UUID.
+
+        @optional
+    */
+    repeated PointMeasurementValue point_measurements = 1;
+
+    /*
+        Measurements associated with Points by name.
+
+        @optional
+    */
+    repeated NamedMeasurementValue named_measurements = 2;
+
+    /*
+        A collective timestamp for Measurements that are bundled in the batch without individual timestamps. For example, this may be
+        the time that the values were collected from the field.
+
+        If no wall time is specified, the measurement processor will use the time at which it received the batch.
+
+        Time is measured in milliseconds since midnight, January 1, 1970 UTC.
+
+        @optional
+    */
+    optional uint64 wall_time = 3;
+}
+
+/*
+    Notification of a new Measurement value for a particular Point. The UUID and name of the Point are provided.
+*/
+message MeasurementNotification {
+
+    /*
+        Point UUID associated with this Measurement.
+    */
+    optional ModelUUID point_uuid = 1;
+
+    /*
+        Point name associated with this Measurement.
+    */
+    optional string point_name = 2;
+
+    /*
+        Measurement value.
+    */
+    optional Measurement value = 3;
+}
+
+/*
+    Notification of batch of Measurements published for a particular Endpoint. The UUID and name of the Point for each Measurement are provided.
+*/
+message MeasurementBatchNotification {
+
+    /*
+        Endpoint UUID associated with this batch of Measurements.
+    */
+    optional ModelUUID endpoint_uuid = 1;
+
+    /*
+        Set of Measurements published in this batch.
+    */
+    repeated MeasurementNotification values = 3;
+}
+

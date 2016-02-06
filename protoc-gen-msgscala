@@ -1,0 +1,5 @@
+#! /bin/sh
+
+JAR=~/.m2/repository/io/greenbus/msg/greenbus-msg-compiler/1.0.0/greenbus-msg-compiler-1.0.0-jar-with-dependencies.jar
+
+java -DgenTarget=scala -jar ${JAR}

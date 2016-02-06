@@ -1,0 +1,158 @@
+/**
+ * Copyright 2011-2016 Green Energy Corp.
+ *
+ * Licensed to Green Energy Corp (www.greenenergycorp.com) under one or more
+ * contributor license agreements. See the NOTICE file distributed with this
+ * work for additional information regarding copyright ownership. Green Energy
+ * Corp licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+package greenbus.client;
+
+option java_package = "io.greenbus.client.service.proto";
+option java_outer_classname = "LoginRequests";
+option java_generic_services = false;
+
+import "google/protobuf/descriptor.proto";
+import "CompilerExtensions.proto";
+
+import "Auth.proto";
+
+/*
+    Request for an auth token, specifying name and password, expiration time, and contextual information.
+*/
+message LoginRequest {
+
+    /*
+        Name associated with credentials. Will be the name of an Agent modeled in the system.
+
+        @required
+    */
+    optional string name            = 2;
+
+    /*
+        Password associated with credentials.
+
+        @required
+    */
+    optional string password        = 3;
+
+    /*
+        Provides contextual information about the user or process obtaining the auth token.
+
+        @optional
+    */
+    optional string login_location  = 4;
+
+    /*
+        Time for the resulting auth token. If not specified, a default value will be provided.
+
+        Time is measured in milliseconds since midnight, January 1, 1970 UTC.
+
+        @optional
+    */
+    optional uint64 expiration_time = 5;
+
+    /*
+        Provides contextual information about the client software version.
+
+        @optional
+    */
+    optional string client_version  = 6;
+}
+
+/*
+    Provides an auth token, expiration time, and contextual information as a result of a successful login.
+*/
+message LoginResponse {
+
+    /*
+        Auth token resulting from a successful login. Can be included in subsequent service requests in order to
+        authorize them.
+    */
+    optional string token = 2;
+
+    /*
+        Expiration time for this auth token. After this time the auth token will be rejected and a new token
+        will need to be acquired.
+
+        Time is measured in milliseconds since midnight, January 1, 1970 UTC.
+    */
+    optional uint64 expiration_time = 3;
+
+    /*
+        Contextual information about the server software version.
+    */
+    optional string server_version = 4;
+}
+
+/*
+    Request to invalidate and remove an auth token no longer being used.
+*/
+message LogoutRequest {
+
+    /*
+        Auth token to be invalidated.
+
+        @required
+    */
+    optional string token = 2;
+}
+
+
+
+message PostLoginRequest {
+    optional LoginRequest request = 1;
+}
+message PostLoginResponse {
+    optional LoginResponse response = 1;
+}
+
+message PostLogoutRequest {
+    optional LogoutRequest request = 1;
+}
+message PostLogoutResponse {
+
+}
+
+message ValidateAuthTokenRequest {
+    optional string token = 1;
+}
+message ValidateAuthTokenResponse {
+}
+
+
+service LoginService {
+    option (scala_package) = "io.greenbus.client.service";
+    option (java_package) = "io.greenbus.japi.client.service";
+
+    /*
+        Provides user credentials in exchange for an auth token.
+
+        Request does not require authorization.
+    */
+    rpc login(PostLoginRequest) returns (PostLoginResponse);
+
+    /*
+        Logs out an auth token, causing subsequent authorizations using it to fail.
+    */
+    rpc logout(PostLogoutRequest) returns (PostLogoutResponse);
+
+    /*
+        Verifies an auth token is valid. Fails if the auth token is not authorized.
+
+        Used in situations where a process is managing requests on behalf of a client that has provided it
+        a pre-obtained auth token.
+    */
+    rpc validate(ValidateAuthTokenRequest) returns (ValidateAuthTokenResponse);
+
+}

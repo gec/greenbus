@@ -1,0 +1,174 @@
+/**
+ * Copyright 2011-2016 Green Energy Corp.
+ *
+ * Licensed to Green Energy Corp (www.greenenergycorp.com) under one or more
+ * contributor license agreements. See the NOTICE file distributed with this
+ * work for additional information regarding copyright ownership. Green Energy
+ * Corp licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+package greenbus.client;
+
+option java_package = "io.greenbus.client.service.proto";
+option java_outer_classname = "Commands";
+
+import "Model.proto";
+
+
+/*
+    Represents the access table for the Command system. CommandLock entries have one or two
+    modes, _allowed_ and _blocked_. CommandRequests cannot be issued unless they have an
+    _allowed_ entry. This selects the command for operation by a single user, for
+    as long as the lock is held. Blocking a Command makes it so no CommandRequests can be
+    issued and no other CommandLocks can be acquired.
+
+    Multiple Commands can be referenced in the same CommandLock. The Agent
+    associated with the CommandLock is determined by the request header.
+*/
+message CommandLock {
+
+    /*
+        Enumerates the effect of a CommandLock.
+    */
+    enum AccessMode {
+        ALLOWED = 1;    // The Agent may issue a CommandRequest for the Commands.
+        BLOCKED = 2;    // No other Agents may lock or issue the Commands.
+    }
+
+    /*
+        ID for the CommandLock entry.
+    */
+    optional ModelID       id             = 1;
+
+    /*
+        Command UUIDs the CommandLock pertains to.
+    */
+    repeated ModelUUID     command_uuids  = 2;
+
+    /*
+        The type of AccessMode the CommandLock represents.
+    */
+    optional AccessMode   access         = 3;
+
+    /*
+        The time when the CommandLock will no longer be valid.
+
+        CommandLocks with the AccessMode `BLOCKED` have no expiration time.
+
+        Time is measured in milliseconds since midnight, January 1, 1970 UTC.
+
+        @optional
+    */
+    optional uint64       expire_time    = 4;
+
+    /*
+        The UUID of the Agent that created the CommandLock.
+    */
+    optional ModelUUID     agent_uuid     = 5;
+}
+
+/*
+    Represents a request for a front-end to perform a control operation.
+
+    CommandRequests may optionally contain a value.
+*/
+message CommandRequest {
+
+    /*
+        Enumeration of the possible value types a CommandRequest could hold.
+    */
+	enum ValType {
+		NONE = 0;
+		INT = 1;
+		DOUBLE = 2;
+		STRING = 4;
+	}
+
+    /*
+        UUID of the Command this request is for.
+
+        @required
+    */
+	optional ModelUUID command_uuid = 1;
+
+    /*
+        Specifies the type of value the CommandRequest contains.
+
+        Defaults to `NONE`.
+
+        @optional
+    */
+	optional ValType type = 3;
+
+    /*
+        Specifies an integer value. If present, `type` must be set to `INT`.
+
+        @optional
+    */
+	optional sint64   int_val = 4;
+
+    /*
+        Specifies a double floating-point value. If present, `type` must be set to `DOUBLE`.
+
+        @optional
+    */
+	optional double  double_val = 5;
+
+    /*
+        Specifies a string value. If present, `type` must be set to `STRING`.
+
+        @optional
+    */
+	optional string  string_val = 6;
+
+	/*
+        Flag set to prevent events from being logged when command request is issued. Requires special authorization.
+
+	    @optional
+	*/
+	optional bool    unevented = 16;
+}
+
+/*
+    Represents the result of a front-end receiving a CommandRequest.
+*/
+message CommandResult {
+
+    /*
+        Used by the front-end to describe the result of the CommandRequest.
+    */
+    optional CommandStatus  status          = 1;
+
+    /*
+        If the CommandStatus was not `SUCCESS`, may optionally hold additional information.
+
+        @optional
+    */
+	optional string         error_message   = 2;
+}
+
+/*
+    Enumeration of Command statuses/results.
+*/
+enum CommandStatus {
+	SUCCESS        = 1;     // Command was a success.
+	TIMEOUT        = 2;     // A timeout occurred to a remote device.
+	NO_SELECT      = 3;     // The remote device reports there was no select before operate. (Separate from CommandLock.)
+	FORMAT_ERROR   = 4;     // The remote device does not recognize the control or data format.
+	NOT_SUPPORTED  = 5;     // The operation was not supported.
+	ALREADY_ACTIVE = 6;     // An operation is already in progress.
+	HARDWARE_ERROR = 7;     // The remote device reports a hardware error.
+	LOCAL          = 8;     // The remote device is only allowing local control.
+	TOO_MANY_OPS   = 9;     // The remote device rejects the operation because it has too many already in progress.
+	NOT_AUTHORIZED = 10;    // The remote device rejects the authorization of the front-end.
+	UNDEFINED      = 11;    // The error is unrecognized.
+}

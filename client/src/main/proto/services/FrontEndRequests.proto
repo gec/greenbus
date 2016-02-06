@@ -1,0 +1,156 @@
+/**
+ * Copyright 2011-2016 Green Energy Corp.
+ *
+ * Licensed to Green Energy Corp (www.greenenergycorp.com) under one or more
+ * contributor license agreements. See the NOTICE file distributed with this
+ * work for additional information regarding copyright ownership. Green Energy
+ * Corp licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+package greenbus.client;
+
+option java_package = "io.greenbus.client.service.proto";
+option java_outer_classname = "FrontEndRequests";
+option java_generic_services = false;
+
+import "google/protobuf/descriptor.proto";
+import "CompilerExtensions.proto";
+
+import "FrontEnd.proto";
+import "Model.proto";
+import "services/ModelRequests.proto";
+
+
+/*
+    Represents a front-end's registration to provide service for an Endpoint.
+
+    An address may be provided where CommandRequests for this Endpoint should be sent. If no address is included, the
+    Endpoint will not support CommandRequests.
+*/
+message FrontEndRegistrationTemplate {
+
+    /*
+        UUID of the Endpoint the front-end is registering for.
+
+        @required
+    */
+    optional ModelUUID endpoint_uuid = 1;
+
+    /*
+        Service address that should be used to send CommandRequests to this front-end for this Endpoint.
+
+        @optional
+    */
+    optional string command_address = 2;
+
+    /*
+        Allows the front-end instance to associate the registration with a unique persistent identity. If the front-end loses
+        the registration information (perhaps due to a restart) re-registration with the same node ID may be
+        accepted even if the registration has not timed out.
+
+        Node IDs should be unique for all front-ends and only re-used by the same logical process on restarts.
+
+        @optional
+    */
+    optional string fep_node_id = 5;
+
+    /*
+        Used by the front-end to indicate that it is currently excluding other front-ends from make a connection for this Endpoint
+        (perhaps by holding open a connection that will only accept a single client). Registrations using this flag
+        take precedence and will abort the registrations of other front-ends (which presumably are unable to connect).
+
+        This is intended to allow front-end instances that were separated from the network for long enough for a fail-over to
+        occur to reclaim their registration instead of releasing an expensive external connection.
+
+        @optional
+    */
+    optional bool holding_lock = 6;
+}
+
+/*
+    Used by a front-end to notify the system of updates to the status of itself or the external source it communicates with.
+*/
+message FrontEndStatusUpdate {
+
+    /*
+        UUID of the Endpoint the front-end is registering for.
+
+        @required
+    */
+    optional ModelUUID endpoint_uuid = 1;
+
+    /*
+        UUID of the Endpoint the front-end is registering for.
+
+        @required
+    */
+    optional FrontEndConnectionStatus.Status status = 2;
+}
+
+
+message PutFrontEndRegistrationRequest {
+    optional FrontEndRegistrationTemplate request = 1;
+}
+message PutFrontEndRegistrationResponse {
+    optional FrontEndRegistration results = 1;
+}
+
+message GetFrontEndConnectionStatusRequest {
+    optional EntityKeySet endpoints = 1;
+}
+message GetFrontEndConnectionStatusResponse {
+    repeated FrontEndConnectionStatus results = 1;
+}
+message SubscribeFrontEndConnectionStatusRequest {
+    optional EndpointSubscriptionQuery endpoints = 1;
+}
+message SubscribeFrontEndConnectionStatusResponse {
+    repeated FrontEndConnectionStatus results = 1;
+}
+message PutFrontEndConnectionStatusRequest {
+    repeated FrontEndStatusUpdate updates = 1;
+}
+message PutFrontEndConnectionStatusResponse {
+    repeated FrontEndConnectionStatus results = 1;
+}
+
+service FrontEndService {
+    option (scala_package) = "io.greenbus.client.service";
+    option (java_package) = "io.greenbus.japi.client.service";
+
+    /*
+        Registers a set of front-ends to provide services for a set of Endpoints.
+    */
+    rpc put_front_end_registration(PutFrontEndRegistrationRequest) returns (PutFrontEndRegistrationResponse) {
+        option (addressed) = OPTIONALLY;
+    }
+
+    /*
+        Gets front-end connection statuses by Endpoint UUIDs and names.
+    */
+    rpc get_front_end_connection_statuses(GetFrontEndConnectionStatusRequest) returns (GetFrontEndConnectionStatusResponse);
+
+    /*
+        Notifies the system of updates to the status of front-end services for a set of Endpoints.
+    */
+    rpc put_front_end_connection_statuses(PutFrontEndConnectionStatusRequest) returns (PutFrontEndConnectionStatusResponse) {
+        option (addressed) = OPTIONALLY;
+    }
+
+    /*
+        Subscribes to notifications for changes to the statuses of front-end connections for a particular set of Endpoints.
+    */
+    rpc subscribe_to_front_end_connection_statuses(SubscribeFrontEndConnectionStatusRequest) returns (SubscribeFrontEndConnectionStatusResponse) {
+        option (subscription_type) = "greenbus.client.FrontEndConnectionStatusNotification";
+    }
+
+}

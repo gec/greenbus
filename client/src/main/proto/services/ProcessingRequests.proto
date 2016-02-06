@@ -1,0 +1,142 @@
+/**
+ * Copyright 2011-2016 Green Energy Corp.
+ *
+ * Licensed to Green Energy Corp (www.greenenergycorp.com) under one or more
+ * contributor license agreements. See the NOTICE file distributed with this
+ * work for additional information regarding copyright ownership. Green Energy
+ * Corp licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+package greenbus.client;
+
+option java_package = "io.greenbus.client.service.proto";
+option java_outer_classname = "ProcessingRequests";
+option java_generic_services = false;
+
+import "google/protobuf/descriptor.proto";
+import "CompilerExtensions.proto";
+
+import "Processing.proto";
+import "Model.proto";
+import "ServiceEnvelopes.proto";
+import "services/ModelRequests.proto";
+
+/*
+    Subscription parameters for MeasOverrides. Notifications can be filtered by Point or Endpoint.
+
+    - Including key parameters (and no Endpoint UUIDs) will return the current state of the MeasOverrides for those Points
+        and subscribe to notifications for them.
+    - Including Endpoint UUIDs will subscribe to MeasOverride notifications for Points associated with those Endpoints,
+        but return no immediate results.
+    - Including no parameters will subscribe to MeasOverride notifications for all Points, but return no immediate results.
+
+    __Note__: MeasOverride notifications are filtered by Point UUID, not Point name. Using a name parameter resolves
+    the UUID of the Point associated with that name at the time of the request, and is
+    equivalent to the client resolving the UUID before making the request. As a result, if the
+    Point a particular name refers to changes (due to a deletion/addition or two renames) notifications will be delivered
+    for only for the original Point.
+
+    Endpoint UUIDs are _not_ resolved to a set of Points at request time, and updates in the system model to associations between Points
+    and Endpoints will affect what notifications are delivered to the subscription.
+*/
+message OverrideSubscriptionQuery {
+
+    /*
+        UUIDs of Points to subscribe to MeasOverrides for.
+
+        @optional
+        @optional
+    */
+    repeated ModelUUID point_uuids = 1;
+
+    /*
+        Names of Points to subscribe to MeasOverrides for.
+
+        @optional
+    */
+    repeated string point_names = 2;
+
+
+    /*
+        UUIDs of Endpoints to subscribe to MeasOverrides for.
+
+        @optional
+    */
+    repeated ModelUUID endpoint_uuids = 3;
+}
+
+
+message GetOverridesRequest {
+    optional EntityKeySet request = 1;
+}
+message GetOverridesResponse {
+    repeated MeasOverride results = 1;
+}
+message SubscribeOverridesRequest {
+    optional OverrideSubscriptionQuery query = 1;
+}
+message SubscribeOverridesResponse {
+    repeated MeasOverride results = 1;
+}
+message PutOverridesRequest {
+    repeated MeasOverride overrides = 1;
+}
+message PutOverridesResponse {
+    repeated MeasOverride results = 1;
+}
+message DeleteOverridesRequest {
+    repeated ModelUUID point_uuids = 1;
+}
+message DeleteOverridesResponse {
+    repeated MeasOverride results = 1;
+}
+
+
+/*
+    Service for configuring the behavior of the measurement processor.
+
+    MeasOverride objects provide the ability to block new Measurements from being published, and to optionally
+    replace the latest value provided by the front-end with a user-specified override value. Blocked (not in service)
+    Measurements will not be stored in the current value and historian stores, and will not be published to the
+    Measurement notification stream.
+
+    TriggerSet objects describe the transformations and event generation to be performed on Measurements in the
+    measurement processor before they are published to the stores and notification stream.
+*/
+service ProcessingService {
+    option (scala_package) = "io.greenbus.client.service";
+    option (java_package) = "io.greenbus.japi.client.service";
+
+    /*
+        Returns a set of MeasOverrides associated with Points specified by an EntityKeySet.
+    */
+    rpc get_overrides(GetOverridesRequest) returns (GetOverridesResponse);
+
+    /*
+        Creates or modifies the MeasOverrides associated with Points.
+
+        Only one MeasOverride can exist for any given Point. Putting a new value will replace a previous one.
+    */
+    rpc put_overrides(PutOverridesRequest) returns (PutOverridesResponse);
+
+    /*
+        Delete MeasOverrides associated with Points by specifying the Point UUIDs.
+    */
+    rpc delete_overrides(DeleteOverridesRequest) returns (DeleteOverridesResponse);
+
+    /*
+        Subscribes to notifications for changes to MeasOverrides by either Point or Endpoint.
+    */
+    rpc subscribe_to_overrides(SubscribeOverridesRequest) returns (SubscribeOverridesResponse) {
+        option (subscription_type) = "greenbus.client.OverrideNotification";
+    }
+}

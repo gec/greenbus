@@ -1,0 +1,205 @@
+/**
+ * Copyright 2011-2016 Green Energy Corp.
+ *
+ * Licensed to Green Energy Corp (www.greenenergycorp.com) under one or more
+ * contributor license agreements. See the NOTICE file distributed with this
+ * work for additional information regarding copyright ownership. Green Energy
+ * Corp licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+package greenbus.client;
+
+option java_package = "io.greenbus.client.service.proto";
+option java_outer_classname = "CommandRequests";
+option java_generic_services = false;
+
+import "google/protobuf/descriptor.proto";
+import "CompilerExtensions.proto";
+
+import "Commands.proto";
+import "Model.proto";
+import "ServiceEnvelopes.proto";
+import "services/ModelRequests.proto";
+
+/*
+    Represents a request to acquire a CommandLock in order to issue CommandRequests for a
+    set of Commands.
+*/
+message CommandSelect {
+
+    /*
+        Specifies the Commands the CommandSelect will affect, by UUID.
+
+        Must include one or more Commands.
+
+        @required
+    */
+    repeated ModelUUID command_uuids = 1;
+
+    /*
+        Duration in milliseconds the CommandLock should last before expiring.
+
+        If not set, a server-determined default will be used.
+
+        @optional
+    */
+    optional uint64 expire_duration = 2;
+}
+
+/*
+    Represents a request to acquire a CommandLock in order to block CommandRequests from being
+    issued and CommandSelects succeeding for a set of Commands.
+*/
+message CommandBlock {
+
+    /*
+        Specifies the Commands the CommandBlock will affect, by UUID.
+
+        Must include one or more Commands.
+
+        @required
+    */
+    repeated ModelUUID command_uuids = 1;
+}
+
+/*
+    Query parameters to select a set of CommandLocks.
+
+    CommandLocks can be matched by the Commands they refer to, their AccessMode, or the Agents that acquired them.
+    Including no search parameters will return all CommandLocks in the system.
+
+    Uses paging to handle large result sets.
+*/
+message CommandLockQuery {
+
+    /*
+        Parameters to match CommandLocks by the UUIDs of the Commands they pertain to. All CommandLocks that
+        refer to at least one of the specified Commands will be returned.
+
+        @optional
+    */
+    repeated ModelUUID command_uuids      = 1;
+
+    /*
+        Parameters to filter CommandLocks to those matching a particular AccessMode.
+
+        @optional
+    */
+    optional CommandLock.AccessMode access      = 2;
+
+
+    /*
+        Parameters to match CommandLocks by the UUIDs of the Agents that acquired them.
+
+        @optional
+    */
+    repeated ModelUUID agent_uuids        = 4;
+
+    /*
+        Last ID (in the returned sorted order) of a previous result set. This result set will be the
+        page beginning from the next ID.
+
+        @optional
+    */
+    optional ModelID last_id = 14;
+
+    /*
+        The number of elements to return. Used to limit the size of result sets in large models. If not set,
+        a server-determined page size will be used.
+
+        If the size of the result set equals the page size, there may be more data available.
+
+        @optional
+    */
+    optional uint32 page_size = 15;
+}
+
+message PostCommandRequestRequest {
+    optional CommandRequest request = 1;
+}
+message PostCommandRequestResponse {
+    optional CommandResult result = 1;
+}
+
+message GetCommandLockRequest {
+    repeated ModelID lock_ids = 1;
+}
+message GetCommandLockResponse {
+    repeated CommandLock results = 1;
+}
+message CommandLockQueryRequest {
+    optional CommandLockQuery request = 1;
+}
+message CommandLockQueryResponse {
+    repeated CommandLock results = 1;
+}
+message PostCommandSelectRequest {
+    optional CommandSelect request = 1;
+}
+message PostCommandSelectResponse {
+    optional CommandLock result = 1;
+}
+message PostCommandBlockRequest {
+    optional CommandBlock request = 1;
+}
+message PostCommandBlockResponse {
+    optional CommandLock result = 1;
+}
+
+message DeleteCommandLockRequest {
+    repeated ModelID lock_ids = 1;
+}
+message DeleteCommandLockResponse {
+    repeated CommandLock results = 1;
+}
+
+/*
+    Service for issuing CommandRequests and acquiring and managing CommandLocks.
+*/
+service CommandService {
+    option (scala_package) = "io.greenbus.client.service";
+    option (java_package) = "io.greenbus.japi.client.service";
+
+    /*
+        Issues a CommandRequest.
+    */
+    rpc issue_command_request(PostCommandRequestRequest) returns (PostCommandRequestResponse) {
+        option (addressed) = OPTIONALLY;
+    }
+
+    /*
+        Returns a set of CommandLocks specified by ID.
+    */
+    rpc get_command_locks(GetCommandLockRequest) returns (GetCommandLockResponse);
+
+    /*
+        Returns all CommandLocks or those matching query parameters. Uses paging to
+        handle large result sets.
+    */
+    rpc command_lock_query(CommandLockQueryRequest) returns (CommandLockQueryResponse);
+
+    /*
+        Selects a set of Commands for exclusive access in order to issue CommandRequests.
+    */
+    rpc select_commands(PostCommandSelectRequest) returns (PostCommandSelectResponse);
+
+    /*
+        Blocks a set of Commands to prevent CommandRequests from being issued and CommandSelects from being
+        acquired by other Agents.
+    */
+    rpc block_commands(PostCommandBlockRequest) returns (PostCommandBlockResponse);
+
+    /*
+        Deletes a set of CommandLocks specified by ID.
+    */
+    rpc delete_command_locks(DeleteCommandLockRequest) returns (DeleteCommandLockResponse);
+}

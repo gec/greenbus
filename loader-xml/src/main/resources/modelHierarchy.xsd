@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+
+    Copyright 2011-2016 Green Energy Corp.
+
+    Licensed to Green Energy Corp (www.greenenergycorp.com) under one or more
+    contributor license agreements. See the NOTICE file distributed with this
+    work for additional information regarding copyright ownership. Green Energy
+    Corp licenses this file to you under the GNU Affero General Public License
+    Version 3.0 (the "License"); you may not use this file except in compliance
+    with the License. You may obtain a copy of the License at
+
+    http://www.gnu.org/licenses/agpl.html
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations under
+    the License.
+
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+					 targetNamespace="xml.ldr.greenbus.io"
+					 xmlns="xml.ldr.greenbus.io"
+					 elementFormDefault="qualified"
+					 xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+					 jaxb:version="1.0">
+
+	<xs:include schemaLocation="calculation.xsd"/>
+	<xs:include schemaLocation="triggersActionsMessages.xsd"/>
+
+	<xs:complexType name="entityId">
+		<xs:attribute name="uuid" type="xs:string" use="optional"/>
+		<xs:attribute name="name" type="xs:string" use="optional"/>
+	</xs:complexType>
+
+	<xs:element name="reference">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="entityId"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="relationship">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="entityId">
+					<xs:attribute name="relation" type="xs:string"/>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="keyValue">
+		<xs:complexType>
+			<xs:attribute name="key" type="xs:string" use="required"/>
+			<xs:attribute name="stringValue" type="xs:string"/>
+			<xs:attribute name="booleanValue" type="xs:boolean"/>
+			<xs:attribute name="intValue" type="xs:long"/>
+			<xs:attribute name="doubleValue" type="xs:double"/>
+			<xs:attribute name="bytesSize" type="xs:long"/>
+			<xs:attribute name="fileName" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="type">
+		<xs:annotation>
+			<xs:documentation>
+				<p class="elementDef">Types are tags used for classification of equipment and measurements into groups
+					or categories.
+				</p>
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="name" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+
+
+	<xs:element name="externalOwners">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="reference" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="parentRelationships">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="relationship" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="childRelationships">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="relationship" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<!-- ___________________ Commands ___________________ -->
+
+	<xs:complexType name="command" abstract="true">
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:annotation>
+				<xs:appinfo>
+					<jaxb:property name="elements"/>
+				</xs:appinfo>
+			</xs:annotation>
+			<xs:element ref="type" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="keyValue" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="externalOwners" minOccurs="0" maxOccurs="1" />
+			<xs:element ref="parentRelationships" minOccurs="0" maxOccurs="1" />
+			<xs:element ref="childRelationships" minOccurs="0" maxOccurs="1" />
+		</xs:choice>
+		<xs:attribute name="name" type="xs:string" use="required"/>
+		<xs:attribute name="displayName" type="xs:string"/>
+		<xs:attribute name="uuid" type="xs:string"/>
+	</xs:complexType>
+
+	<xs:element name="control">
+		<xs:annotation>
+			<xs:documentation>
+				<p class="elementDef">Defines a control. The "name" attribute is the name of the Control. This name will
+					be displayed in the HMI. Control names should not contain spaces or periods "." and should be
+					limited to 64 characters. (ex. Breaker100_Open).
+				</p>
+			</xs:documentation>
+		</xs:annotation>
+
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="command"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+    <xs:simpleType name="SetpointType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="double"/>
+			<xs:enumeration value="integer"/>
+            <xs:enumeration value="string"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:element name="setpoint">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="command">
+                    <xs:attribute name="setpointType" type="SetpointType" />
+                </xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<!-- ___________________ Point Types ___________________ -->
+	<!-- Meta data for point types that have values (i.e. not controls) -->
+	<xs:complexType name="PointType" abstract="true">
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:annotation>
+				<xs:appinfo>
+					<jaxb:property name="elements"/>
+				</xs:appinfo>
+			</xs:annotation>
+			<xs:element ref="type"/>
+			<xs:element ref="keyValue" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="commands" minOccurs="0" maxOccurs="1">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element ref="reference" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element ref="externalOwners" minOccurs="0" maxOccurs="1"/>
+			<xs:element ref="parentRelationships" minOccurs="0" maxOccurs="1"/>
+			<xs:element ref="childRelationships" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="triggers" minOccurs="0" maxOccurs="1">
+				<xs:complexType>
+					<xs:group ref="triggerGroup" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element ref="calculation" minOccurs="0" maxOccurs="1"/>
+		</xs:choice>
+		<xs:attribute name="name" type="xs:string" use="required"/>
+		<xs:attribute name="unit" type="xs:string"/>
+		<xs:attribute name="uuid" type="xs:string"/>
+	</xs:complexType>
+
+	<xs:element name="status">
+		<xs:annotation>
+			<xs:documentation>
+				<p class="elementDef">Defines an status measurement. The following are attributes of
+					<span class="elementStyle">status</span>
+					<blockquote>
+						<span class="elementStyle">name</span>
+						- Name of the status measurement that will be displayed in the HMI. Status names should not
+						contain spaces or periods "." and should be limited to 64 characters. (ex. CB1001_Status,
+						Recloser122_status).
+					</blockquote>
+					<blockquote>
+						<span class="elementStyle">unit</span>
+						- The status unit of measurement.
+					</blockquote>
+				</p>
+			</xs:documentation>
+		</xs:annotation>
+
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="PointType"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="analog">
+		<xs:annotation>
+			<xs:documentation>
+				<p class="elementDef">Defines an analog measurement. The following are attributes of
+					<span class="elementStyle">analog</span>
+					<blockquote>
+						<span class="elementStyle">name</span>
+						- Name of the analog measurement that will be displayed in the HMI. Analog names should not
+						contain spaces or periods "." and should be limited to 64 characters. (ex. Line100_Current,
+						Bus201_Voltage).
+					</blockquote>
+					<blockquote>
+						<span class="elementStyle">unit</span>
+						- The analog unit of measurement.
+					</blockquote>
+				</p>
+			</xs:documentation>
+		</xs:annotation>
+
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="PointType"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="counter">
+		<xs:annotation>
+			<xs:documentation>
+				<p class="elementDef">
+					Defines a counter. The
+					<span class="elementStyle">name</span>
+					attribute is the of the Counter Measurement. This name will be displayed in the HMI. Counter names
+					should not contain spaces or periods "." and should be limited to 64 characters. (ex.
+					TX300_TotOperations). The
+					<span class="elementStyle">unit</span>
+					attribute is the counter unit of measurement.
+				</p>
+			</xs:documentation>
+		</xs:annotation>
+
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="PointType"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<!--
+	equipment element can specify all contained equipment or reference an equipmentProfile.
+	The only difference between an equipmentProfile and equipment is that equipment has an
+	optional equipmentProfile attribute. Both can specify multiple profiles in descendant
+	elements.
+
+	Multiple equipmentProfile elements can be specified.
+-->
+	<xs:complexType name="EquipmentType" abstract="true">
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:annotation>
+				<xs:appinfo>
+					<jaxb:property name="elements"/>
+				</xs:appinfo>
+			</xs:annotation>
+			<xs:element ref="type"/>
+			<xs:element ref="keyValue" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="control"/>
+			<xs:element ref="setpoint"/>
+			<xs:element ref="status"/>
+			<xs:element ref="analog"/>
+			<xs:element ref="counter"/>
+			<xs:element ref="equipment"/>
+			<xs:element ref="externalOwners" minOccurs="0" maxOccurs="1"/>
+			<xs:element ref="parentRelationships" minOccurs="0" maxOccurs="1"/>
+			<xs:element ref="childRelationships" minOccurs="0" maxOccurs="1"/>
+		</xs:choice>
+
+		<xs:attribute name="name" type="xs:string" use="required"/>
+		<xs:attribute name="uuid" type="xs:string"/>
+	</xs:complexType>
+
+	<xs:element name="equipment">
+		<xs:annotation>
+			<xs:documentation>
+				<p class="elementDef">
+					Defines entities within the system such as stations, equipment groups, equipment, and devices.
+					Measurement tags are represented as<span class="elementStyle">
+					equipment.equipment.measurement-name</span>. The parent-child relationship of any measurement tag is
+					defined by nesting of equipment elements.
+					<span class="elementStyle">equipment</span>
+					elements can specify all contained equipment or reference an<span class="elementStyle">
+					equipmentProfile</span>. The only difference between an
+					<span class="elementStyle">equipmentProfile</span>
+					and
+					<span class="elementStyle">equipment</span>
+					is that
+					<span class="elementStyle">equipment</span>
+					has an optional
+					<span class="elementStyle">equipmentProfile</span>
+					attribute. Both can specify multiple profiles in descendant elements. equipment elements can contain
+					the following elements (<span class="elementStyle">equipmentProfile</span>,<span
+						class="elementStyle">type</span>,<span class="elementStyle">control</span>,<span
+						class="elementStyle">status</span>,<span class="elementStyle">analog</span>,<span
+						class="elementStyle">counter</span>,<span class="elementStyle">equipment</span>).
+				</p>
+			</xs:documentation>
+		</xs:annotation>
+
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="EquipmentType"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<!-- ___________________ root element  ___________________ -->
+	<xs:element name="equipmentModel">
+		<xs:annotation>
+			<xs:documentation>
+				<p class="elementDef">This is the root element of the equipment modeling section, child elements of
+					<span class="elementStyle">equipmentModel</span>
+					are profiles and equipment.
+				</p>
+			</xs:documentation>
+		</xs:annotation>
+
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="equipment" minOccurs="1" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="EndpointType" abstract="true">
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:annotation>
+				<xs:appinfo>
+					<jaxb:property name="elements"/>
+				</xs:appinfo>
+			</xs:annotation>
+			<xs:element ref="type"/>
+			<xs:element ref="keyValue" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="source">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="entityId"/>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element ref="externalOwners" minOccurs="0" maxOccurs="1"/>
+			<xs:element ref="parentRelationships" minOccurs="0" maxOccurs="1"/>
+			<xs:element ref="childRelationships" minOccurs="0" maxOccurs="1"/>
+		</xs:choice>
+
+		<xs:attribute name="name" type="xs:string" use="required"/>
+		<xs:attribute name="uuid" type="xs:string"/>
+		<xs:attribute name="protocol" type="xs:string"/>
+	</xs:complexType>
+
+	<xs:element name="endpoint">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="EndpointType"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="endpointModel">
+		<xs:annotation>
+			<xs:documentation>
+				<p class="elementDef">This is the root element of the equipment modeling section, child elements of
+					<span class="elementStyle">equipmentModel</span>
+					are profiles and equipment.
+				</p>
+			</xs:documentation>
+		</xs:annotation>
+
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="endpoint" minOccurs="1" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>

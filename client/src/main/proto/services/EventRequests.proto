@@ -1,0 +1,680 @@
+/**
+ * Copyright 2011-2016 Green Energy Corp.
+ *
+ * Licensed to Green Energy Corp (www.greenenergycorp.com) under one or more
+ * contributor license agreements. See the NOTICE file distributed with this
+ * work for additional information regarding copyright ownership. Green Energy
+ * Corp licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+package greenbus.client;
+
+option java_package = "io.greenbus.client.service.proto";
+option java_outer_classname = "EventRequests";
+option java_generic_services = false;
+
+import "google/protobuf/descriptor.proto";
+import "CompilerExtensions.proto";
+
+import "Events.proto";
+import "Model.proto";
+import "services/ModelRequests.proto";
+
+/*
+    Query parameters to select a set of Events.
+*/
+message EventQueryParams {
+
+    /*
+        Specifies a set of Event types to be directly matched. Events with one of any of the included Event types will
+        be returned.
+
+        @optional
+    */
+    repeated string   event_type         =  1;
+
+    /*
+        Searches for Events with a time greater than or equal to this value.
+
+        Time is measured in milliseconds since midnight, January 1, 1970 UTC.
+
+        @optional
+    */
+    optional uint64   time_from          =  2;
+
+    /*
+        Searches for Events with a time less than or equal to this value.
+
+        Time is measured in milliseconds since midnight, January 1, 1970 UTC.
+
+        @optional
+    */
+    optional uint64   time_to            =  3;
+
+    /*
+        Specifies a set of Event severities to be directly matched. Events with one of any of the included Event severities will
+        be returned.
+
+        @optional
+    */
+    repeated uint32   severity           =  4;
+
+    /*
+        Specifies a lower bound on severities. Any Event at this severity or higher (numerically lower) will
+        be returned.
+
+        If present, overrides the `severity` parameter.
+
+        @optional
+    */
+    optional uint32   severity_or_higher =  5;
+
+    /*
+        Specifies a set of Event subystem fields to be directly matched. Events with one of any of the included subystems will
+        be returned.
+
+        @optional
+    */
+    repeated string   subsystem          =  6;
+
+    /*
+        Specifies a set of Event agent names to be directly matched. Events with one of any of the included agent names will
+        be returned.
+
+        @optional
+    */
+    repeated string   agent              =  7;
+
+    /*
+        Specifies a set of Entities by keys. Events associated with any of the specified Entities will be returned.
+
+        @nested
+        @optional
+    */
+    optional EntityKeySet entities       =  8;
+
+    /*
+        Specifies a set of model segments. Events associated with any of the specified model segments will be returned.
+
+        @optional
+    */
+    repeated string     model_group     = 10;
+
+    /*
+        If `true`, only returns Events that caused an Alarm to be raised. If `false`, only returns Events that did not
+        raise an Alarm.
+
+        @optional
+    */
+    optional bool     is_alarm           =  9;
+
+
+    /*
+        Specifies which side of a page window to return Events for.
+
+        If the number of Events in the time window exceeds the limit on the number of Events to be
+        returned by the query, the sequence of Events will be justified to either the lower or higher
+        boundary of the window.
+
+        - If `false`, the returned Events will begin with the first in the time window and proceed until the time window
+            ends or the limit is met. Paging using this method would move forward in time.
+        - If `true`, the sequence of returned Events begins at the `limit`th value below the high boundary of the time window,
+            and proceeds to the high boundary. Paging using this method would move backward in time.
+
+        In both cases, the sequence of Events is returned in ascending time-order (oldest to newest).
+
+        The default value is `true`.
+
+        @optional
+    */
+    optional bool     latest             = 16;
+
+}
+
+/*
+    Query for Events.
+
+    Including no search parameters will return all Events in the system.
+
+    Paging by ID is used to handle large result sets. Results will be returned sorted first by the requested time
+    ordering and then by ID to distinguish between Events that are recorded in the same millisecond.
+
+    - When paging "forward" (`latest = false`), the `last_id` field should be set to the last value in the result order.
+    - When paging "backward" (`latest = true`), the `last_id` field should be set to the first value in the result order.
+*/
+message EventQuery {
+
+    /*
+        The query parameters to find a set of Events.
+
+        @optional
+        @nested
+    */
+    optional EventQueryParams query_params = 1;
+
+    /*
+        Last ID (in the returned sorted order) of a previous result set. This result set will be the
+        page beginning from the next ID.
+
+        @optional
+    */
+    optional ModelID last_id = 25;
+
+    /*
+        The number of elements to return. Used to limit the size of result sets in large models. If not set,
+        a server-determined limit will be used.
+
+        If the size of the result set equals the limit, there may be more data available.
+
+        @optional
+    */
+    optional uint32   page_size = 26;
+}
+
+/*
+    Subscription parameters for Events.
+
+    Including no subscription parameters will subscribe to all future Event notifications.
+
+    Subscribes and returns an initial result set. The initial result set is governed by the `time_from` and `limit`
+    fields, which put a bound on the number of the _latest_ Events to return that also match the subscription parameters.
+    Not specifying these parameters will use a default `limit`; setting `limit = 0` will result in only subscribing to
+    future Events.
+*/
+message EventSubscriptionQuery {
+
+    /*
+        Specifies a set of Event types to be directly matched. Events with one of any of the included Event types will
+        be returned and notifications for Events with these types will be delivered.
+
+        @optional
+    */
+    repeated string   event_type         =  1;
+
+    /*
+        Specifies a set of Event severities to be directly matched. Events with one of any of the included Event severities will
+        be returned and notifications for Events with these severities will be delivered.
+
+        @optional
+    */
+    repeated uint32   severity           =  2;
+
+    /*
+        Specifies a set of subsystems to be directly matched. Events with one of any of the included subsystems will
+        be returned and notifications for Events with these subsystems will be delivered.
+
+        @optional
+    */
+    repeated string   subsystem          =  3;
+
+    /*
+        Specifies a set of agent names to be directly matched. Events with one of any of the included agent names will
+        be returned and notifications for Events with these agent names will be delivered.
+
+        @optional
+    */
+    repeated string   agent              =  4;
+
+    /*
+        Specifies a set of Event types to be directly matched. Events with one of any of the included Event types will
+        be returned and notifications for Events with these types will be delivered.
+
+        __Note__: Event notifications are filtered by Entity UUID, not name. Using a name parameter resolves
+        the UUID of the Entity associated with that name at the time of the request, and is
+        equivalent to the client resolving the UUID before making the request. As a result, if the
+        Entity a particular name refers to changes (due to a deletion/addition or two renames) Event notifications will be delivered
+        for only for Events pertaining to the original Entity.
+
+        @nested
+        @optional
+    */
+    optional EntityKeySet entities       =  5;
+
+    /*
+        If, `true`, only returns and subscribes to notifications for Events that raised an Alarm. If `false`, only returns
+        and subscribes to notifications for Events that did not raise an Alarm.
+
+        @optional
+    */
+    optional bool     is_alarm           =  6;
+
+    /*
+        Searches for Events with a time greater than or equal to this value.
+
+        Only relevant to the initial result set. Does not affect the subscription itself.
+
+        Time is measured in milliseconds since midnight, January 1, 1970 UTC.
+
+        @optional
+    */
+    optional uint64   time_from          =  14;
+
+    /*
+        The number of elements to return.  If not set, a server-determined limit will be used.
+
+        Only relevant to the initial result set. Does not affect the subscription itself.
+
+        @optional
+    */
+    optional uint32   limit              =  15;
+}
+
+/*
+    Description used to create an Event.
+*/
+message EventTemplate {
+
+    /*
+        Event type, corresponding to a registered type in the event configuration.
+
+        @required
+    */
+    optional string   event_type    =  1;
+
+    /*
+        Subsystem that authored this event.
+
+        @optional
+    */
+    optional string   subsystem     =  2;
+
+    /*
+        Time of occurrence for the underlying condition that caused the Event to be published.
+
+        Time is measured in milliseconds since midnight, January 1, 1970 UTC.
+
+        @optional
+    */
+    optional uint64   device_time   =  5;
+
+    /*
+        UUID of the object in the system model associated with this Event.
+
+        @optional
+    */
+    optional ModelUUID entity_uuid   =  9;
+
+    /*
+        ID of the segment of the model this Event is associated with.
+
+        @optional
+    */
+    optional string model_group   =  11;
+
+    /*
+        Specifies key-value pairs that correspond to parameters in the resource string
+        for the EventConfig associated with `event_type`.
+
+        @optional
+    */
+    repeated Attribute args     = 10;
+}
+
+/*
+    Query parameters to select a set of Alarms. Relies on the EventQuery to search by the Events associated
+    with Alarms, adding Alarm-specific query parameters.
+
+    Including no search parameters will return all Alarms in the system.
+
+    Paging by ID is used to handle large result sets. Results will be returned sorted first by the requested time
+    ordering and then by ID to distinguish between Events that are recorded in the same millisecond.
+
+    - When paging "forward" (`latest = false`), the `last_id` field should be set to the last value in the result order.
+    - When paging "backward" (`latest = true`), the `last_id` field should be set to the first value in the result order.
+*/
+message AlarmQuery {
+
+    /*
+        Parameters describing the Event associated with the Alarm.
+
+        @nested
+        @optional
+    */
+    optional EventQueryParams event_query_params      =  1;
+
+    /*
+        Specifies a set of Alarm states to be directly matched. Alarms with one of any of the included Alarm states will
+        be returned.
+    */
+    repeated Alarm.State alarm_states     =  2;
+
+    /*
+        Last ID (in the returned sorted order) of a previous result set. This result set will be the
+        page beginning from the next ID.
+
+        The ID used should be for the Alarm, not an associated Event.
+
+        @optional
+    */
+    optional ModelID last_id = 25;
+
+    /*
+        The number of elements to return. Used to limit the size of result sets in large models. If not set,
+        a server-determined limit will be used.
+
+        If the size of the result set equals the limit, there may be more data available.
+
+        @optional
+    */
+    optional uint32   page_size = 26;
+}
+
+/*
+    Subscription parameters for Alarms. Relies on the EventSubscriptionQuery to define the Events associated
+    with Alarms, adding Alarm-specific subscription parameters.
+
+    Including no subscription parameters will subscribe to all future Event notifications.
+*/
+message AlarmSubscriptionQuery {
+
+    /*
+        Parameters describing the Event associated with the Alarm.
+
+        @nested
+        @optional
+    */
+    optional EventSubscriptionQuery event_query      =  1;
+
+    /*
+
+        Specifies a set of Alarm states to be directly matched. Alarms with one of any of the included Alarm states will
+        be returned and notifications for Alarms with these states will be delivered.
+
+        @optional
+    */
+    repeated Alarm.State alarm_states     =  2;
+}
+
+/*
+    Represents a modification to the state of an existing Alarm.
+*/
+message AlarmStateUpdate {
+
+    /*
+        ID of the Alarm to be updated.
+
+        @required
+    */
+    optional ModelID alarm_id = 1;
+
+    /*
+        New state the Alarm should be in.
+
+        @required
+    */
+    optional Alarm.State alarm_state = 2;
+}
+
+/*
+    Description used to create or modify an EventConfig.
+*/
+message EventConfigTemplate {
+
+    /*
+        Event type this EventConfig configures.
+
+        @required
+    */
+    optional string             event_type    = 1;
+
+    /*
+        Severity ranking for the prospective Event. `1` is the most severe. Number of severity levels is
+        configurable (default is 1-8).
+
+        @required
+    */
+    optional uint32             severity      = 2;
+
+    /*
+        Determines whether Events published with this type will be just Events, Events and Alarms, or will be demoted
+        to log entries.
+
+        @required
+    */
+    optional EventConfig.Designation  designation   = 3;
+
+    /*
+        If `designation` is `ALARM`, specifies the initial state of the raised Alarm.
+
+        Defaults to `UNACK_SILENT`. Irrelevant if an Alarm is not raised.
+
+        @optional
+    */
+    optional Alarm.State        alarm_state   = 4;
+
+    /*
+        Specifies the template for Event messages. Parameters are specified by enclosing the index into the Attribute
+        list in braces.
+
+        Example:
+
+        <pre><code>
+        Resource: "The {subject} jumped over the {object}."
+        Attributes: ["subject -> "cow", "object" -> "moon"]
+        </code></pre>
+
+        If an Attribute is not present, the key name itself will appear in the message.
+
+        @required
+    */
+    optional string             resource      = 5;
+}
+
+/*
+    Query parameters to select a set of EventConfigs. EventConfigs can be filtered by severity, designation,
+    or the initial state of Alarms.
+
+    Including no search parameters will return all EventConfigs in the system.
+
+    Paging by the `event_type` field is used to handle large result sets.
+*/
+message EventConfigQuery {
+
+    /*
+        Specifies a set of severities to be directly matched. EventConfigs with one of any of the included severities will
+        be returned.
+
+        @optional
+    */
+    repeated uint32   severity           =  1;
+
+    /*
+        Specifies a lower bound on severities. Any EventConfig at this severity or higher (numerically lower) will
+        be returned.
+
+        If present, overrides the `severity` parameter.
+
+        @optional
+    */
+    optional uint32   severity_or_higher =  2;
+
+    /*
+        Specifies a set of designations to be directly matched. EventConfigs with one of any of the included designations
+        will be returned.
+
+        @optional
+    */
+    repeated EventConfig.Designation  designation   = 3;
+
+    /*
+        Specifies a set of Alarm states to be directly matched. EventConfigs with one of any of the included Alarm states
+        will be returned.
+
+        @optional
+    */
+    repeated Alarm.State    alarm_state   = 4;
+
+    /*
+        Last Event type (in the returned sorted order) of a previous result set. This result set will be the
+        page beginning from the next Event type.
+
+        @optional
+    */
+    optional string last_event_type = 14;
+
+    /*
+        The number of elements to return. Used to limit the size of result sets in large models. If not set,
+        a server-determined page size will be used.
+
+        If the size of the result set equals the page size, there may be more data available.
+
+        @optional
+    */
+    optional uint32 page_size = 15;
+}
+
+
+message GetEventsRequest {
+    repeated ModelID event_id = 1;
+}
+message GetEventsResponse {
+    repeated Event results = 1;
+}
+message EventQueryRequest {
+    optional EventQuery request = 1;
+}
+message EventQueryResponse {
+    repeated Event results = 1;
+}
+message PostEventsRequest {
+    repeated EventTemplate request = 1;
+}
+message PostEventsResponse {
+    repeated Event results = 1;
+}
+message SubscribeEventsRequest {
+    optional EventSubscriptionQuery request = 1;
+}
+message SubscribeEventsResponse {
+    repeated Event results = 1;
+}
+
+message AlarmQueryRequest {
+    optional AlarmQuery request = 1;
+}
+message AlarmQueryResponse {
+    repeated Alarm results = 1;
+}
+message PutAlarmStateRequest {
+    repeated AlarmStateUpdate request = 1;
+}
+message PutAlarmStateResponse {
+    repeated Alarm results = 1;
+}
+message SubscribeAlarmsRequest {
+    optional AlarmSubscriptionQuery request = 1;
+}
+message SubscribeAlarmsResponse {
+    repeated Alarm results = 1;
+}
+
+
+message EventConfigQueryRequest {
+    optional EventConfigQuery request = 1;
+}
+message EventConfigQueryResponse {
+    repeated EventConfig results = 1;
+}
+message GetEventConfigRequest {
+    repeated string event_type = 1;
+}
+message GetEventConfigResponse {
+    repeated EventConfig results = 1;
+}
+message PutEventConfigRequest {
+    repeated EventConfigTemplate request = 1;
+}
+message PutEventConfigResponse {
+    repeated EventConfig results = 1;
+}
+message DeleteEventConfigRequest {
+    repeated string event_type = 1;
+}
+message DeleteEventConfigResponse {
+    repeated EventConfig results = 1;
+}
+
+
+service EventService {
+    option (scala_package) = "io.greenbus.client.service";
+    option (java_package) = "io.greenbus.japi.client.service";
+
+    /*
+        Returns Events identified by ID.
+    */
+    rpc get_events(GetEventsRequest) returns (GetEventsResponse);
+
+    /*
+        Returns all Events or those matching query parameters.
+    */
+    rpc event_query(EventQueryRequest) returns (EventQueryResponse);
+
+    /*
+        Requests Events be created.
+    */
+    rpc post_events(PostEventsRequest) returns (PostEventsResponse);
+
+    /*
+        Subscribes to Event notifications, and can return the latest Events.
+    */
+    rpc subscribe_to_events(SubscribeEventsRequest) returns (SubscribeEventsResponse) {
+        option (subscription_type) = "greenbus.client.EventNotification";
+    }
+
+    /*
+        Returns all Alarms or those matching query parameters.
+    */
+    rpc alarm_query(AlarmQueryRequest) returns (AlarmQueryResponse);
+
+    /*
+        Updates the state of a set of Alarms.
+
+        The valid Alarm state transitions are:
+
+        - `UNACK_AUDIBLE` -> ( `UNACK_SILENT`, `ACKNOWLEDGED` )
+        - `UNACK_SILENT` -> ( `ACKNOWLEDGED` )
+        - `ACKNOWLEDGED` -> ( `REMOVED` )
+
+        Additionally, an update that does not change the state of the Alarm is always legal.
+
+    */
+    rpc put_alarm_state(PutAlarmStateRequest) returns (PutAlarmStateResponse);
+
+    /*
+        Subscribes to Alarm notifications, and can return the latest Alarm.
+    */
+    rpc subscribe_to_alarms(SubscribeAlarmsRequest) returns (SubscribeAlarmsResponse) {
+        option (subscription_type) = "greenbus.client.AlarmNotification";
+    }
+
+    /*
+        Returns all EventConfigs or those matching query parameters.
+    */
+    rpc event_config_query(EventConfigQueryRequest) returns (EventConfigQueryResponse);
+
+    /*
+        Returns EventConfigs identified by Event type.
+    */
+    rpc get_event_configs(GetEventConfigRequest) returns (GetEventConfigResponse);
+
+    /*
+        Creates or modifies a set of EventConfigs.
+    */
+    rpc put_event_configs(PutEventConfigRequest) returns (PutEventConfigResponse);
+
+    /*
+        Deletes a set of EventConfigs identified by Event type. Returns the final state of the deleted EventConfigs.
+
+        Will fail if specified EventConfigs are built-in.
+    */
+    rpc delete_event_configs(DeleteEventConfigRequest) returns (DeleteEventConfigResponse);
+}

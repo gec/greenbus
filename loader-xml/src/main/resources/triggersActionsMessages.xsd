@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+
+    Copyright 2011-2016 Green Energy Corp.
+
+    Licensed to Green Energy Corp (www.greenenergycorp.com) under one or more
+    contributor license agreements. See the NOTICE file distributed with this
+    work for additional information regarding copyright ownership. Green Energy
+    Corp licenses this file to you under the GNU Affero General Public License
+    Version 3.0 (the "License"); you may not use this file except in compliance
+    with the License. You may obtain a copy of the License at
+
+    http://www.gnu.org/licenses/agpl.html
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations under
+    the License.
+
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="xml.ldr.greenbus.io"
+					 xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+					 targetNamespace="xml.ldr.greenbus.io"
+					 elementFormDefault="qualified" jaxb:version="1.0">
+
+	<!-- Greenbus configuration XSD -->
+
+	<!-- This uses the additional vendor specific features provided by the JAXB RI
+				They are defined in the "http://java.sun.com/xml/ns/jaxb/xjc" namespace -->
+	<xs:annotation>
+		<xs:appinfo>
+			<jaxb:globalBindings generateIsSetMethod="true"/>
+		</xs:appinfo>
+	</xs:annotation>
+
+	<xs:simpleType name="ActivationConditionType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="HIGH"/>
+			<xs:enumeration value="LOW"/>
+			<xs:enumeration value="RISING"/>
+			<xs:enumeration value="FALLING"/>
+			<xs:enumeration value="TRANSITION"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="ActionType">
+		<xs:attribute name="activation" type="ActivationConditionType" />
+	</xs:complexType>
+
+	<xs:element name="suppress">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="ActionType"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="stripValue">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="ActionType"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="setBool">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="ActionType">
+					<xs:attribute name="value" type="xs:boolean" use="required"/>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="event">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="ActionType">
+					<xs:attribute name="eventType" type="xs:string" use="required"/>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="scale">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="ActionType">
+					<xs:attribute name="scale" type="xs:double"/>
+					<xs:attribute name="offset" type="xs:double"/>
+					<xs:attribute name="forceToDouble" type="xs:boolean" default="false"/>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="boolMapping">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="ActionType">
+					<xs:attribute name="falseString" type="xs:string" use="required"/>
+					<xs:attribute name="trueString" type="xs:string" use="required"/>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="integerMapping">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="ActionType">
+					<xs:sequence>
+						<xs:element name="mapping" minOccurs="0" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:attribute name="fromInteger" type="xs:long"/>
+								<xs:attribute name="toString" type="xs:string"/>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+					<xs:attribute name="defaultValue" type="xs:string" use="optional"/>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:group name="actionGroup">
+		<xs:choice>
+			<xs:element ref="suppress"/>
+			<xs:element ref="stripValue"/>
+			<xs:element ref="setBool"/>
+			<xs:element ref="event"/>
+			<xs:element ref="scale"/>
+			<xs:element ref="boolMapping"/>
+			<xs:element ref="integerMapping"/>
+		</xs:choice>
+	</xs:group>
+
+	<!-- TRIGGERS
+
+	 -->
+
+	<xs:complexType name="triggerBase">
+		<xs:group ref="actionGroup" minOccurs="1" maxOccurs="unbounded"/>
+		<xs:attribute name="stopProcessingWhen" type="ActivationConditionType"/>
+	</xs:complexType>
+
+	<xs:element name="always">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="triggerBase">
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="filter">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="triggerBase">
+					<xs:attribute name="deadband" type="xs:double"/>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="matchValue">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="triggerBase">
+					<xs:attribute name="stringValue" type="xs:string"/>
+					<xs:attribute name="booleanValue" type="xs:boolean"/>
+					<xs:attribute name="intValue" type="xs:long"/>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="range">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="triggerBase">
+					<xs:attribute name="low" type="xs:double"/>
+					<xs:attribute name="high" type="xs:double"/>
+					<xs:attribute name="deadband" type="xs:double"/>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:group name="triggerGroup">
+		<xs:choice>
+			<xs:element ref="always" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="filter" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="matchValue" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="range" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:choice>
+	</xs:group>
+
+</xs:schema>
