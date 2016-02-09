@@ -1,0 +1,86 @@
+<!--
+
+    Copyright 2011-2016 Green Energy Corp.
+
+    Licensed to Green Energy Corp (www.greenenergycorp.com) under one or more
+    contributor license agreements. See the NOTICE file distributed with this
+    work for additional information regarding copyright ownership. Green Energy
+    Corp licenses this file to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations under
+    the License.
+
+-->
+<html ng-app="apiApp">
+<head>
+	<title>Message</title>
+	<link rel="stylesheet" href="bootstrap-3.2.0-dist/css/bootstrap.min.css">
+	<script src="bootstrap-3.2.0-dist/js/bootstrap.min.js"></script>
+  	<script src="angular/angular.min.js"></script>
+  	<script src="angular/controller.js"></script>
+  	<script type="text/javascript">
+
+  	apiData = {"version":"3.0.0","message":{"name":"EntityTemplate","package":"greenbus.client","description":"<p>Description used to create or modify an Entity.</p>\n<p>New Entities are created by using a template with no UUID, identified by name and with a set of types. The UUID for the Entity\nwill be generated on the server.</p>\n<p>Including a UUID will either create a new Entity with a pre-defined UUID (e.g. imported), or modify the name and types\nof an existing Entity.<br  /></p>\n","fields":[{"name":"uuid","type":{"messageType":"ModelUUID","messagePackage":"greenbus.client","multiplicity":"single"},"label":"optional","description":"<p>Identifies a pre-existing Entity, or provides a pre-determined UUID for a new Entity.</p>\n","requirement":"optional"},{"name":"name","type":{"simpleType":"string","multiplicity":"single"},"label":"optional","description":"<p>Identifies a pre-existing Entity, provides a name for a created Entity, or a new name for an existing Entity.</p>\n<ul>\n<li>If a UUID is not provided and the Entity does not exist an Entity will be created with this name.</li>\n<li>If a UUID is not provided and the Entity exists, the Entity will be identified and only the types will be (potentially) modified.</li>\n<li>If a UUID is provided and the Entity does not exist, an Entity will be created with this name.</li>\n<li>If a UUID is provided and the Entity already exists, the Entity will be renamed to this name.</li>\n</ul>\n","requirement":"required"},{"name":"types","type":{"simpleType":"string","multiplicity":"multiple"},"label":"repeated","description":"<p>The set of types for the Entity.</p>\n<ul>\n<li>If the Entity is being created, all types will be added.</li>\n<li>If the Entity is being modified, types not in this field will be removed and types in this field and not previously in the Entity will be added.</li>\n<li>An empty set of types (including if the field is uninitialized) will result in the Entity containing no types.</li>\n</ul>\n","requirement":"required"}],"simple":false},"mentions":{"messageMentions":["greenbus.client.PointTemplate","greenbus.client.CommandTemplate","greenbus.client.EndpointTemplate"],"serviceParamMentions":[{"service":"greenbus.client.ModelService","method":"put"}]}};
+
+  	</script>
+</head>
+<body ng-controller="msgControl">
+<div class="container">
+    <div class="page-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-1"><h4><span class="label label-primary">message</span></h4></div>
+                <div class="col-md-8"><h4><i>{{message.package}}</i></h4></div>
+                <div class="col-md-3 text-right"><h5><small>Version:</small> {{version}}</h5></div>
+            </div>
+        </div>
+        <h1>{{message.name}}</h1>
+    </div>
+
+    <div ng-bind-html="message.description"></div>
+
+    <div>
+        <p ng-if="mentions.messageMentions"><strong>Used in: </strong>
+            <span ng-repeat="mention in mentions.messageMentions"><a href="{{mention}}.html">{{mention}}</a><span ng-if="!$last">, </span></span>
+        </p>
+        <p ng-if="mentions.serviceParamMentions"><strong>Parameter for: </strong>
+            <span ng-repeat="m in mentions.serviceParamMentions"><a href="{{m.service}}.html">{{m.service}}.{{m.method}}</a><span ng-if="!$last">, </span></span>
+        </p>
+        <p ng-if="mentions.serviceResultMentions"><strong>Result of: </strong>
+            <span ng-repeat="m in mentions.serviceResultMentions"><a href="{{m.service}}.html">{{m.service}}.{{m.method}}</a><span ng-if="!$last">, </span></span>
+        </p>
+    </div>
+
+    <div>
+
+        <table class="table" style="font-size: 100%">
+            <thead class="text-info">
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            </thead>
+            <tr ng-repeat="field in message.fields">
+                <td><span class="clearfix"><strong>{{field.name}}</strong></span><span class="pull-left text-muted"><em>{{field.requirement}}</em></span></td>
+
+                <td ng-if="field.type.simpleType">
+                    <strong style="font-size: 110%">{{field.type.simpleType}}<span ng-if="field.type.multiplicity === 'multiple'">[]</span></strong>
+                </td>
+                <td ng-if="!field.type.simpleType">
+                    <strong style="font-size: 110%"><a href="{{field.type.messagePackage}}.{{field.type.messageType}}.html">{{field.type.messagePackage}}.{{field.type.messageType}}</a><span ng-if="field.type.multiplicity === 'multiple'">[]</span></strong>
+                </td>
+
+                <td ng-bind-html="field.description"></td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

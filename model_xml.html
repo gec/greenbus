@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>System Model XML Configuration  - GreenBus</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+
+    <style type="text/css">code{white-space: pre;}</style>
+    <style type="text/css">
+        table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+        margin: 0; padding: 0; vertical-align: baseline; border: none; }
+        table.sourceCode { width: 100%; line-height: 100%; }
+        td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+        td.sourceCode { padding-left: 5px; }
+        /*code > span.kw { color: #007020; font-weight: bold; }
+        code > span.dt { color: #902000; }
+        code > span.dv { color: #40a070; }
+        code > span.bn { color: #40a070; }
+        code > span.fl { color: #40a070; }
+        code > span.ch { color: #4070a0; }
+        code > span.st { color: #4070a0; }
+        code > span.co { color: #60a0b0; font-style: italic; }
+        code > span.ot { color: #007020; }
+        code > span.al { color: #ff0000; font-weight: bold; }
+        code > span.fu { color: #06287e; }
+        code > span.er { color: #ff0000; font-weight: bold; }*/
+
+        code > span.kw { color: #63a35c; }
+        code > span.dt { color: #183691; }
+        code > span.dv { color: #40a070; }
+        code > span.bn { color: #40a070; }
+        code > span.fl { color: #40a070; }
+        code > span.ch { color: #4070a0; }
+        code > span.st { color: #183691; }
+        code > span.co { color: #60a0b0; font-style: italic; }
+        code > span.ot { color: #795da3; }
+        code > span.al { color: #ff0000; font-weight: bold; }
+        code > span.fu { color: #06287e; }
+        code > span.er { color: #ff0000; font-weight: bold; }
+    </style>
+    <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" />
+    <style type="text/css">
+        body {
+            padding-top: 50px;
+            font-size: 16px;
+        }
+        h2 {
+            /* padding-bottom: 15px; */
+            border-bottom-width: 2px;
+            border-bottom-color: #8cc63e;
+            border-bottom-style: solid;
+            padding-bottom: 7px;
+            margin-bottom: 22px;
+        }
+        .navbar-brand {
+            /*border-top-color: #8cc63e;
+            border-top-style: solid;
+            border-top-width: 8px;
+            margin-right: 40px;*/
+        }
+        span#gb_title {
+            /*border-right-style: solid;
+            border-right-width: 7px;
+            border-right-color: #8cc63e;
+            padding-right: 5px;*/
+
+            /*border-left-style: solid;
+            border-left-width: 4px;
+            border-left-color: #8cc63e;
+            padding-left: 6px;*/
+        }
+        div.jumbotron {
+            background-color: #8cc63e;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="index.html" style="color: #fff"><span class="glyphicon glyphicon-stop" aria-hidden="true" style="color: #8cc63e"></span> <span id="gb_title"> GreenBus</span> Platform</a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">System Overview <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="arch.html">Architecture Overview</a></li>
+                        <li><a href="system_model.html">System Model</a></li>
+                        <li><a href="measurement_stream.html">Measurement Stream</a></li>
+                        <li><a href="command_requests.html">Command Requests</a></li>
+                        <li><a href="events_alarms.html">Events and Alarms</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="auth_model.html">Authorization Model</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="calculation.html">Calculation Protocol</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">User Docs <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="model_xml.html">System Model XML</a></li>
+                        <li><a href="processing_xml.html">Measurement Processing XML</a></li>
+                        <li><a href="calculation_xml.html">Calculation XML</a></li>
+                        <li><a href="event_xml.html">Event Configuration XML</a></li>
+                        <li><a href="auth_xml.html">Authorization System XML</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="frontend_json.html">Frontend Configuration</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Programming Docs <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="api/">API Reference</a></li>
+                        <li><a href="https://github.com/gec/greenbus-examples">API Examples</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="program_java.html">Java Tutorial</a></li>
+                    </ul>
+                </li>
+                <li><a href="hmi.html">HMI</a></li>
+                <li><a href="downloads.html">Downloads</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+<div id="doc-content" class="container">
+<div id="model-xml" class="section level2">
+<h2>Model XML</h2>
+<p>The system model XML format is used by the model importer/exporter to make changes to the GreenBus system model. Modifications to the existing system should be made by first exporting the current state, making changes in the outputted XML, and re-importing.</p>
+<p>When exported or created from scratch, an individual XML document represents a <em>fragment</em> of the total model, defined by the root elements present in the equipment and endpoint models. The fragment extends to children (through the <em>owns</em> model hierarchy) of the equipment roots, and the exporter will also include any Endpoints that reference the equipment model's Points and Commands.</p>
+<p>On re-import, the fragment in the XML is compared to the same fragment in the current live system, and elements missing from the XML are deleted. Model objects in the current system <em>not</em> in the fragment are not deleted. Therefore, if a system has more than one root node, and the XML represents an export of only one root, re-importing that XML does not imply the other roots and their children should be deleted.</p>
+<p>Relationships between objects in the fragment and those outside it (for instance, if the root in the XML is actually a child of an actual root node in the system) are represented by external relationship elements such as <code>&lt;externalOwners&gt;</code>. If these elements have been removed on re-import the model relationship will be deleted in the system.</p>
+<div id="high-level-structure" class="section level3">
+<h3>High-level Structure</h3>
+<p>The model configuration schema consists of a <code>&lt;configuration&gt;</code> root element that contains two major subsections, the equipment model and the endpoint (communications) model. They contain a list of <code>&lt;equipment&gt;</code> and <code>&lt;endpoint&gt;</code> elements, respectively, and <code>&lt;equipment&gt;</code> elements may recursively include sub-equipment.</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;?xml</span> version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;yes&quot;<span class="kw">?&gt;</span>
+<span class="kw">&lt;configuration</span><span class="ot"> xmlns=</span><span class="st">&quot;xml.ldr.greenbus.io&quot;</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;equipmentModel&gt;</span>
+        <span class="kw">&lt;equipment</span><span class="ot"> name=</span><span class="st">&quot;RootA&quot;</span><span class="kw">&gt;</span>
+            ...
+        <span class="kw">&lt;/equipment&gt;</span>
+        <span class="kw">&lt;equipment</span><span class="ot"> name=</span><span class="st">&quot;RootB&quot;</span><span class="kw">&gt;</span>
+            ...
+        <span class="kw">&lt;/equipment&gt;</span>
+    <span class="kw">&lt;/equipmentModel&gt;</span>
+    <span class="kw">&lt;endpointModel&gt;</span>
+        <span class="kw">&lt;endpoint</span><span class="ot"> name=</span><span class="st">&quot;EndpointA&quot;</span><span class="ot"> protocol=</span><span class="st">&quot;protocolA&quot;</span><span class="kw">&gt;</span>
+            ...
+        <span class="kw">&lt;/endpoint&gt;</span>
+        <span class="kw">&lt;endpoint</span><span class="ot"> name=</span><span class="st">&quot;EndpointB&quot;</span><span class="ot"> protocol=</span><span class="st">&quot;protocolB&quot;</span><span class="kw">&gt;</span>
+            ...
+        <span class="kw">&lt;/endpoint&gt;</span>
+<span class="kw">&lt;/configuration&gt;</span></code></pre>
+</div>
+<div id="common-elements" class="section level3">
+<h3>Common Elements</h3>
+</div>
+<div id="identification" class="section level3">
+<h3>Identification</h3>
+<p>Model objects are identified by a combination of a <code>name</code> attribute and an optional <code>uuid</code> attribute. When creating new objects through the XML the UUID may be left absent to be generated by the services. Renaming objects requires the UUID to be present so that the XML element with the new name can be correlated with the model object with the old name.</p>
+<p>Model relationships in the XML model (<code>&lt;reference&gt;</code>, <code>&lt;relationship&gt;</code>, <code>&lt;source&gt;</code>) are also identified by the combination of <code>name</code> and <code>uuid</code> attributes. In this case, one of the two attributes must be present. If both are present, the UUID is considered to be the stronger identification.</p>
+</div>
+<div id="types" class="section level3">
+<h3>Types</h3>
+<p>The <code>&lt;type&gt;</code> element represents the presence of a type in a model object. It contains the single attribute <code>name</code> that contains the type name.</p>
+<p>Example:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;type</span><span class="ot"> name=</span><span class="st">&quot;TypeA&quot;</span><span class="kw">/&gt;</span></code></pre>
+</div>
+<div id="key-values" class="section level3">
+<h3>Key Values</h3>
+<p>The <code>&lt;keyValue&gt;</code> element represents a key value attached to a model objects. It contains a <code>key</code> attribute specifying the name of the key, as well as one of the following value attributes:</p>
+<table class="table table-bordered">
+<thead>
+<tr class="header">
+<th align="left">Attribute</th>
+<th align="left">Value Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>stringValue</code></td>
+<td align="left">string</td>
+<td align="left">A string value.</td>
+</tr>
+<tr class="even">
+<td align="left"><code>booleanValue</code></td>
+<td align="left">boolean</td>
+<td align="left">A boolean value, <code>true</code> or <code>false</code>.</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>intValue</code></td>
+<td align="left">long</td>
+<td align="left">An integer value</td>
+</tr>
+<tr class="even">
+<td align="left"><code>doubleValue</code></td>
+<td align="left">double</td>
+<td align="left">A floating point value.</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>bytesSize</code></td>
+<td align="left">long</td>
+<td align="left">A byte array value referenced only by its size. Can be deleted by removing it but not modified.</td>
+</tr>
+<tr class="even">
+<td align="left"><code>fileName</code></td>
+<td align="left">string</td>
+<td align="left">A byte array value referenced by the name of another file.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="external-relationships" class="section level3">
+<h3>External Relationships</h3>
+<p>Objects in the equipment model define ownership relationships to sub-equipment, points, and commands according to the presence of full descriptions of those objects in the XML hierarchy. Relationships to objects elsewhere in the XML or not present in the model fragment are specified by the <code>&lt;externalOwners&gt;</code>, <code>&lt;parentRelationships&gt;</code>, and <code>&lt;childRelationships&gt;</code> elements.</p>
+<p>The <code>&lt;externalOwners&gt;</code> element contains a collection of <code>&lt;reference&gt;</code> elements. References contain attributes for <code>name</code> and <code>uuid</code>, and at least one must be present.</p>
+<p>Example:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;externalOwners&gt;</span>
+    <span class="kw">&lt;reference</span><span class="ot"> name=</span><span class="st">&quot;RootNotInXml&quot;</span><span class="ot"> uuid=</span><span class="st">&quot;...&quot;</span><span class="kw">/&gt;</span>
+<span class="kw">&lt;/externalOwners&gt;</span></code></pre>
+<p>The <code>&lt;parentRelationships&gt;</code> and <code>&lt;childRelationships&gt;</code> elements contain collections of <code>&lt;relationship&gt;</code> elements. In the parent relationship collection, the referenced object is the parent of the object. In the child relationship collection, the referenced object is the child of the object. Relationships contain <code>name</code> and <code>uuid</code> as in a reference, but also specify a <code>relation</code> attribute that defines the relationship type. Examples:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;parentRelationships&gt;</span>
+    <span class="kw">&lt;relationship</span><span class="ot"> name=</span><span class="st">&quot;SomeOtherObjectA&quot;</span><span class="ot"> uuid=</span><span class="st">&quot;...&quot;</span><span class="ot"> relation=</span><span class="st">&quot;relatesTo&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;relationship</span><span class="ot"> name=</span><span class="st">&quot;SomeOtherObjectB&quot;</span><span class="ot"> uuid=</span><span class="st">&quot;...&quot;</span><span class="ot"> relation=</span><span class="st">&quot;relatesTo&quot;</span><span class="kw">/&gt;</span>
+<span class="kw">&lt;/externalOwners&gt;</span>
+<span class="kw">&lt;childRelationships&gt;</span>
+    <span class="kw">&lt;relationship</span><span class="ot"> name=</span><span class="st">&quot;SomeOtherObjectC&quot;</span><span class="ot"> uuid=</span><span class="st">&quot;...&quot;</span><span class="ot"> relation=</span><span class="st">&quot;relatesTo&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;relationship</span><span class="ot"> name=</span><span class="st">&quot;SomeOtherObjectD&quot;</span><span class="ot"> uuid=</span><span class="st">&quot;...&quot;</span><span class="ot"> relation=</span><span class="st">&quot;relatesTo&quot;</span><span class="kw">/&gt;</span>
+<span class="kw">&lt;/childRelationships&gt;</span></code></pre>
+</div>
+<div id="equipment" class="section level3">
+<h3>Equipment</h3>
+<p>Model entities are represented in the XML by <code>&lt;equipment&gt;</code> elements. Equipment may recursively include sub-equipment, forming a tree, and may also contain elements for Points and Commands.</p>
+<p>Additionally, <code>&lt;equipment&gt;</code> elements contain the common sub-elements for objects in the model: types, key values, and external relationships.</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;equipment</span><span class="ot"> name=</span><span class="st">&quot;EquipmentA&quot;</span><span class="ot"> uuid=</span><span class="st">&quot;...&quot;</span><span class="kw">&gt;</span>
+
+    <span class="co">&lt;!-- List of types --&gt;</span>
+    <span class="kw">&lt;type</span><span class="ot"> name=</span><span class="st">&quot;Equipment&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;type</span><span class="ot"> name=</span><span class="st">&quot;TypeA&quot;</span><span class="kw">/&gt;</span>
+
+    <span class="co">&lt;!-- List of key values --&gt;</span>
+    <span class="kw">&lt;keyValue</span><span class="ot"> key=</span><span class="st">&quot;keyA&quot;</span><span class="ot"> stringValue=</span><span class="st">&quot;A Value&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;keyValue</span><span class="ot"> key=</span><span class="st">&quot;keyB&quot;</span><span class="ot"> fileName=</span><span class="st">&quot;file01.txt&quot;</span><span class="kw">/&gt;</span>
+
+    <span class="co">&lt;!-- List of sub-equipment --&gt;</span>
+    <span class="kw">&lt;equipment</span><span class="ot"> name=</span><span class="st">&quot;SubEquipment1&quot;</span><span class="kw">&gt;</span>
+        ...
+    <span class="kw">&lt;/equipment&gt;</span>
+
+    <span class="co">&lt;!-- Points/Commands owned by the equipment --&gt;</span>
+    <span class="kw">&lt;status</span> <span class="er">...</span><span class="kw">&gt;</span> ... <span class="kw">&lt;/status&gt;</span>
+    <span class="kw">&lt;analog</span> <span class="er">...</span><span class="kw">&gt;</span> ... <span class="kw">&lt;/analog&gt;</span>
+    <span class="kw">&lt;counter</span> <span class="er">...</span><span class="kw">&gt;</span> ... <span class="kw">&lt;/counter&gt;</span>
+    <span class="kw">&lt;control</span> <span class="er">...</span><span class="kw">&gt;</span> ... <span class="kw">&lt;/control&gt;</span>
+    <span class="kw">&lt;setpoint</span> <span class="er">...</span><span class="kw">&gt;</span> ... <span class="kw">&lt;/setpoint&gt;</span>
+
+    <span class="co">&lt;!-- Other relationships, each element occurs zero or one time --&gt;</span>
+    <span class="kw">&lt;externalOwners</span> <span class="er">...</span><span class="kw">&gt;</span> ... <span class="kw">&lt;/externalOwners&gt;</span>
+    <span class="kw">&lt;parentRelationships</span> <span class="er">...</span><span class="kw">&gt;</span> ... <span class="kw">&lt;/parentRelationships&gt;</span>
+    <span class="kw">&lt;childRelationships</span> <span class="er">...</span><span class="kw">&gt;</span> ... <span class="kw">&lt;/childRelationships&gt;</span>
+
+<span class="kw">&lt;/equipment&gt;</span></code></pre>
+</div>
+<div id="points" class="section level3">
+<h3>Points</h3>
+<p>Points in the model are represented by <code>&lt;status&gt;</code>, <code>&lt;analog&gt;</code>, or <code>&lt;counter&gt;</code> elements, with the element type determining the Point category. Points contain the common sub-elements for objects in the model: types, key values, and external relationships.</p>
+<p>The <em>feedback</em> relationship between Points and Commands is modeled in the <code>&lt;commands&gt;</code> sub-element, which is a list of references to Command objects elsewhere in the model.</p>
+<p>The Point elements also contain the <code>&lt;triggers&gt;</code> and <code>&lt;calculation&gt;</code> sub-elements, which are discussed in the processing and calculation XML documentation.</p>
+<p>Example/structure:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;analog</span><span class="ot"> name=</span><span class="st">&quot;PointA&quot;</span><span class="ot"> uuid=</span><span class="st">&quot;...&quot;</span><span class="ot"> unit=</span><span class="st">&quot;unitA&quot;</span><span class="kw">&gt;</span>
+
+    <span class="co">&lt;!-- List of types --&gt;</span>
+    <span class="kw">&lt;type</span><span class="ot"> name=</span><span class="st">&quot;Point&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;type</span><span class="ot"> name=</span><span class="st">&quot;TypeA&quot;</span><span class="kw">/&gt;</span>
+
+    <span class="co">&lt;!-- List of key values --&gt;</span>
+    <span class="kw">&lt;keyValue</span><span class="ot"> key=</span><span class="st">&quot;keyA&quot;</span><span class="ot"> stringValue=</span><span class="st">&quot;A Value&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;keyValue</span><span class="ot"> key=</span><span class="st">&quot;keyB&quot;</span><span class="ot"> fileName=</span><span class="st">&quot;file01.txt&quot;</span><span class="kw">/&gt;</span>
+
+    <span class="co">&lt;!-- Processing configuration --&gt;</span>
+    <span class="kw">&lt;triggers&gt;</span>
+        ...
+    <span class="kw">&lt;/triggers&gt;</span>
+
+    <span class="co">&lt;!-- Calculation configuration --&gt;</span>
+    <span class="kw">&lt;calculation&gt;</span>
+        ...
+    <span class="kw">&lt;/calculation&gt;</span>
+
+    <span class="co">&lt;!-- List of feedback references to Commands --&gt;</span>
+    <span class="kw">&lt;commands&gt;</span>
+        <span class="kw">&lt;reference</span><span class="ot"> name=</span><span class="st">&quot;CommandA&quot;</span><span class="kw">/&gt;</span>
+        <span class="kw">&lt;reference</span><span class="ot"> name=</span><span class="st">&quot;CommandB&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;/commands&gt;</span>
+
+    <span class="co">&lt;!-- Other relationships, each element occurs zero or one time --&gt;</span>
+    <span class="kw">&lt;externalOwners</span> <span class="er">...</span><span class="kw">&gt;</span> ... <span class="kw">&lt;/externalOwners&gt;</span>
+    <span class="kw">&lt;parentRelationships</span> <span class="er">...</span><span class="kw">&gt;</span> ... <span class="kw">&lt;/parentRelationships&gt;</span>
+    <span class="kw">&lt;childRelationships</span> <span class="er">...</span><span class="kw">&gt;</span> ... <span class="kw">&lt;/childRelationships&gt;</span>
+
+<span class="kw">&lt;/analog&gt;</span></code></pre>
+</div>
+<div id="commands" class="section level3">
+<h3>Commands</h3>
+<p>Commands in the model are represented by <code>&lt;control&gt;</code> and <code>&lt;setpoint&gt;</code> elements, with the element type determining the Command category. Commands contain the common sub-elements for objects in the model: types, key values, and external relationships.</p>
+<p>Both the <code>&lt;control&gt;</code> and <code>&lt;setpoint&gt;</code> elements contain the <code>displayName</code> attribute (a string value), and the <code>&lt;setpoint&gt;</code> element additionally contains the <code>setpointType</code> attribute, which has possible values <code>double</code>, <code>integer</code>, or <code>string</code>.</p>
+<p>Example/structure:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;control</span><span class="ot"> name=</span><span class="st">&quot;ControlA&quot;</span><span class="ot"> uuid=</span><span class="st">&quot;...&quot;</span><span class="ot"> displayName=</span><span class="st">&quot;Control A&quot;</span><span class="kw">&gt;</span>
+
+    <span class="co">&lt;!-- List of types --&gt;</span>
+    <span class="kw">&lt;type</span><span class="ot"> name=</span><span class="st">&quot;Command&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;type</span><span class="ot"> name=</span><span class="st">&quot;TypeA&quot;</span><span class="kw">/&gt;</span>
+
+    <span class="co">&lt;!-- List of key values --&gt;</span>
+    <span class="kw">&lt;keyValue</span><span class="ot"> key=</span><span class="st">&quot;keyA&quot;</span><span class="ot"> stringValue=</span><span class="st">&quot;A Value&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;keyValue</span><span class="ot"> key=</span><span class="st">&quot;keyB&quot;</span><span class="ot"> fileName=</span><span class="st">&quot;file01.txt&quot;</span><span class="kw">/&gt;</span>
+
+    <span class="co">&lt;!-- Other relationships, each element occurs zero or one time --&gt;</span>
+    <span class="kw">&lt;externalOwners</span> <span class="er">...</span><span class="kw">&gt;</span> ... <span class="kw">&lt;/externalOwners&gt;</span>
+    <span class="kw">&lt;parentRelationships</span> <span class="er">...</span><span class="kw">&gt;</span> ... <span class="kw">&lt;/parentRelationships&gt;</span>
+    <span class="kw">&lt;childRelationships</span> <span class="er">...</span><span class="kw">&gt;</span> ... <span class="kw">&lt;/childRelationships&gt;</span>
+
+<span class="kw">&lt;/control&gt;</span>
+
+<span class="kw">&lt;setpoint</span><span class="ot"> name=</span><span class="st">&quot;SetpointA&quot;</span><span class="ot"> uuid=</span><span class="st">&quot;...&quot;</span><span class="ot"> displayName=</span><span class="st">&quot;Setpoint A&quot;</span><span class="ot"> setpointType=</span><span class="st">&quot;double&quot;</span><span class="kw">/&gt;</span>
+    ...
+<span class="er">&lt;</span>/setpoint&gt;</code></pre>
+</div>
+<div id="endpoints" class="section level3">
+<h3>Endpoints</h3>
+<p>Endpoints in the model are represented by <code>&lt;endpoint&gt;</code> elements. Endpoints contain the common sub-elements for objects in the model: types, key values, and external relationships.</p>
+<p>The <code>protocol</code> attribute defines the Endpoint protocol.</p>
+<p>Endpoints contain a series of <code>&lt;source&gt;</code> sub-elements that are references to Points and Commands the Endpoint serves as a data source for. The <code>&lt;source&gt;</code> elements are identical to <code>&lt;reference&gt;</code> elements, containing one or both of a <code>name</code> and <code>uuid</code> attribute.</p>
+<p>Example/structure:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;endpoint</span><span class="ot"> name=</span><span class="st">&quot;Simulated_PV&quot;</span><span class="ot"> uuid=</span><span class="st">&quot;...&quot;</span><span class="ot"> protocol=</span><span class="st">&quot;simulator&quot;</span><span class="kw">&gt;</span>
+
+    <span class="co">&lt;!-- List of types --&gt;</span>
+    <span class="kw">&lt;type</span><span class="ot"> name=</span><span class="st">&quot;Endpoint&quot;</span> <span class="kw">/&gt;</span>
+    <span class="kw">&lt;type</span><span class="ot"> name=</span><span class="st">&quot;TypeA&quot;</span><span class="kw">/&gt;</span>
+
+    <span class="co">&lt;!-- List of key values --&gt;</span>
+    <span class="kw">&lt;keyValue</span><span class="ot"> key=</span><span class="st">&quot;protocolConfig&quot;</span><span class="ot"> fileName=</span><span class="st">&quot;configuration.file&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;keyValue</span><span class="ot"> key=</span><span class="st">&quot;keyA&quot;</span><span class="ot"> stringValue=</span><span class="st">&quot;A Value&quot;</span><span class="kw">/&gt;</span>
+
+    <span class="co">&lt;!-- List of source relationships --&gt;</span>
+    <span class="kw">&lt;source</span><span class="ot"> name=</span><span class="st">&quot;PointA&quot;</span><span class="ot"> uuid=</span><span class="st">&quot;...&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;source</span><span class="ot"> name=</span><span class="st">&quot;CommandA&quot;</span><span class="ot"> uuid=</span><span class="st">&quot;...&quot;</span><span class="kw">/&gt;</span>
+
+    <span class="co">&lt;!-- Other relationships, each element occurs zero or one time --&gt;</span>
+    <span class="kw">&lt;externalOwners</span> <span class="er">...</span><span class="kw">&gt;</span> ... <span class="kw">&lt;/externalOwners&gt;</span>
+    <span class="kw">&lt;parentRelationships</span> <span class="er">...</span><span class="kw">&gt;</span> ... <span class="kw">&lt;/parentRelationships&gt;</span>
+    <span class="kw">&lt;childRelationships</span> <span class="er">...</span><span class="kw">&gt;</span> ... <span class="kw">&lt;/childRelationships&gt;</span>
+
+<span class="kw">&lt;/endpoint&gt;</span></code></pre>
+</div>
+</div>
+</div>
+
+
+<footer>
+    <div class="container" style="margin-bottom: 20px">
+        <hr>
+        <div class="row">
+            <div class="col-md-4"><p>&copy; Green Energy Corp 2016</p></div>
+            <div class="col-md-2 col-md-offset-6"><a href="http://www.greenenergycorp.com"><img src="img/gec_sm.jpg"></img></a></div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

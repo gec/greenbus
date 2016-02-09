@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Calculation XML Configuration  - GreenBus</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+
+    <style type="text/css">code{white-space: pre;}</style>
+    <style type="text/css">
+        table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+        margin: 0; padding: 0; vertical-align: baseline; border: none; }
+        table.sourceCode { width: 100%; line-height: 100%; }
+        td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+        td.sourceCode { padding-left: 5px; }
+        /*code > span.kw { color: #007020; font-weight: bold; }
+        code > span.dt { color: #902000; }
+        code > span.dv { color: #40a070; }
+        code > span.bn { color: #40a070; }
+        code > span.fl { color: #40a070; }
+        code > span.ch { color: #4070a0; }
+        code > span.st { color: #4070a0; }
+        code > span.co { color: #60a0b0; font-style: italic; }
+        code > span.ot { color: #007020; }
+        code > span.al { color: #ff0000; font-weight: bold; }
+        code > span.fu { color: #06287e; }
+        code > span.er { color: #ff0000; font-weight: bold; }*/
+
+        code > span.kw { color: #63a35c; }
+        code > span.dt { color: #183691; }
+        code > span.dv { color: #40a070; }
+        code > span.bn { color: #40a070; }
+        code > span.fl { color: #40a070; }
+        code > span.ch { color: #4070a0; }
+        code > span.st { color: #183691; }
+        code > span.co { color: #60a0b0; font-style: italic; }
+        code > span.ot { color: #795da3; }
+        code > span.al { color: #ff0000; font-weight: bold; }
+        code > span.fu { color: #06287e; }
+        code > span.er { color: #ff0000; font-weight: bold; }
+    </style>
+    <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" />
+    <style type="text/css">
+        body {
+            padding-top: 50px;
+            font-size: 16px;
+        }
+        h2 {
+            /* padding-bottom: 15px; */
+            border-bottom-width: 2px;
+            border-bottom-color: #8cc63e;
+            border-bottom-style: solid;
+            padding-bottom: 7px;
+            margin-bottom: 22px;
+        }
+        .navbar-brand {
+            /*border-top-color: #8cc63e;
+            border-top-style: solid;
+            border-top-width: 8px;
+            margin-right: 40px;*/
+        }
+        span#gb_title {
+            /*border-right-style: solid;
+            border-right-width: 7px;
+            border-right-color: #8cc63e;
+            padding-right: 5px;*/
+
+            /*border-left-style: solid;
+            border-left-width: 4px;
+            border-left-color: #8cc63e;
+            padding-left: 6px;*/
+        }
+        div.jumbotron {
+            background-color: #8cc63e;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="index.html" style="color: #fff"><span class="glyphicon glyphicon-stop" aria-hidden="true" style="color: #8cc63e"></span> <span id="gb_title"> GreenBus</span> Platform</a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">System Overview <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="arch.html">Architecture Overview</a></li>
+                        <li><a href="system_model.html">System Model</a></li>
+                        <li><a href="measurement_stream.html">Measurement Stream</a></li>
+                        <li><a href="command_requests.html">Command Requests</a></li>
+                        <li><a href="events_alarms.html">Events and Alarms</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="auth_model.html">Authorization Model</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="calculation.html">Calculation Protocol</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">User Docs <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="model_xml.html">System Model XML</a></li>
+                        <li><a href="processing_xml.html">Measurement Processing XML</a></li>
+                        <li><a href="calculation_xml.html">Calculation XML</a></li>
+                        <li><a href="event_xml.html">Event Configuration XML</a></li>
+                        <li><a href="auth_xml.html">Authorization System XML</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="frontend_json.html">Frontend Configuration</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Programming Docs <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="api/">API Reference</a></li>
+                        <li><a href="https://github.com/gec/greenbus-examples">API Examples</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="program_java.html">Java Tutorial</a></li>
+                    </ul>
+                </li>
+                <li><a href="hmi.html">HMI</a></li>
+                <li><a href="downloads.html">Downloads</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+<div id="doc-content" class="container">
+<div id="calculation-xml-configuration" class="section level2">
+<h2>Calculation XML Configuration</h2>
+<div id="structure-example" class="section level3">
+<h3>Structure / Example</h3>
+<p>The <code>&lt;calculation&gt;</code> XML element contains the configuration parameters for a calculation.</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;calculation&gt;</span>
+    <span class="kw">&lt;inputs</span><span class="ot"> inputQualityStrategy=</span><span class="st">&quot;ONLY_WHEN_ALL_OK&quot;</span><span class="kw">&gt;</span>
+        <span class="kw">&lt;single</span><span class="ot"> pointName=</span><span class="st">&quot;Model.Point1&quot;</span><span class="ot"> variable=</span><span class="st">&quot;A&quot;</span><span class="kw">/&gt;</span>
+        <span class="kw">&lt;single</span><span class="ot"> pointName=</span><span class="st">&quot;Model.Point2&quot;</span><span class="ot"> variable=</span><span class="st">&quot;B&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;/inputs&gt;</span>
+    <span class="kw">&lt;triggering</span><span class="ot"> updateOnAnyChange=</span><span class="st">&quot;true&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;formula&gt;</span>SUM(A,B)<span class="kw">&lt;/formula&gt;</span>
+    <span class="kw">&lt;output</span><span class="ot"> outputQualityStrategy=</span><span class="st">&quot;WORST_QUALITY&quot;</span><span class="kw">/&gt;</span>
+<span class="kw">&lt;/calculation&gt;</span></code></pre>
+</div>
+<div id="inputs" class="section level3">
+<h3>Inputs</h3>
+<p>The <code>&lt;input&gt;</code> element defines one attribute, <code>inputQualityStrategy</code>, and contains zero or more sub-elements for input Points.</p>
+<p>Valid values for <code>inputQualityStrategy</code> are:</p>
+<ul>
+<li><code>ACCEPT_ALL</code></li>
+<li><code>ONLY_WHEN_ALL_OK</code></li>
+<li><code>REMOVE_BAD_AND_CALC</code></li>
+</ul>
+<p>These correspond to the input quality strategies in the calculation module documentation.</p>
+<p>Input sub-elements can be either <code>&lt;single&gt;</code> or <code>&lt;multi&gt;</code> elements, depending on whether they are intended to represent multiple values for the same Point. Each contain the <code>pointName</code> and <code>variable</code> attributes, which define the name of Point and the symbol it is represented by in the formula.</p>
+<p>Additionally, the <code>&lt;multi&gt;</code> element defines the following attributes:</p>
+<table class="table table-bordered">
+<thead>
+<tr class="header">
+<th align="left">Attribute</th>
+<th align="left">Value Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>from</code></td>
+<td align="left">long</td>
+<td align="left">Specifies an offset in milliseconds to the beginning of a time window of Measurement history to use for this input. An offset to past times should be negative. For example, a value of <code>-5000</code> will create a range that includes all Measurements since five seconds before the current time. If the number of Measurements in that time window exceeds the <code>limit</code> field, the latest Measurements will be used.</td>
+</tr>
+<tr class="even">
+<td align="left"><code>limit</code></td>
+<td align="left">int</td>
+<td align="left">Provides a limit on the size of the Measurement sequence retained for the calculation input. The limit will also apply to the request for Measurement history when the calculation is initialized. If not specified, the measurement calculator will use a default value.</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>sinceLastPublish</code></td>
+<td align="left">boolean</td>
+<td align="left">If set to <code>true</code>, the input does not retrieve Measurement history and instead begins accumulating time-series values from the time the calculation endpoint came online.</td>
+</tr>
+</tbody>
+</table>
+<p>Example of a single input:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;single</span><span class="ot"> pointName=</span><span class="st">&quot;Model.Point1&quot;</span><span class="ot"> variable=</span><span class="st">&quot;A&quot;</span><span class="kw">/&gt;</span></code></pre>
+<p>Examples of multi input:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;multi</span><span class="ot"> pointName=</span><span class="st">&quot;Model.Point1&quot;</span><span class="ot"> variable=</span><span class="st">&quot;A&quot;</span><span class="ot"> from=</span><span class="st">&quot;5000&quot;</span><span class="ot"> limit=</span><span class="st">&quot;100&quot;</span><span class="kw">/&gt;</span></code></pre>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;multi</span><span class="ot"> pointName=</span><span class="st">&quot;Model.Point1&quot;</span><span class="ot"> variable=</span><span class="st">&quot;A&quot;</span><span class="ot"> from=</span><span class="st">&quot;5000&quot;</span><span class="ot"> limit=</span><span class="st">&quot;100&quot;</span><span class="ot"> sinceLastPublish=</span><span class="st">&quot;true&quot;</span><span class="kw">/&gt;</span></code></pre>
+</div>
+<div id="triggering" class="section level3">
+<h3>Triggering</h3>
+<p>The <code>&lt;triggering&gt;</code> element is used to define the triggering stategy for the calculation. The element may have either the <code>updateOnAnyChange</code> attribute set to <code>true</code>, or the <code>updateEveryPeriodInMilliseconds</code> attribute with a time interval in milliseconds.</p>
+<p>Examples:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;triggering</span><span class="ot"> updateOnAnyChange=</span><span class="st">&quot;true&quot;</span><span class="kw">/&gt;</span></code></pre>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;triggering</span><span class="ot"> updateEveryPeriodInMilliseconds=</span><span class="st">&quot;5000&quot;</span><span class="kw">/&gt;</span></code></pre>
+</div>
+<div id="formula" class="section level3">
+<h3>Formula</h3>
+<p>The <code>&lt;formula&gt;</code> element contains a single expression made up of input variables, arithmetic operators, and function calls.</p>
+<p>Example:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;formula&gt;</span>SUM(A,B)<span class="kw">&lt;/formula&gt;</span></code></pre>
+</div>
+<div id="output-quality" class="section level3">
+<h3>Output Quality</h3>
+<p>The <code>&lt;output&gt;</code> element configureds the output quality strategy for the calculation. It contains the single attribute, <code>outputQualityStrategy</code>, which can be assigned the following values:</p>
+<ul>
+<li>WORST_QUALITY</li>
+<li>ALWAYS_OK</li>
+</ul>
+<p>These correspond to the output quality strategies in the calculation module documentation.</p>
+<p>Output example:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;output</span><span class="ot"> outputQualityStrategy=</span><span class="st">&quot;WORST_QUALITY&quot;</span><span class="kw">/&gt;</span></code></pre>
+</div>
+</div>
+</div>
+
+
+<footer>
+    <div class="container" style="margin-bottom: 20px">
+        <hr>
+        <div class="row">
+            <div class="col-md-4"><p>&copy; Green Energy Corp 2016</p></div>
+            <div class="col-md-2 col-md-offset-6"><a href="http://www.greenenergycorp.com"><img src="img/gec_sm.jpg"></img></a></div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!--
+
+    Copyright 2011-2016 Green Energy Corp.
+
+    Licensed to Green Energy Corp (www.greenenergycorp.com) under one or more
+    contributor license agreements. See the NOTICE file distributed with this
+    work for additional information regarding copyright ownership. Green Energy
+    Corp licenses this file to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations under
+    the License.
+
+-->
+<html ng-app="apiApp">
+<head>
+	<title>Message</title>
+	<link rel="stylesheet" href="bootstrap-3.2.0-dist/css/bootstrap.min.css">
+	<script src="bootstrap-3.2.0-dist/js/bootstrap.min.js"></script>
+  	<script src="angular/angular.min.js"></script>
+  	<script src="angular/controller.js"></script>
+  	<script type="text/javascript">
+
+  	apiData = {"version":"3.0.0","message":{"name":"EntityEdgeQuery","package":"greenbus.client","description":"<p>Queries for edges in the graph model. Can search according to parents, children, relationship types,\nand depth.</p>\n<p>Including no search parameters will return all edges in the graph model. Including only\n<code>depth_limit = 1</code> will return all immediate edges, which is sufficient to reconstruct the model.</p>\n<p>Enables querying for derived edges, but the intermediate path will not necessarily be included.</p>\n<p>The cost of the query does not increase with depth.</p>\n<p>Uses paging to handle large result sets.</p>\n","fields":[{"name":"parent_uuids","type":{"messageType":"ModelUUID","messagePackage":"greenbus.client","multiplicity":"multiple"},"label":"repeated","description":"<p>Filters results by parent UUIDs.</p>\n","requirement":"optional"},{"name":"child_uuids","type":{"messageType":"ModelUUID","messagePackage":"greenbus.client","multiplicity":"multiple"},"label":"repeated","description":"<p>Filters results by child UUIDs.</p>\n","requirement":"optional"},{"name":"relationships","type":{"simpleType":"string","multiplicity":"multiple"},"label":"repeated","description":"<p>Filters results by relationships.</p>\n<ul>\n<li>If not specified, edges of any relationship will be returned.</li>\n<li>If specified, only edges with one of the listed relationships will be returned.</li>\n</ul>\n","requirement":"optional"},{"name":"depth_limit","type":{"simpleType":"uint32","multiplicity":"single"},"label":"optional","description":"<p>Provides an optional limit to the depth of the query. By default, the query will return any and all\nderived edges (<code>distance &gt; 1</code>). Setting a depth limit will return only edges up to and including that\ndepth.</p>\n<p>Example:</p>\n<pre><code>\nEntity tree: A -> B -> C -> D\nParent: ( A )\n\nNo depth limit:     ( (A -> B), (A -> C), (A -> D) )\nDepth limit = 1:    ( (A -> B) )\nDepth limit = 2:    ( (A -> B), (A -> C) )\n</code></pre>\n<p>Note that intermediate edges are not necessarily provided (unless they are otherwise part of the result set).\nIn other words, in the example above, <code>(B -&gt; C)</code>, <code>(B -&gt; D)</code>, and <code>(C -&gt; D)</code> are all unstated. The same result\nwould hold in an alternate scenario where <code>C</code> and <code>D</code> were immediate children of <code>B</code>.</p>\n","requirement":"optional"},{"name":"last_id","type":{"messageType":"ModelID","messagePackage":"greenbus.client","multiplicity":"single"},"label":"optional","description":"<p>Last ID (in the returned sorted order) of a previous result set. This result set will be the\npage beginning from the next ID.</p>\n","requirement":"optional"},{"name":"page_size","type":{"simpleType":"uint32","multiplicity":"single"},"label":"optional","description":"<p>The number of elements to return. Used to limit the size of result sets in large models. If not set,\na server-determined page size will be used.</p>\n<p>If the size of the result set equals the page size, there may be more data available.</p>\n","requirement":"optional"}],"simple":false},"mentions":{"serviceParamMentions":[{"service":"greenbus.client.ModelService","method":"edge_query"}]}};
+
+  	</script>
+</head>
+<body ng-controller="msgControl">
+<div class="container">
+    <div class="page-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-1"><h4><span class="label label-primary">message</span></h4></div>
+                <div class="col-md-8"><h4><i>{{message.package}}</i></h4></div>
+                <div class="col-md-3 text-right"><h5><small>Version:</small> {{version}}</h5></div>
+            </div>
+        </div>
+        <h1>{{message.name}}</h1>
+    </div>
+
+    <div ng-bind-html="message.description"></div>
+
+    <div>
+        <p ng-if="mentions.messageMentions"><strong>Used in: </strong>
+            <span ng-repeat="mention in mentions.messageMentions"><a href="{{mention}}.html">{{mention}}</a><span ng-if="!$last">, </span></span>
+        </p>
+        <p ng-if="mentions.serviceParamMentions"><strong>Parameter for: </strong>
+            <span ng-repeat="m in mentions.serviceParamMentions"><a href="{{m.service}}.html">{{m.service}}.{{m.method}}</a><span ng-if="!$last">, </span></span>
+        </p>
+        <p ng-if="mentions.serviceResultMentions"><strong>Result of: </strong>
+            <span ng-repeat="m in mentions.serviceResultMentions"><a href="{{m.service}}.html">{{m.service}}.{{m.method}}</a><span ng-if="!$last">, </span></span>
+        </p>
+    </div>
+
+    <div>
+
+        <table class="table" style="font-size: 100%">
+            <thead class="text-info">
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            </thead>
+            <tr ng-repeat="field in message.fields">
+                <td><span class="clearfix"><strong>{{field.name}}</strong></span><span class="pull-left text-muted"><em>{{field.requirement}}</em></span></td>
+
+                <td ng-if="field.type.simpleType">
+                    <strong style="font-size: 110%">{{field.type.simpleType}}<span ng-if="field.type.multiplicity === 'multiple'">[]</span></strong>
+                </td>
+                <td ng-if="!field.type.simpleType">
+                    <strong style="font-size: 110%"><a href="{{field.type.messagePackage}}.{{field.type.messageType}}.html">{{field.type.messagePackage}}.{{field.type.messageType}}</a><span ng-if="field.type.multiplicity === 'multiple'">[]</span></strong>
+                </td>
+
+                <td ng-bind-html="field.description"></td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

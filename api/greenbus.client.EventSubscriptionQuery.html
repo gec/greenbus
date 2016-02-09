@@ -1,0 +1,86 @@
+<!--
+
+    Copyright 2011-2016 Green Energy Corp.
+
+    Licensed to Green Energy Corp (www.greenenergycorp.com) under one or more
+    contributor license agreements. See the NOTICE file distributed with this
+    work for additional information regarding copyright ownership. Green Energy
+    Corp licenses this file to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations under
+    the License.
+
+-->
+<html ng-app="apiApp">
+<head>
+	<title>Message</title>
+	<link rel="stylesheet" href="bootstrap-3.2.0-dist/css/bootstrap.min.css">
+	<script src="bootstrap-3.2.0-dist/js/bootstrap.min.js"></script>
+  	<script src="angular/angular.min.js"></script>
+  	<script src="angular/controller.js"></script>
+  	<script type="text/javascript">
+
+  	apiData = {"version":"3.0.0","message":{"name":"EventSubscriptionQuery","package":"greenbus.client","description":"<p>Subscription parameters for Events.</p>\n<p>Including no subscription parameters will subscribe to all future Event notifications.</p>\n<p>Subscribes and returns an initial result set. The initial result set is governed by the <code>time_from</code> and <code>limit</code>\nfields, which put a bound on the number of the <em>latest</em> Events to return that also match the subscription parameters.\nNot specifying these parameters will use a default <code>limit</code>; setting <code>limit = 0</code> will result in only subscribing to\nfuture Events.</p>\n","fields":[{"name":"event_type","type":{"simpleType":"string","multiplicity":"multiple"},"label":"repeated","description":"<p>Specifies a set of Event types to be directly matched. Events with one of any of the included Event types will\nbe returned and notifications for Events with these types will be delivered.</p>\n","requirement":"optional"},{"name":"severity","type":{"simpleType":"uint32","multiplicity":"multiple"},"label":"repeated","description":"<p>Specifies a set of Event severities to be directly matched. Events with one of any of the included Event severities will\nbe returned and notifications for Events with these severities will be delivered.</p>\n","requirement":"optional"},{"name":"subsystem","type":{"simpleType":"string","multiplicity":"multiple"},"label":"repeated","description":"<p>Specifies a set of subsystems to be directly matched. Events with one of any of the included subsystems will\nbe returned and notifications for Events with these subsystems will be delivered.</p>\n","requirement":"optional"},{"name":"agent","type":{"simpleType":"string","multiplicity":"multiple"},"label":"repeated","description":"<p>Specifies a set of agent names to be directly matched. Events with one of any of the included agent names will\nbe returned and notifications for Events with these agent names will be delivered.</p>\n","requirement":"optional"},{"name":"entities","type":{"messageType":"EntityKeySet","messagePackage":"greenbus.client","multiplicity":"single"},"label":"optional","description":"<p>Specifies a set of Event types to be directly matched. Events with one of any of the included Event types will\nbe returned and notifications for Events with these types will be delivered.</p>\n<p><strong>Note</strong>: Event notifications are filtered by Entity UUID, not name. Using a name parameter resolves\nthe UUID of the Entity associated with that name at the time of the request, and is\nequivalent to the client resolving the UUID before making the request. As a result, if the\nEntity a particular name refers to changes (due to a deletion/addition or two renames) Event notifications will be delivered\nfor only for Events pertaining to the original Entity.</p>\n","requirement":"optional","nested":true},{"name":"is_alarm","type":{"simpleType":"bool","multiplicity":"single"},"label":"optional","description":"<p>If, <code>true</code>, only returns and subscribes to notifications for Events that raised an Alarm. If <code>false</code>, only returns\nand subscribes to notifications for Events that did not raise an Alarm.</p>\n","requirement":"optional"},{"name":"time_from","type":{"simpleType":"uint64","multiplicity":"single"},"label":"optional","description":"<p>Searches for Events with a time greater than or equal to this value.</p>\n<p>Only relevant to the initial result set. Does not affect the subscription itself.</p>\n<p>Time is measured in milliseconds since midnight, January 1, 1970 UTC.</p>\n","requirement":"optional"},{"name":"limit","type":{"simpleType":"uint32","multiplicity":"single"},"label":"optional","description":"<p>The number of elements to return.  If not set, a server-determined limit will be used.</p>\n<p>Only relevant to the initial result set. Does not affect the subscription itself.</p>\n","requirement":"optional"}],"simple":false},"mentions":{"messageMentions":["greenbus.client.AlarmSubscriptionQuery"],"serviceParamMentions":[{"service":"greenbus.client.EventService","method":"subscribe_to_events"}]}};
+
+  	</script>
+</head>
+<body ng-controller="msgControl">
+<div class="container">
+    <div class="page-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-1"><h4><span class="label label-primary">message</span></h4></div>
+                <div class="col-md-8"><h4><i>{{message.package}}</i></h4></div>
+                <div class="col-md-3 text-right"><h5><small>Version:</small> {{version}}</h5></div>
+            </div>
+        </div>
+        <h1>{{message.name}}</h1>
+    </div>
+
+    <div ng-bind-html="message.description"></div>
+
+    <div>
+        <p ng-if="mentions.messageMentions"><strong>Used in: </strong>
+            <span ng-repeat="mention in mentions.messageMentions"><a href="{{mention}}.html">{{mention}}</a><span ng-if="!$last">, </span></span>
+        </p>
+        <p ng-if="mentions.serviceParamMentions"><strong>Parameter for: </strong>
+            <span ng-repeat="m in mentions.serviceParamMentions"><a href="{{m.service}}.html">{{m.service}}.{{m.method}}</a><span ng-if="!$last">, </span></span>
+        </p>
+        <p ng-if="mentions.serviceResultMentions"><strong>Result of: </strong>
+            <span ng-repeat="m in mentions.serviceResultMentions"><a href="{{m.service}}.html">{{m.service}}.{{m.method}}</a><span ng-if="!$last">, </span></span>
+        </p>
+    </div>
+
+    <div>
+
+        <table class="table" style="font-size: 100%">
+            <thead class="text-info">
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            </thead>
+            <tr ng-repeat="field in message.fields">
+                <td><span class="clearfix"><strong>{{field.name}}</strong></span><span class="pull-left text-muted"><em>{{field.requirement}}</em></span></td>
+
+                <td ng-if="field.type.simpleType">
+                    <strong style="font-size: 110%">{{field.type.simpleType}}<span ng-if="field.type.multiplicity === 'multiple'">[]</span></strong>
+                </td>
+                <td ng-if="!field.type.simpleType">
+                    <strong style="font-size: 110%"><a href="{{field.type.messagePackage}}.{{field.type.messageType}}.html">{{field.type.messagePackage}}.{{field.type.messageType}}</a><span ng-if="field.type.multiplicity === 'multiple'">[]</span></strong>
+                </td>
+
+                <td ng-bind-html="field.description"></td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

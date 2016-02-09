@@ -1,0 +1,81 @@
+<!--
+
+    Copyright 2011-2016 Green Energy Corp.
+
+    Licensed to Green Energy Corp (www.greenenergycorp.com) under one or more
+    contributor license agreements. See the NOTICE file distributed with this
+    work for additional information regarding copyright ownership. Green Energy
+    Corp licenses this file to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations under
+    the License.
+
+-->
+<html ng-app="apiApp">
+<head>
+	<title>Enumeration</title>
+	<link rel="stylesheet" href="bootstrap-3.2.0-dist/css/bootstrap.min.css">
+	<script src="bootstrap-3.2.0-dist/js/bootstrap.min.js"></script>
+  	<script src="angular/angular.min.js"></script>
+  	<script src="angular/controller.js"></script>
+  	<script type="text/javascript">
+
+  	apiData = {"version":"3.0.0","name":"CommandCategory","package":"greenbus.client","description":"<p>Enumerates whether CommandRequests associated with a Command contain a value, and what data type the value is.</p>\n<p>Commands without values are referred to as <em>controls</em> and Commands with values are referred to as <em>setpoints</em>.</p>\n","fields":[{"name":"CONTROL","number":1,"description":"<p>CommandRequests contain no values.</p>\n"},{"name":"SETPOINT_INT","number":2,"description":"<p>CommandRequests contain an integer value.</p>\n"},{"name":"SETPOINT_DOUBLE","number":3,"description":"<p>CommandRequests contain a double floating-point value.</p>\n"},{"name":"SETPOINT_STRING","number":4,"description":"<p>CommandRequests contain a string value.</p>\n"}],"mentions":{"messageMentions":["greenbus.client.Command","greenbus.client.CommandTemplate","greenbus.client.CommandQuery"]}};
+
+  	</script>
+</head>
+<body ng-controller="enumControl">
+<div class="container">
+    <div class="page-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-1"><h4><span class="label label-warning">enum</span></h4></div>
+                <div class="col-md-8"><h4><i>{{package}}</i></h4></div>
+                <div class="col-md-3 text-right"><h5><small>Version:</small> {{version}}</h5></div>
+            </div>
+        </div>
+        <h1>{{name}}</h1>
+    </div>
+
+    <div ng-bind-html="description"></div>
+
+    <div>
+        <p ng-if="mentions.messageMentions"><strong>Used in: </strong>
+            <span ng-repeat="mention in mentions.messageMentions"><a href="{{mention}}.html">{{mention}}</a><span ng-if="!$last">, </span></span>
+        </p>
+        <p ng-if="mentions.serviceParamMentions"><strong>Parameter for: </strong>
+            <span ng-repeat="m in mentions.serviceParamMentions"><a href="{{m.service}}.html">{{m.service}}.{{m.method}}</a><span ng-if="!$last">, </span></span>
+        </p>
+        <p ng-if="mentions.serviceResultMentions"><strong>Result of: </strong>
+            <span ng-repeat="m in mentions.serviceResultMentions"><a href="{{m.service}}.html">{{m.service}}.{{m.method}}</a><span ng-if="!$last">, </span></span>
+        </p>
+    </div>
+
+    <div>
+
+        <table class="table" style="font-size: 100%">
+            <thead class="text-info">
+            <th>Value</th>
+            <th>Number</th>
+            <th>Description</th>
+            </thead>
+            <tr ng-repeat="field in fields">
+                <td><strong>{{field.name}}</strong></td>
+
+                <td>{{field.number}}</td>
+
+                <td ng-bind-html="field.description"></td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

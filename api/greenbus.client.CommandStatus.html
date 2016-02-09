@@ -1,0 +1,81 @@
+<!--
+
+    Copyright 2011-2016 Green Energy Corp.
+
+    Licensed to Green Energy Corp (www.greenenergycorp.com) under one or more
+    contributor license agreements. See the NOTICE file distributed with this
+    work for additional information regarding copyright ownership. Green Energy
+    Corp licenses this file to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations under
+    the License.
+
+-->
+<html ng-app="apiApp">
+<head>
+	<title>Enumeration</title>
+	<link rel="stylesheet" href="bootstrap-3.2.0-dist/css/bootstrap.min.css">
+	<script src="bootstrap-3.2.0-dist/js/bootstrap.min.js"></script>
+  	<script src="angular/angular.min.js"></script>
+  	<script src="angular/controller.js"></script>
+  	<script type="text/javascript">
+
+  	apiData = {"version":"3.0.0","name":"CommandStatus","package":"greenbus.client","description":"<p>Enumeration of Command statuses/results.</p>\n","fields":[{"name":"SUCCESS","number":1,"description":"<p>Command was a success.</p>\n"},{"name":"TIMEOUT","number":2,"description":"<p>A timeout occurred to a remote device.</p>\n"},{"name":"NO_SELECT","number":3,"description":"<p>The remote device reports there was no select before operate. (Separate from CommandLock.)</p>\n"},{"name":"FORMAT_ERROR","number":4,"description":"<p>The remote device does not recognize the control or data format.</p>\n"},{"name":"NOT_SUPPORTED","number":5,"description":"<p>The operation was not supported.</p>\n"},{"name":"ALREADY_ACTIVE","number":6,"description":"<p>An operation is already in progress.</p>\n"},{"name":"HARDWARE_ERROR","number":7,"description":"<p>The remote device reports a hardware error.</p>\n"},{"name":"LOCAL","number":8,"description":"<p>The remote device is only allowing local control.</p>\n"},{"name":"TOO_MANY_OPS","number":9,"description":"<p>The remote device rejects the operation because it has too many already in progress.</p>\n"},{"name":"NOT_AUTHORIZED","number":10,"description":"<p>The remote device rejects the authorization of the front-end.</p>\n"},{"name":"UNDEFINED","number":11,"description":"<p>The error is unrecognized.</p>\n"}],"mentions":{"messageMentions":["greenbus.client.CommandResult"]}};
+
+  	</script>
+</head>
+<body ng-controller="enumControl">
+<div class="container">
+    <div class="page-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-1"><h4><span class="label label-warning">enum</span></h4></div>
+                <div class="col-md-8"><h4><i>{{package}}</i></h4></div>
+                <div class="col-md-3 text-right"><h5><small>Version:</small> {{version}}</h5></div>
+            </div>
+        </div>
+        <h1>{{name}}</h1>
+    </div>
+
+    <div ng-bind-html="description"></div>
+
+    <div>
+        <p ng-if="mentions.messageMentions"><strong>Used in: </strong>
+            <span ng-repeat="mention in mentions.messageMentions"><a href="{{mention}}.html">{{mention}}</a><span ng-if="!$last">, </span></span>
+        </p>
+        <p ng-if="mentions.serviceParamMentions"><strong>Parameter for: </strong>
+            <span ng-repeat="m in mentions.serviceParamMentions"><a href="{{m.service}}.html">{{m.service}}.{{m.method}}</a><span ng-if="!$last">, </span></span>
+        </p>
+        <p ng-if="mentions.serviceResultMentions"><strong>Result of: </strong>
+            <span ng-repeat="m in mentions.serviceResultMentions"><a href="{{m.service}}.html">{{m.service}}.{{m.method}}</a><span ng-if="!$last">, </span></span>
+        </p>
+    </div>
+
+    <div>
+
+        <table class="table" style="font-size: 100%">
+            <thead class="text-info">
+            <th>Value</th>
+            <th>Number</th>
+            <th>Description</th>
+            </thead>
+            <tr ng-repeat="field in fields">
+                <td><strong>{{field.name}}</strong></td>
+
+                <td>{{field.number}}</td>
+
+                <td ng-bind-html="field.description"></td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

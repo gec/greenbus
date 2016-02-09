@@ -1,0 +1,81 @@
+<!--
+
+    Copyright 2011-2016 Green Energy Corp.
+
+    Licensed to Green Energy Corp (www.greenenergycorp.com) under one or more
+    contributor license agreements. See the NOTICE file distributed with this
+    work for additional information regarding copyright ownership. Green Energy
+    Corp licenses this file to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations under
+    the License.
+
+-->
+<html ng-app="apiApp">
+<head>
+	<title>Enumeration</title>
+	<link rel="stylesheet" href="bootstrap-3.2.0-dist/css/bootstrap.min.css">
+	<script src="bootstrap-3.2.0-dist/js/bootstrap.min.js"></script>
+  	<script src="angular/angular.min.js"></script>
+  	<script src="angular/controller.js"></script>
+  	<script type="text/javascript">
+
+  	apiData = {"version":"3.0.0","name":"ActivationType","package":"greenbus.client","description":"<p>Describes both the current and previous value of a condition necessary to take some action.</p>\n","fields":[{"name":"HIGH","number":1,"description":"<p>Activated whenever the condition <code>true</code>.</p>\n"},{"name":"LOW","number":2,"description":"<p>Activated whenever the condition is <code>false</code>.</p>\n"},{"name":"RISING","number":3,"description":"<p>Activated whenever the condition is <code>true</code> <em>and</em> the previous state of the condition was <code>false</code>.</p>\n"},{"name":"FALLING","number":4,"description":"<p>Activated whenever the condition is <code>false</code> <em>and</em> the previous state of the condition was <code>true</code>.</p>\n"},{"name":"TRANSITION","number":5,"description":"<p>Activated whenever the latest condition value does not match the previous state of the condition.</p>\n"}],"mentions":{"messageMentions":["greenbus.client.Action","greenbus.client.Trigger"]}};
+
+  	</script>
+</head>
+<body ng-controller="enumControl">
+<div class="container">
+    <div class="page-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-1"><h4><span class="label label-warning">enum</span></h4></div>
+                <div class="col-md-8"><h4><i>{{package}}</i></h4></div>
+                <div class="col-md-3 text-right"><h5><small>Version:</small> {{version}}</h5></div>
+            </div>
+        </div>
+        <h1>{{name}}</h1>
+    </div>
+
+    <div ng-bind-html="description"></div>
+
+    <div>
+        <p ng-if="mentions.messageMentions"><strong>Used in: </strong>
+            <span ng-repeat="mention in mentions.messageMentions"><a href="{{mention}}.html">{{mention}}</a><span ng-if="!$last">, </span></span>
+        </p>
+        <p ng-if="mentions.serviceParamMentions"><strong>Parameter for: </strong>
+            <span ng-repeat="m in mentions.serviceParamMentions"><a href="{{m.service}}.html">{{m.service}}.{{m.method}}</a><span ng-if="!$last">, </span></span>
+        </p>
+        <p ng-if="mentions.serviceResultMentions"><strong>Result of: </strong>
+            <span ng-repeat="m in mentions.serviceResultMentions"><a href="{{m.service}}.html">{{m.service}}.{{m.method}}</a><span ng-if="!$last">, </span></span>
+        </p>
+    </div>
+
+    <div>
+
+        <table class="table" style="font-size: 100%">
+            <thead class="text-info">
+            <th>Value</th>
+            <th>Number</th>
+            <th>Description</th>
+            </thead>
+            <tr ng-repeat="field in fields">
+                <td><strong>{{field.name}}</strong></td>
+
+                <td>{{field.number}}</td>
+
+                <td ng-bind-html="field.description"></td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!--
+
+    Copyright 2011-2016 Green Energy Corp.
+
+    Licensed to Green Energy Corp (www.greenenergycorp.com) under one or more
+    contributor license agreements. See the NOTICE file distributed with this
+    work for additional information regarding copyright ownership. Green Energy
+    Corp licenses this file to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations under
+    the License.
+
+-->
+<html ng-app="apiApp">
+<head>
+	<title>Service</title>
+	<link rel="stylesheet" href="bootstrap-3.2.0-dist/css/bootstrap.min.css">
+	<script src="bootstrap-3.2.0-dist/js/bootstrap.min.js"></script>
+  	<script src="angular/angular.min.js"></script>
+  	<script src="angular/controller.js"></script>
+  	<script type="text/javascript">
+
+  	apiData = {"version":"3.0.0","name":"CommandService","package":"greenbus.client","description":"<p>Service for issuing CommandRequests and acquiring and managing CommandLocks.</p>\n","methods":[{"name":"issue_command_request","parameters":[{"name":"request","type":{"messageType":"CommandRequest","messagePackage":"greenbus.client","multiplicity":"single"}}],"returnValue":{"messageType":"CommandResult","messagePackage":"greenbus.client","multiplicity":"single"},"addressing":"optional","description":"<p>Issues a CommandRequest.</p>\n"},{"name":"get_command_locks","parameters":[{"name":"lock_ids","type":{"messageType":"ModelID","messagePackage":"greenbus.client","multiplicity":"multiple"}}],"returnValue":{"messageType":"CommandLock","messagePackage":"greenbus.client","multiplicity":"multiple"},"description":"<p>Returns a set of CommandLocks specified by ID.</p>\n"},{"name":"command_lock_query","parameters":[{"name":"request","type":{"messageType":"CommandLockQuery","messagePackage":"greenbus.client","multiplicity":"single"}}],"returnValue":{"messageType":"CommandLock","messagePackage":"greenbus.client","multiplicity":"multiple"},"description":"<p>Returns all CommandLocks or those matching query parameters. Uses paging to\nhandle large result sets.</p>\n"},{"name":"select_commands","parameters":[{"name":"request","type":{"messageType":"CommandSelect","messagePackage":"greenbus.client","multiplicity":"single"}}],"returnValue":{"messageType":"CommandLock","messagePackage":"greenbus.client","multiplicity":"single"},"description":"<p>Selects a set of Commands for exclusive access in order to issue CommandRequests.</p>\n"},{"name":"block_commands","parameters":[{"name":"request","type":{"messageType":"CommandBlock","messagePackage":"greenbus.client","multiplicity":"single"}}],"returnValue":{"messageType":"CommandLock","messagePackage":"greenbus.client","multiplicity":"single"},"description":"<p>Blocks a set of Commands to prevent CommandRequests from being issued and CommandSelects from being\nacquired by other Agents.</p>\n"},{"name":"delete_command_locks","parameters":[{"name":"lock_ids","type":{"messageType":"ModelID","messagePackage":"greenbus.client","multiplicity":"multiple"}}],"returnValue":{"messageType":"CommandLock","messagePackage":"greenbus.client","multiplicity":"multiple"},"description":"<p>Deletes a set of CommandLocks specified by ID.</p>\n"}],"nested":{"greenbus.client.CommandRequest":{"name":"CommandRequest","package":"greenbus.client","description":"<p>Represents a request for a front-end to perform a control operation.</p>\n<p>CommandRequests may optionally contain a value.</p>\n","fields":[{"name":"command_uuid","type":{"messageType":"ModelUUID","messagePackage":"greenbus.client","multiplicity":"single"},"label":"optional","description":"<p>UUID of the Command this request is for.</p>\n","requirement":"required"},{"name":"type","type":{"messageType":"ValType","messagePackage":"greenbus.client.CommandRequest","multiplicity":"single"},"label":"optional","description":"<p>Specifies the type of value the CommandRequest contains.</p>\n<p>Defaults to <code>NONE</code>.</p>\n","requirement":"optional"},{"name":"int_val","type":{"simpleType":"sint64","multiplicity":"single"},"label":"optional","description":"<p>Specifies an integer value. If present, <code>type</code> must be set to <code>INT</code>.</p>\n","requirement":"optional"},{"name":"double_val","type":{"simpleType":"double","multiplicity":"single"},"label":"optional","description":"<p>Specifies a double floating-point value. If present, <code>type</code> must be set to <code>DOUBLE</code>.</p>\n","requirement":"optional"},{"name":"string_val","type":{"simpleType":"string","multiplicity":"single"},"label":"optional","description":"<p>Specifies a string value. If present, <code>type</code> must be set to <code>STRING</code>.</p>\n","requirement":"optional"},{"name":"unevented","type":{"simpleType":"bool","multiplicity":"single"},"label":"optional","description":"<p>Flag set to prevent events from being logged when command request is issued. Requires special authorization.</p>\n","requirement":"optional"}],"simple":false},"greenbus.client.CommandLockQuery":{"name":"CommandLockQuery","package":"greenbus.client","description":"<p>Query parameters to select a set of CommandLocks.</p>\n<p>CommandLocks can be matched by the Commands they refer to, their AccessMode, or the Agents that acquired them.\nIncluding no search parameters will return all CommandLocks in the system.</p>\n<p>Uses paging to handle large result sets.</p>\n","fields":[{"name":"command_uuids","type":{"messageType":"ModelUUID","messagePackage":"greenbus.client","multiplicity":"multiple"},"label":"repeated","description":"<p>Parameters to match CommandLocks by the UUIDs of the Commands they pertain to. All CommandLocks that\nrefer to at least one of the specified Commands will be returned.</p>\n","requirement":"optional"},{"name":"access","type":{"messageType":"AccessMode","messagePackage":"greenbus.client.CommandLock","multiplicity":"single"},"label":"optional","description":"<p>Parameters to filter CommandLocks to those matching a particular AccessMode.</p>\n","requirement":"optional"},{"name":"agent_uuids","type":{"messageType":"ModelUUID","messagePackage":"greenbus.client","multiplicity":"multiple"},"label":"repeated","description":"<p>Parameters to match CommandLocks by the UUIDs of the Agents that acquired them.</p>\n","requirement":"optional"},{"name":"last_id","type":{"messageType":"ModelID","messagePackage":"greenbus.client","multiplicity":"single"},"label":"optional","description":"<p>Last ID (in the returned sorted order) of a previous result set. This result set will be the\npage beginning from the next ID.</p>\n","requirement":"optional"},{"name":"page_size","type":{"simpleType":"uint32","multiplicity":"single"},"label":"optional","description":"<p>The number of elements to return. Used to limit the size of result sets in large models. If not set,\na server-determined page size will be used.</p>\n<p>If the size of the result set equals the page size, there may be more data available.</p>\n","requirement":"optional"}],"simple":false},"greenbus.client.CommandSelect":{"name":"CommandSelect","package":"greenbus.client","description":"<p>Represents a request to acquire a CommandLock in order to issue CommandRequests for a\nset of Commands.</p>\n","fields":[{"name":"command_uuids","type":{"messageType":"ModelUUID","messagePackage":"greenbus.client","multiplicity":"multiple"},"label":"repeated","description":"<p>Specifies the Commands the CommandSelect will affect, by UUID.</p>\n<p>Must include one or more Commands.</p>\n","requirement":"required"},{"name":"expire_duration","type":{"simpleType":"uint64","multiplicity":"single"},"label":"optional","description":"<p>Duration in milliseconds the CommandLock should last before expiring.</p>\n<p>If not set, a server-determined default will be used.</p>\n","requirement":"optional"}],"simple":false},"greenbus.client.CommandBlock":{"name":"CommandBlock","package":"greenbus.client","description":"<p>Represents a request to acquire a CommandLock in order to block CommandRequests from being\nissued and CommandSelects succeeding for a set of Commands.</p>\n","fields":[{"name":"command_uuids","type":{"messageType":"ModelUUID","messagePackage":"greenbus.client","multiplicity":"multiple"},"label":"repeated","description":"<p>Specifies the Commands the CommandBlock will affect, by UUID.</p>\n<p>Must include one or more Commands.</p>\n","requirement":"required"}],"simple":false}}};
+
+  	</script>
+</head>
+<body ng-controller="serviceControl">
+<div class="container">
+    <div class="page-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-1"><h4><span class="label label-success">service</span></h4></div>
+                <div class="col-md-8"><h4><i>{{package}}</i></h4></div>
+                <div class="col-md-3 text-right"><h5><small>Version:</small> {{version}}</h5></div>
+            </div>
+        </div>
+        <h1>{{name}}</h1>
+    </div>
+
+    <div ng-bind-html="description"></div>
+
+    <div ng-repeat="method in methods" class="panel panel-success">
+        <div class="panel-heading">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-3">
+                        <span style="font-size: 110%" ng-if="method.returnValue.simpleType">{{method.returnValue.simpleType}} <span ng-if="method.returnValue.multiplicity === 'multiple'">[]</span></span>
+		  				<span style="font-size: 110%" ng-if="!method.returnValue.simpleType">
+		  					<a href="{{method.returnValue.messagePackage}}.{{method.returnValue.messageType}}.html">{{method.returnValue.messagePackage}}.{{method.returnValue.messageType}}</a><a ng-if="method.returnValue.multiplicity === 'multiple'">[]</a>
+						</span>
+                    </div>
+                    <div class="col-md-9">
+                        <strong style="font-size: 120%">{{method.name}} (</strong>
+		  				<span style="font-size: 110%" ng-repeat="param in method.parameters">
+		  					<span ng-if="param.type.simpleType">{{param.type.simpleType}}<a ng-if="param.type.multiplicity === 'multiple'">[]</a> {{param.name}}</span>
+		  					<span ng-if="!param.type.simpleType">
+			  					<a href="{{param.type.messagePackage}}.{{param.type.messageType}}.html">{{param.type.messagePackage}}.{{param.type.messageType}}</a><a ng-if="param.type.multiplicity === 'multiple'">[]</a>
+		  						{{param.name}}</span><span ng-if="!$last">,</span>
+		  				</span>
+                        <span style="font-size: 120%"><strong>)</strong></span>
+                    </div>
+                </div></div>
+        </div>
+        <div class="panel-body">
+
+            <div>
+                <table ng-if="method.subscription || method.addressing" style="font-size: 100%; margin-bottom: 10px;">
+                    <tr ng-if="method.subscription">
+                        <td><h4><span class="label label-primary"><strong>Subscription:</strong></span></h4></td>
+                        <td style="padding-left: 10px">
+                            <a href="{{method.subscription.messagePackage}}.{{method.subscription.messageType}}.html">{{method.subscription.messagePackage}}.{{method.subscription.messageType}}</a>
+                        </td>
+                    </tr>
+                    <tr ng-if="method.addressing">
+                        <td><h4><span class="label label-warning"><strong>Addressing:</strong></span></h4></td>
+                        <td style="padding-left: 10px"><em class="text-muted">{{method.addressing}}</em></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div ng-bind-html="method.description"></div>
+
+            <div ng-repeat="param in method.parameters" >
+
+                <div class="panel panel-default" ng-if="param.type.messageType && nested[param.type.messagePackage + '.' + param.type.messageType]" ng-init="message = nested[param.type.messagePackage + '.' + param.type.messageType]">
+                    <div class="panel-heading"><a href="{{param.type.messagePackage}}.{{param.type.messageType}}.html"><em>{{param.type.messagePackage}}.{{param.type.messageType}}</em></a></div>
+                    <div class="panel-body">
+                        <div ng-bind-html="message.description"></div>
+                        <table class="table" style="font-size: 100%">
+
+                            <thead class="text-info">
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                            </thead>
+                            <tr ng-repeat-start="field in message.fields">
+                                <td><span class="clearfix"><strong>{{field.name}}</strong></span><span class="pull-left text-muted"><em>{{field.requirement}}</em></span></td>
+
+                                <td ng-if="field.type.simpleType">
+                                    <strong style="font-size: 110%">{{field.type.simpleType}}<span ng-if="field.type.multiplicity === 'multiple'">[]</span></strong>
+                                </td>
+                                <td ng-if="!field.type.simpleType">
+                                    <strong style="font-size: 110%"><a href="{{field.type.messagePackage}}.{{field.type.messageType}}.html">{{field.type.messagePackage}}.{{field.type.messageType}}</a><span ng-if="field.type.multiplicity === 'multiple'">[]</span></strong>
+                                </td>
+
+                                <td ng-bind-html="field.description"></td>
+                            </tr>
+                            <tr ng-repeat-end ng-if="field.nested" ng-init="message = nested[field.type.messagePackage + '.' + field.type.messageType]">
+
+                                <!-- RECURSE 1 -->
+                                <td colspan="3" style="border-top: 0px;">
+                                    <div class="panel panel-default"  style="margin-left: 50px;">
+                                        <div class="panel-heading"><a href="{{field.type.messagePackage}}.{{field.type.messageType}}.html"><em>{{field.type.messagePackage}}.{{field.type.messageType}}</em></a></div>
+                                        <div class="panel-body">
+                                            <div ng-bind-html="message.description"></div>
+                                            <table class="table" style="font-size: 100%">
+                                                <thead class="text-info">
+                                                <th>Name</th>
+                                                <th>Type</th>
+                                                <th>Description</th>
+                                                </thead>
+                                                <tr ng-repeat-start="subField1 in message.fields">
+                                                    <td><span class="clearfix"><strong>{{subField1.name}}</strong></span><span class="pull-left text-muted"><em>{{subField1.requirement}}</em></span></td>
+
+                                                    <td ng-if="subField1.type.simpleType">
+                                                        <strong style="font-size: 110%">{{subField1.type.simpleType}}<span ng-if="subField1.type.multiplicity === 'multiple'">[]</span></strong>
+                                                    </td>
+                                                    <td ng-if="!subField1.type.simpleType">
+                                                        <strong style="font-size: 110%"><a href="{{subField1.type.messagePackage}}.{{subField1.type.messageType}}.html">{{subField1.type.messagePackage}}.{{subField1.type.messageType}}</a><span ng-if="subField1.type.multiplicity === 'multiple'">[]</span></strong>
+                                                    </td>
+
+                                                    <td ng-bind-html="subField1.description"></td>
+                                                </tr>
+                                                <tr ng-repeat-end ng-if="subField1.nested" ng-init="message = nested[subField1.type.messagePackage + '.' + subField1.type.messageType]">
+
+                                                    <!-- RECURSE 2 -->
+                                                    <td colspan="3" style="border-top: 0px;">
+                                                        <div class="panel panel-default"  style="margin-left: 50px;">
+                                                            <div class="panel-heading"><a href="{{subField1.type.messagePackage}}.{{subField1.type.messageType}}.html"><em>{{subField1.type.messagePackage}}.{{subField1.type.messageType}}</em></a></div>
+                                                            <div class="panel-body">
+                                                                <div ng-bind-html="message.description"></div>
+                                                                <table class="table" style="font-size: 100%">
+                                                                    <thead class="text-info">
+                                                                    <th>Name</th>
+                                                                    <th>Type</th>
+                                                                    <th>Description</th>
+                                                                    </thead>
+                                                                    <tr ng-repeat="subField2 in message.fields">
+                                                                        <td><span class="clearfix"><strong>{{subField2.name}}</strong></span><span class="pull-left text-muted"><em>{{subField2.requirement}}</em></span></td>
+
+                                                                        <td ng-if="subField2.type.simpleType">
+                                                                            <strong style="font-size: 110%">{{subField2.type.simpleType}}<span ng-if="subField2.type.multiplicity === 'multiple'">[]</span></strong>
+                                                                        </td>
+                                                                        <td ng-if="!subField2.type.simpleType">
+                                                                            <strong style="font-size: 110%"><a href="{{subField2.type.messagePackage}}.{{subField2.type.messageType}}.html">{{subField2.type.messagePackage}}.{{subField2.type.messageType}}</a><span ng-if="subField2.type.multiplicity === 'multiple'">[]</span></strong>
+                                                                        </td>
+
+                                                                        <td ng-bind-html="subField2.description"></td>
+                                                                    </tr>
+                                                                    <!--<tr ng-repeat-end ng-if="subField2.nested">
+
+                                                                    </tr>-->
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

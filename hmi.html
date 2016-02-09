@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>GreenBus HMI  - GreenBus</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+
+    <style type="text/css">code{white-space: pre;}</style>
+    <style type="text/css">
+        table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+        margin: 0; padding: 0; vertical-align: baseline; border: none; }
+        table.sourceCode { width: 100%; line-height: 100%; }
+        td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+        td.sourceCode { padding-left: 5px; }
+        /*code > span.kw { color: #007020; font-weight: bold; }
+        code > span.dt { color: #902000; }
+        code > span.dv { color: #40a070; }
+        code > span.bn { color: #40a070; }
+        code > span.fl { color: #40a070; }
+        code > span.ch { color: #4070a0; }
+        code > span.st { color: #4070a0; }
+        code > span.co { color: #60a0b0; font-style: italic; }
+        code > span.ot { color: #007020; }
+        code > span.al { color: #ff0000; font-weight: bold; }
+        code > span.fu { color: #06287e; }
+        code > span.er { color: #ff0000; font-weight: bold; }*/
+
+        code > span.kw { color: #63a35c; }
+        code > span.dt { color: #183691; }
+        code > span.dv { color: #40a070; }
+        code > span.bn { color: #40a070; }
+        code > span.fl { color: #40a070; }
+        code > span.ch { color: #4070a0; }
+        code > span.st { color: #183691; }
+        code > span.co { color: #60a0b0; font-style: italic; }
+        code > span.ot { color: #795da3; }
+        code > span.al { color: #ff0000; font-weight: bold; }
+        code > span.fu { color: #06287e; }
+        code > span.er { color: #ff0000; font-weight: bold; }
+    </style>
+    <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" />
+    <style type="text/css">
+        body {
+            padding-top: 50px;
+            font-size: 16px;
+        }
+        h2 {
+            /* padding-bottom: 15px; */
+            border-bottom-width: 2px;
+            border-bottom-color: #8cc63e;
+            border-bottom-style: solid;
+            padding-bottom: 7px;
+            margin-bottom: 22px;
+        }
+        .navbar-brand {
+            /*border-top-color: #8cc63e;
+            border-top-style: solid;
+            border-top-width: 8px;
+            margin-right: 40px;*/
+        }
+        span#gb_title {
+            /*border-right-style: solid;
+            border-right-width: 7px;
+            border-right-color: #8cc63e;
+            padding-right: 5px;*/
+
+            /*border-left-style: solid;
+            border-left-width: 4px;
+            border-left-color: #8cc63e;
+            padding-left: 6px;*/
+        }
+        div.jumbotron {
+            background-color: #8cc63e;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="index.html" style="color: #fff"><span class="glyphicon glyphicon-stop" aria-hidden="true" style="color: #8cc63e"></span> <span id="gb_title"> GreenBus</span> Platform</a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">System Overview <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="arch.html">Architecture Overview</a></li>
+                        <li><a href="system_model.html">System Model</a></li>
+                        <li><a href="measurement_stream.html">Measurement Stream</a></li>
+                        <li><a href="command_requests.html">Command Requests</a></li>
+                        <li><a href="events_alarms.html">Events and Alarms</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="auth_model.html">Authorization Model</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="calculation.html">Calculation Protocol</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">User Docs <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="model_xml.html">System Model XML</a></li>
+                        <li><a href="processing_xml.html">Measurement Processing XML</a></li>
+                        <li><a href="calculation_xml.html">Calculation XML</a></li>
+                        <li><a href="event_xml.html">Event Configuration XML</a></li>
+                        <li><a href="auth_xml.html">Authorization System XML</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="frontend_json.html">Frontend Configuration</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Programming Docs <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="api/">API Reference</a></li>
+                        <li><a href="https://github.com/gec/greenbus-examples">API Examples</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="program_java.html">Java Tutorial</a></li>
+                    </ul>
+                </li>
+                <li><a href="hmi.html">HMI</a></li>
+                <li><a href="downloads.html">Downloads</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+<div id="doc-content" class="container">
+<div id="greenbus-hmi" class="section level2">
+<h2>GreenBus HMI</h2>
+<p>The GreenBus HMI project provides a modular, web-based operator interface built on AngularJS and the Play Framework.</p>
+<div style="margin-top: 40px">
+<center><img src="img/hmi_tabular_2.png" alt="Tabular display" /></center>
+</div>
+<div style="margin-top: 40px; margin-bottom: 40px">
+<center><img src="img/hmi_trend.png" alt="Trend" /></center>
+</div>
+<p>GitHub projects:</p>
+<ul>
+<li><a href="https://github.com/gec/greenbus-web-core">GreenBus Web Core</a></li>
+<li><a href="https://github.com/gec/greenbus-web-views">GreenBus Web View</a></li>
+</ul>
+</div>
+</div>
+
+
+<footer>
+    <div class="container" style="margin-bottom: 20px">
+        <hr>
+        <div class="row">
+            <div class="col-md-4"><p>&copy; Green Energy Corp 2016</p></div>
+            <div class="col-md-2 col-md-offset-6"><a href="http://www.greenenergycorp.com"><img src="img/gec_sm.jpg"></img></a></div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Measurement Processing XML Configuration  - GreenBus</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+
+    <style type="text/css">code{white-space: pre;}</style>
+    <style type="text/css">
+        table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+        margin: 0; padding: 0; vertical-align: baseline; border: none; }
+        table.sourceCode { width: 100%; line-height: 100%; }
+        td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+        td.sourceCode { padding-left: 5px; }
+        /*code > span.kw { color: #007020; font-weight: bold; }
+        code > span.dt { color: #902000; }
+        code > span.dv { color: #40a070; }
+        code > span.bn { color: #40a070; }
+        code > span.fl { color: #40a070; }
+        code > span.ch { color: #4070a0; }
+        code > span.st { color: #4070a0; }
+        code > span.co { color: #60a0b0; font-style: italic; }
+        code > span.ot { color: #007020; }
+        code > span.al { color: #ff0000; font-weight: bold; }
+        code > span.fu { color: #06287e; }
+        code > span.er { color: #ff0000; font-weight: bold; }*/
+
+        code > span.kw { color: #63a35c; }
+        code > span.dt { color: #183691; }
+        code > span.dv { color: #40a070; }
+        code > span.bn { color: #40a070; }
+        code > span.fl { color: #40a070; }
+        code > span.ch { color: #4070a0; }
+        code > span.st { color: #183691; }
+        code > span.co { color: #60a0b0; font-style: italic; }
+        code > span.ot { color: #795da3; }
+        code > span.al { color: #ff0000; font-weight: bold; }
+        code > span.fu { color: #06287e; }
+        code > span.er { color: #ff0000; font-weight: bold; }
+    </style>
+    <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" />
+    <style type="text/css">
+        body {
+            padding-top: 50px;
+            font-size: 16px;
+        }
+        h2 {
+            /* padding-bottom: 15px; */
+            border-bottom-width: 2px;
+            border-bottom-color: #8cc63e;
+            border-bottom-style: solid;
+            padding-bottom: 7px;
+            margin-bottom: 22px;
+        }
+        .navbar-brand {
+            /*border-top-color: #8cc63e;
+            border-top-style: solid;
+            border-top-width: 8px;
+            margin-right: 40px;*/
+        }
+        span#gb_title {
+            /*border-right-style: solid;
+            border-right-width: 7px;
+            border-right-color: #8cc63e;
+            padding-right: 5px;*/
+
+            /*border-left-style: solid;
+            border-left-width: 4px;
+            border-left-color: #8cc63e;
+            padding-left: 6px;*/
+        }
+        div.jumbotron {
+            background-color: #8cc63e;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="index.html" style="color: #fff"><span class="glyphicon glyphicon-stop" aria-hidden="true" style="color: #8cc63e"></span> <span id="gb_title"> GreenBus</span> Platform</a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">System Overview <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="arch.html">Architecture Overview</a></li>
+                        <li><a href="system_model.html">System Model</a></li>
+                        <li><a href="measurement_stream.html">Measurement Stream</a></li>
+                        <li><a href="command_requests.html">Command Requests</a></li>
+                        <li><a href="events_alarms.html">Events and Alarms</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="auth_model.html">Authorization Model</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="calculation.html">Calculation Protocol</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">User Docs <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="model_xml.html">System Model XML</a></li>
+                        <li><a href="processing_xml.html">Measurement Processing XML</a></li>
+                        <li><a href="calculation_xml.html">Calculation XML</a></li>
+                        <li><a href="event_xml.html">Event Configuration XML</a></li>
+                        <li><a href="auth_xml.html">Authorization System XML</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="frontend_json.html">Frontend Configuration</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Programming Docs <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="api/">API Reference</a></li>
+                        <li><a href="https://github.com/gec/greenbus-examples">API Examples</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="program_java.html">Java Tutorial</a></li>
+                    </ul>
+                </li>
+                <li><a href="hmi.html">HMI</a></li>
+                <li><a href="downloads.html">Downloads</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+<div id="doc-content" class="container">
+<div id="xml-for-trigger-action-processing" class="section level2">
+<h2>XML for Trigger / Action Processing</h2>
+<div id="overview" class="section level3">
+<h3>Overview</h3>
+<p>The sequence of triggers describe the conditional evaluation of transformations of Measurement value and quality, as well as the generation of events.</p>
+<p>The sequence of triggers are evaluated in order. Triggers may have as one of their side effects that no further triggers will be processed, at which point the rest of the sequence is ignored.</p>
+<p>An action is only taken when the current value of the trigger condition and the previous value match the ActivationType.</p>
+</div>
+<div id="activation" class="section level3">
+<h3>Activation</h3>
+<p>Activation types describe the current state of trigger conditions, taking into account both the current value and previous value.</p>
+<table class="table table-bordered">
+<thead>
+<tr class="header">
+<th align="left">Previous State</th>
+<th align="left">Current State</th>
+<th align="left">Activation</th>
+<th align="left">Matched By</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">true</td>
+<td align="left">true</td>
+<td align="left">HIGH</td>
+<td align="left">HIGH</td>
+</tr>
+<tr class="even">
+<td align="left">false</td>
+<td align="left">true</td>
+<td align="left">RISING</td>
+<td align="left">RISING, TRANSITION, HIGH</td>
+</tr>
+<tr class="odd">
+<td align="left">true</td>
+<td align="left">false</td>
+<td align="left">FALLING</td>
+<td align="left">FALLING, TRANSITION, LOW</td>
+</tr>
+<tr class="even">
+<td align="left">false</td>
+<td align="left">false</td>
+<td align="left">LOW</td>
+<td align="left">LOW</td>
+</tr>
+</tbody>
+</table>
+<p>Example of activating when high:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="co">&lt;!--</span>
+<span class="co">    Value 1: 0     Condition: LOW         Action not activated.</span>
+<span class="co">    Value 2: 1     Condition: HIGH        Action activated.</span>
+<span class="co">--&gt;</span>
+<span class="kw">&lt;matchValue</span><span class="ot"> intValue=</span><span class="st">&quot;1&quot;</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;event</span><span class="ot"> eventType=</span><span class="st">&quot;SawAOne&quot;</span><span class="ot"> activation=</span><span class="st">&quot;HIGH&quot;</span><span class="kw">/&gt;</span>
+<span class="kw">&lt;/matchValue&gt;</span></code></pre>
+<p>Example of a rising activation:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="co">&lt;!--</span>
+<span class="co">    Value 1: 12.6    Condition: LOW         Action not activated.</span>
+<span class="co">    Value 2: 9.2     Condition: RISING      Action activated.</span>
+<span class="co">    Value 3: 9.5     Condition: HIGH        Action not activated.</span>
+<span class="co">--&gt;</span>
+<span class="kw">&lt;range</span><span class="ot"> low=</span><span class="st">&quot;10.0&quot;</span><span class="ot"> high=</span><span class="st">&quot;20.0&quot;</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;event</span><span class="ot"> eventType=</span><span class="st">&quot;OutOfNominal&quot;</span><span class="ot"> activation=</span><span class="st">&quot;RISING&quot;</span><span class="kw">/&gt;</span>
+<span class="kw">&lt;/range&gt;</span></code></pre>
+</div>
+<div id="trigger-types" class="section level3">
+<h3>Trigger Types</h3>
+</div>
+<div id="always" class="section level3">
+<h3>Always</h3>
+<p>A condition that is always triggered. Used to create processing steps that are always taken.</p>
+<p>Example:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;always&gt;</span>
+  <span class="co">&lt;!-- actions, condition is always &#39;high&#39; --&gt;</span>
+<span class="kw">&lt;/always&gt;</span></code></pre>
+</div>
+<div id="filter" class="section level3">
+<h3>Filter</h3>
+<p>Describes a condition that triggers when a new Measurement has the same value and quality as the most recent Measurement that did <em>not</em> trigger the condition.</p>
+<p>Optionally, a deadband can be provided to suppress minor changes in analog values.</p>
+<p>Example:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;filter&gt;</span>
+  <span class="co">&lt;!-- actions, condition is &#39;high&#39; when values are duplicated --&gt;</span>
+<span class="kw">&lt;/filter&gt;</span></code></pre>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;filter</span><span class="ot"> deadband=</span><span class="st">&quot;0.5&quot;</span><span class="kw">&gt;</span>
+  <span class="co">&lt;!-- actions, condition is &#39;high&#39; when values are duplicated or within deadband --&gt;</span>
+<span class="kw">&lt;/filter&gt;</span></code></pre>
+</div>
+<div id="matchvalue" class="section level3">
+<h3>MatchValue</h3>
+<p>Condition triggered when a Measurement matches the specified value.</p>
+<p>Example:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;matchValue</span><span class="ot"> stringValue=</span><span class="st">&quot;ExampleString&quot;</span><span class="kw">&gt;</span>
+  <span class="co">&lt;!-- actions, condition is &#39;high&#39; when a Measurement is a string value and matches exactly --&gt;</span>
+<span class="kw">&lt;/matchValue&gt;</span></code></pre>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;matchValue</span><span class="ot"> booleanValue=</span><span class="st">&quot;true&quot;</span><span class="kw">&gt;</span>
+  <span class="co">&lt;!-- actions, condition is &#39;high&#39; when a Measurement is a boolean value and matches --&gt;</span>
+<span class="kw">&lt;/matchValue&gt;</span></code></pre>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;matchValue</span><span class="ot"> intValue=</span><span class="st">&quot;1&quot;</span><span class="kw">&gt;</span>
+  <span class="co">&lt;!-- actions, condition is &#39;high&#39; when a Measurement is an integer value and matches --&gt;</span>
+<span class="kw">&lt;/matchValue&gt;</span></code></pre>
+</div>
+<div id="range" class="section level3">
+<h3>Range</h3>
+<p>Describes boundary conditions for analog values. Can include both upper and lower limits, or just one of either.</p>
+<p>The nominal range is defined to be above the lower limit and below the</p>
+<p>When the condition had been previously triggered (the value was outside of the nominal range), the optional deadband field describes how far the value must return within the nominal range to no longer be triggering the condition. This can be used to prevent a value oscillating near the limit from repeatedly triggering the condition.</p>
+<p>Example:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;range</span><span class="ot"> low=</span><span class="st">&quot;10.0&quot;</span><span class="kw">&gt;</span>
+  <span class="co">&lt;!-- actions, condition is &#39;high&#39; when analog value is less than 10.0 --&gt;</span>
+<span class="kw">&lt;/range&gt;</span></code></pre>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;range</span><span class="ot"> high=</span><span class="st">&quot;20.0&quot;</span><span class="kw">&gt;</span>
+  <span class="co">&lt;!-- actions, condition is &#39;high&#39; when analog value is greater than 20.0 --&gt;</span>
+<span class="kw">&lt;/range&gt;</span></code></pre>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;range</span><span class="ot"> low=</span><span class="st">&quot;10.0&quot;</span><span class="ot"> high=</span><span class="st">&quot;20.0&quot;</span><span class="ot"> deadband=</span><span class="st">&quot;0.5&quot;</span><span class="kw">&gt;</span>
+  <span class="co">&lt;!-- actions, condition is &#39;high&#39; when analog value is less than 10.0 or greater than 20.0,</span>
+<span class="co">            with a deadband as described above --&gt;</span>
+<span class="kw">&lt;/range&gt;</span></code></pre>
+</div>
+<div id="action-types" class="section level3">
+<h3>Action Types</h3>
+</div>
+<div id="suppress" class="section level3">
+<h3>Suppress</h3>
+<p>Type of action that prevents the Measurement from being stored or published.</p>
+<p>Example:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;suppress</span><span class="ot"> activation=</span><span class="st">&quot;HIGH&quot;</span><span class="kw">/&gt;</span></code></pre>
+</div>
+<div id="strip-value" class="section level3">
+<h3>Strip Value</h3>
+<p>Type of action that strips the value of the Measurement before it is stored/published.</p>
+<p>Example:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;stripValue</span><span class="ot"> activation=</span><span class="st">&quot;HIGH&quot;</span><span class="kw">/&gt;</span></code></pre>
+</div>
+<div id="set-boolean-value" class="section level3">
+<h3>Set Boolean Value</h3>
+<p>Type of action that sets the Measurement value to the specified boolean value.</p>
+<p>Example:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;setBool</span><span class="ot"> value=</span><span class="st">&quot;true&quot;</span><span class="ot"> activation=</span><span class="st">&quot;HIGH&quot;</span><span class="kw">/&gt;</span></code></pre>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;setBool</span><span class="ot"> value=</span><span class="st">&quot;false&quot;</span><span class="ot"> activation=</span><span class="st">&quot;HIGH&quot;</span><span class="kw">/&gt;</span></code></pre>
+</div>
+<div id="event" class="section level3">
+<h3>Event</h3>
+<p>Type of action that publishes an Event related to the Measurement's Point.</p>
+<p>The 'eventType' attribute associates the generated Event with system event configuration.</p>
+<p>Example:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;event</span><span class="ot"> eventType=</span><span class="st">&quot;OutOfNominal&quot;</span><span class="ot"> activation=</span><span class="st">&quot;HIGH&quot;</span><span class="kw">/&gt;</span></code></pre>
+</div>
+<div id="scale" class="section level3">
+<h3>Scale</h3>
+<p>Type of action that performs a linear transformation on the analog value of the Measurement.</p>
+<p>Has <code>scale</code> and <code>offset</code> attributes. If the original analog value is <code>x</code>, the final value of the Measurement will be:</p>
+<pre><code>scale * x + offset</code></pre>
+<p>Integer values can be forced to floating point values using the 'forceToDouble' attribute, which defaults to 'false'.</p>
+<p>Example:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;scale</span><span class="ot"> scale=</span><span class="st">&quot;0.1&quot;</span><span class="ot"> offset=</span><span class="st">&quot;100&quot;</span><span class="ot"> activation=</span><span class="st">&quot;HIGH&quot;</span><span class="kw">/&gt;</span></code></pre>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;scale</span><span class="ot"> scale=</span><span class="st">&quot;100&quot;</span><span class="ot"> offset=</span><span class="st">&quot;0.5&quot;</span><span class="ot"> forceToDouble=</span><span class="st">&quot;true&quot;</span><span class="ot"> activation=</span><span class="st">&quot;HIGH&quot;</span><span class="kw">/&gt;</span></code></pre>
+</div>
+<div id="boolean-mapping" class="section level3">
+<h3>Boolean Mapping</h3>
+<p>Type of action that transforms a boolean Measurement value to a string value.</p>
+<p>Example:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;boolMapping</span><span class="ot"> falseString=</span><span class="st">&quot;OFF&quot;</span><span class="ot"> trueString=</span><span class="st">&quot;ON&quot;</span><span class="ot"> activation=</span><span class="st">&quot;HIGH&quot;</span><span class="kw">/&gt;</span></code></pre>
+</div>
+<div id="integer-mapping" class="section level3">
+<h3>Integer Mapping</h3>
+<p>Type of action that transforms an integer Measurement value to a string value.</p>
+<p>Example:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;integerMapping</span><span class="ot"> activation=</span><span class="st">&quot;HIGH&quot;</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;mapping</span><span class="ot"> fromInteger=</span><span class="st">&quot;0&quot;</span><span class="ot"> toString=</span><span class="st">&quot;OFF&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;mapping</span><span class="ot"> fromInteger=</span><span class="st">&quot;1&quot;</span><span class="ot"> toString=</span><span class="st">&quot;ON&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;mapping</span><span class="ot"> fromInteger=</span><span class="st">&quot;3&quot;</span><span class="ot"> toString=</span><span class="st">&quot;ERROR&quot;</span><span class="kw">/&gt;</span>
+<span class="kw">&lt;/integerMapping&gt;</span></code></pre>
+</div>
+</div>
+<div id="full-examples" class="section level2">
+<h2>Full Examples</h2>
+<div id="analog-point" class="section level3">
+<h3>Analog Point</h3>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;analog</span><span class="ot"> name=</span><span class="st">&quot;AnalogPointA&quot;</span><span class="ot"> unit=</span><span class="st">&quot;V&quot;</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;type</span><span class="ot"> name=</span><span class="st">&quot;Point&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;triggers&gt;</span>
+        <span class="kw">&lt;filter</span><span class="ot"> deadband=</span><span class="st">&quot;0.1&quot;</span><span class="kw">&gt;</span>
+            <span class="kw">&lt;suppress</span><span class="ot"> activation=</span><span class="st">&quot;HIGH&quot;</span><span class="kw">/&gt;</span>
+        <span class="kw">&lt;/filter&gt;</span>
+        <span class="kw">&lt;always&gt;</span>
+            <span class="kw">&lt;scale</span><span class="ot"> scale=</span><span class="st">&quot;0.1&quot;</span><span class="ot"> offset=</span><span class="st">&quot;0&quot;</span><span class="ot"> activation=</span><span class="st">&quot;HIGH&quot;</span><span class="kw">/&gt;</span>
+        <span class="kw">&lt;/always&gt;</span>
+        <span class="kw">&lt;range</span><span class="ot"> low=</span><span class="st">&quot;118.5&quot;</span><span class="ot"> high=</span><span class="st">&quot;121.5&quot;</span><span class="ot"> deadband=</span><span class="st">&quot;0.1&quot;</span><span class="kw">&gt;</span>
+            <span class="kw">&lt;event</span><span class="ot"> eventType=</span><span class="st">&quot;OutOfNominal&quot;</span><span class="ot"> activation=</span><span class="st">&quot;RISING&quot;</span><span class="kw">/&gt;</span>
+            <span class="kw">&lt;event</span><span class="ot"> eventType=</span><span class="st">&quot;ReturnToNominal&quot;</span><span class="ot"> activation=</span><span class="st">&quot;FALLING&quot;</span><span class="kw">/&gt;</span>
+        <span class="kw">&lt;/range&gt;</span>
+    <span class="kw">&lt;/triggers&gt;</span>
+<span class="kw">&lt;/analog&gt;</span></code></pre>
+</div>
+<div id="status-point" class="section level3">
+<h3>Status Point</h3>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;status</span><span class="ot"> name=</span><span class="st">&quot;StatusPointB&quot;</span><span class="ot"> unit=</span><span class="st">&quot;status&quot;</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;type</span><span class="ot"> name=</span><span class="st">&quot;Point&quot;</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;triggers&gt;</span>
+        <span class="kw">&lt;filter&gt;</span>
+            <span class="kw">&lt;suppress</span><span class="ot"> activation=</span><span class="st">&quot;HIGH&quot;</span><span class="kw">/&gt;</span>
+        <span class="kw">&lt;/filter&gt;</span>
+        <span class="kw">&lt;always&gt;</span>
+            <span class="kw">&lt;boolMapping</span><span class="ot"> falseString=</span><span class="st">&quot;OPEN&quot;</span><span class="ot"> trueString=</span><span class="st">&quot;CLOSED&quot;</span><span class="ot"> activation=</span><span class="st">&quot;HIGH&quot;</span><span class="kw">/&gt;</span>
+        <span class="kw">&lt;/always&gt;</span>
+    <span class="kw">&lt;/triggers&gt;</span>
+<span class="kw">&lt;/analog&gt;</span></code></pre>
+</div>
+</div>
+</div>
+
+
+<footer>
+    <div class="container" style="margin-bottom: 20px">
+        <hr>
+        <div class="row">
+            <div class="col-md-4"><p>&copy; Green Energy Corp 2016</p></div>
+            <div class="col-md-2 col-md-offset-6"><a href="http://www.greenenergycorp.com"><img src="img/gec_sm.jpg"></img></a></div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

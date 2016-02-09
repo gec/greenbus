@@ -1,0 +1,86 @@
+<!--
+
+    Copyright 2011-2016 Green Energy Corp.
+
+    Licensed to Green Energy Corp (www.greenenergycorp.com) under one or more
+    contributor license agreements. See the NOTICE file distributed with this
+    work for additional information regarding copyright ownership. Green Energy
+    Corp licenses this file to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations under
+    the License.
+
+-->
+<html ng-app="apiApp">
+<head>
+	<title>Message</title>
+	<link rel="stylesheet" href="bootstrap-3.2.0-dist/css/bootstrap.min.css">
+	<script src="bootstrap-3.2.0-dist/js/bootstrap.min.js"></script>
+  	<script src="angular/angular.min.js"></script>
+  	<script src="angular/controller.js"></script>
+  	<script type="text/javascript">
+
+  	apiData = {"version":"3.0.0","message":{"name":"AgentTemplate","package":"greenbus.client","description":"<p>Description used to create or modify an Agent.</p>\n","fields":[{"name":"uuid","type":{"messageType":"ModelUUID","messagePackage":"greenbus.client","multiplicity":"single"},"label":"optional","description":"<p>Identifies a pre-existing Agent, or provides a pre-determined UUID for a new Agent.</p>\n","requirement":"optional"},{"name":"name","type":{"simpleType":"string","multiplicity":"single"},"label":"optional","description":"<p>Identifies a pre-existing Agent, provides a name for a created Agent, or a new name for an existing Agent.</p>\n<ul>\n<li>If a UUID is not provided and the Agent does not exist an Agent will be created with this name.</li>\n<li>If a UUID is not provided and the Agent exists, the Agent will be identified and the non-name fields will be be modified.</li>\n<li>If a UUID is provided and the Agent does not exist, an Agent will be created with this name.</li>\n<li>If a UUID is provided and the Agent already exists, the Agent will be renamed to this name.</li>\n</ul>\n","requirement":"required"},{"name":"password","type":{"simpleType":"string","multiplicity":"single"},"label":"optional","description":"<p>Password for the Agent.</p>\n<ul>\n<li>If creating a new Agent, a password is required.</li>\n<li>If updating an Agent, a password is not required. Hence updating other fields in the Agent is possible without knowing the original password or changing to a new one.</li>\n</ul>\n","requirement":"optional"},{"name":"permission_sets","type":{"simpleType":"string","multiplicity":"multiple"},"label":"repeated","description":"<p>Names of PermissionSets to be assigned to this Agent. The PermissionSets must already exist.</p>\n<p>After modifying an existing Agent, these will be the full set of PermissionSets for that Agent. Any pre-existing PermissionSet assignments not in this list will be removed.</p>\n<p>Any empty list (including if the field is uninitialized) will result in the Agent having no PermissionSets.</p>\n","requirement":"required"}],"simple":false},"mentions":{"serviceParamMentions":[{"service":"greenbus.client.AuthService","method":"put_agents"}]}};
+
+  	</script>
+</head>
+<body ng-controller="msgControl">
+<div class="container">
+    <div class="page-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-1"><h4><span class="label label-primary">message</span></h4></div>
+                <div class="col-md-8"><h4><i>{{message.package}}</i></h4></div>
+                <div class="col-md-3 text-right"><h5><small>Version:</small> {{version}}</h5></div>
+            </div>
+        </div>
+        <h1>{{message.name}}</h1>
+    </div>
+
+    <div ng-bind-html="message.description"></div>
+
+    <div>
+        <p ng-if="mentions.messageMentions"><strong>Used in: </strong>
+            <span ng-repeat="mention in mentions.messageMentions"><a href="{{mention}}.html">{{mention}}</a><span ng-if="!$last">, </span></span>
+        </p>
+        <p ng-if="mentions.serviceParamMentions"><strong>Parameter for: </strong>
+            <span ng-repeat="m in mentions.serviceParamMentions"><a href="{{m.service}}.html">{{m.service}}.{{m.method}}</a><span ng-if="!$last">, </span></span>
+        </p>
+        <p ng-if="mentions.serviceResultMentions"><strong>Result of: </strong>
+            <span ng-repeat="m in mentions.serviceResultMentions"><a href="{{m.service}}.html">{{m.service}}.{{m.method}}</a><span ng-if="!$last">, </span></span>
+        </p>
+    </div>
+
+    <div>
+
+        <table class="table" style="font-size: 100%">
+            <thead class="text-info">
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            </thead>
+            <tr ng-repeat="field in message.fields">
+                <td><span class="clearfix"><strong>{{field.name}}</strong></span><span class="pull-left text-muted"><em>{{field.requirement}}</em></span></td>
+
+                <td ng-if="field.type.simpleType">
+                    <strong style="font-size: 110%">{{field.type.simpleType}}<span ng-if="field.type.multiplicity === 'multiple'">[]</span></strong>
+                </td>
+                <td ng-if="!field.type.simpleType">
+                    <strong style="font-size: 110%"><a href="{{field.type.messagePackage}}.{{field.type.messageType}}.html">{{field.type.messagePackage}}.{{field.type.messageType}}</a><span ng-if="field.type.multiplicity === 'multiple'">[]</span></strong>
+                </td>
+
+                <td ng-bind-html="field.description"></td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

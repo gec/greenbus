@@ -1,0 +1,86 @@
+<!--
+
+    Copyright 2011-2016 Green Energy Corp.
+
+    Licensed to Green Energy Corp (www.greenenergycorp.com) under one or more
+    contributor license agreements. See the NOTICE file distributed with this
+    work for additional information regarding copyright ownership. Green Energy
+    Corp licenses this file to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations under
+    the License.
+
+-->
+<html ng-app="apiApp">
+<head>
+	<title>Message</title>
+	<link rel="stylesheet" href="bootstrap-3.2.0-dist/css/bootstrap.min.css">
+	<script src="bootstrap-3.2.0-dist/js/bootstrap.min.js"></script>
+  	<script src="angular/angular.min.js"></script>
+  	<script src="angular/controller.js"></script>
+  	<script type="text/javascript">
+
+  	apiData = {"version":"3.0.0","message":{"name":"Measurement","package":"greenbus.client","description":"<p>Represents a value at a particular point in time, with annotations for quality and unit of measurement.</p>\n","fields":[{"name":"type","type":{"messageType":"Type","messagePackage":"greenbus.client.Measurement","multiplicity":"single"},"label":"required","description":"<p>Determines the data type of the Measurement. The values of the enumeration correspond to the\n<code>int_val</code>, <code>double_val</code>, <code>bool_val</code> and <code>string_val</code> fields. The selected field type must be\npresent.</p>\n<p>More than one of these fields may be present (possibly due to a transformation); if so this type\nfield specifies to primary data type.</p>\n","requirement":"required"},{"name":"int_val","type":{"simpleType":"sint64","multiplicity":"single"},"label":"optional","description":"<p>Integer (64-bit) data value.</p>\n","requirement":"optional"},{"name":"double_val","type":{"simpleType":"double","multiplicity":"single"},"label":"optional","description":"<p>Double (64-bit) floating-point data value.</p>\n","requirement":"optional"},{"name":"bool_val","type":{"simpleType":"bool","multiplicity":"single"},"label":"optional","description":"<p>Boolean data value.</p>\n","requirement":"optional"},{"name":"string_val","type":{"simpleType":"string","multiplicity":"single"},"label":"optional","description":"<p>String data value.</p>\n","requirement":"optional"},{"name":"quality","type":{"messageType":"Quality","messagePackage":"greenbus.client","multiplicity":"single"},"label":"optional","description":"<p>Annotation of health/validity of this value.</p>\n<p>Not specifying a quality is generally equivalent to good quality.</p>\n","requirement":"optional"},{"name":"time","type":{"simpleType":"uint64","multiplicity":"single"},"label":"optional","description":"<p>Time of occurrence for the measurement value.</p>\n<p>Time is measured in milliseconds since midnight, January 1, 1970 UTC.</p>\n","requirement":"required"},{"name":"is_device_time","type":{"simpleType":"bool","multiplicity":"single"},"label":"optional","description":"<p>True if <code>time</code> field is a device timestamp, false or unset if it represents wall time.</p>\n","requirement":"optional"},{"name":"system_time","type":{"simpleType":"uint64","multiplicity":"single"},"label":"optional","description":"<p>The time when the measurement was processed into the system. The difference this and the <code>time</code> field\nmay be an approximate measurement of delay in the measurement stream or a measure of clock differences between\nthe field devices and the system.</p>\n<p>Time is measured in milliseconds since midnight, January 1, 1970 UTC.</p>\n","requirement":"optional"}],"simple":false},"mentions":{"messageMentions":["greenbus.client.NamedMeasurementValue","greenbus.client.NamedMeasurementValues","greenbus.client.PointMeasurementValue","greenbus.client.PointMeasurementValues","greenbus.client.MeasurementNotification","greenbus.client.MeasOverride"]}};
+
+  	</script>
+</head>
+<body ng-controller="msgControl">
+<div class="container">
+    <div class="page-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-1"><h4><span class="label label-primary">message</span></h4></div>
+                <div class="col-md-8"><h4><i>{{message.package}}</i></h4></div>
+                <div class="col-md-3 text-right"><h5><small>Version:</small> {{version}}</h5></div>
+            </div>
+        </div>
+        <h1>{{message.name}}</h1>
+    </div>
+
+    <div ng-bind-html="message.description"></div>
+
+    <div>
+        <p ng-if="mentions.messageMentions"><strong>Used in: </strong>
+            <span ng-repeat="mention in mentions.messageMentions"><a href="{{mention}}.html">{{mention}}</a><span ng-if="!$last">, </span></span>
+        </p>
+        <p ng-if="mentions.serviceParamMentions"><strong>Parameter for: </strong>
+            <span ng-repeat="m in mentions.serviceParamMentions"><a href="{{m.service}}.html">{{m.service}}.{{m.method}}</a><span ng-if="!$last">, </span></span>
+        </p>
+        <p ng-if="mentions.serviceResultMentions"><strong>Result of: </strong>
+            <span ng-repeat="m in mentions.serviceResultMentions"><a href="{{m.service}}.html">{{m.service}}.{{m.method}}</a><span ng-if="!$last">, </span></span>
+        </p>
+    </div>
+
+    <div>
+
+        <table class="table" style="font-size: 100%">
+            <thead class="text-info">
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            </thead>
+            <tr ng-repeat="field in message.fields">
+                <td><span class="clearfix"><strong>{{field.name}}</strong></span><span class="pull-left text-muted"><em>{{field.requirement}}</em></span></td>
+
+                <td ng-if="field.type.simpleType">
+                    <strong style="font-size: 110%">{{field.type.simpleType}}<span ng-if="field.type.multiplicity === 'multiple'">[]</span></strong>
+                </td>
+                <td ng-if="!field.type.simpleType">
+                    <strong style="font-size: 110%"><a href="{{field.type.messagePackage}}.{{field.type.messageType}}.html">{{field.type.messagePackage}}.{{field.type.messageType}}</a><span ng-if="field.type.multiplicity === 'multiple'">[]</span></strong>
+                </td>
+
+                <td ng-bind-html="field.description"></td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

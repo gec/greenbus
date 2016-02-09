@@ -1,0 +1,189 @@
+<!--
+
+    Copyright 2011-2016 Green Energy Corp.
+
+    Licensed to Green Energy Corp (www.greenenergycorp.com) under one or more
+    contributor license agreements. See the NOTICE file distributed with this
+    work for additional information regarding copyright ownership. Green Energy
+    Corp licenses this file to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations under
+    the License.
+
+-->
+<html ng-app="apiApp">
+<head>
+	<title>Service</title>
+	<link rel="stylesheet" href="bootstrap-3.2.0-dist/css/bootstrap.min.css">
+	<script src="bootstrap-3.2.0-dist/js/bootstrap.min.js"></script>
+  	<script src="angular/angular.min.js"></script>
+  	<script src="angular/controller.js"></script>
+  	<script type="text/javascript">
+
+  	apiData = {"version":"3.0.0","name":"ProcessingService","package":"greenbus.client","description":"<p>Service for configuring the behavior of the measurement processor.</p>\n<p>MeasOverride objects provide the ability to block new Measurements from being published, and to optionally\nreplace the latest value provided by the front-end with a user-specified override value. Blocked (not in service)\nMeasurements will not be stored in the current value and historian stores, and will not be published to the\nMeasurement notification stream.</p>\n<p>TriggerSet objects describe the transformations and event generation to be performed on Measurements in the\nmeasurement processor before they are published to the stores and notification stream.</p>\n","methods":[{"name":"get_overrides","parameters":[{"name":"request","type":{"messageType":"EntityKeySet","messagePackage":"greenbus.client","multiplicity":"single"}}],"returnValue":{"messageType":"MeasOverride","messagePackage":"greenbus.client","multiplicity":"multiple"},"description":"<p>Returns a set of MeasOverrides associated with Points specified by an EntityKeySet.</p>\n"},{"name":"put_overrides","parameters":[{"name":"overrides","type":{"messageType":"MeasOverride","messagePackage":"greenbus.client","multiplicity":"multiple"}}],"returnValue":{"messageType":"MeasOverride","messagePackage":"greenbus.client","multiplicity":"multiple"},"description":"<p>Creates or modifies the MeasOverrides associated with Points.</p>\n<p>Only one MeasOverride can exist for any given Point. Putting a new value will replace a previous one.</p>\n"},{"name":"delete_overrides","parameters":[{"name":"point_uuids","type":{"messageType":"ModelUUID","messagePackage":"greenbus.client","multiplicity":"multiple"}}],"returnValue":{"messageType":"MeasOverride","messagePackage":"greenbus.client","multiplicity":"multiple"},"description":"<p>Delete MeasOverrides associated with Points by specifying the Point UUIDs.</p>\n"},{"name":"subscribe_to_overrides","parameters":[{"name":"query","type":{"messageType":"OverrideSubscriptionQuery","messagePackage":"greenbus.client","multiplicity":"single"}}],"returnValue":{"messageType":"MeasOverride","messagePackage":"greenbus.client","multiplicity":"multiple"},"subscription":{"messageType":"OverrideNotification","messagePackage":"greenbus.client","multiplicity":"single"},"description":"<p>Subscribes to notifications for changes to MeasOverrides by either Point or Endpoint.</p>\n"}],"nested":{"greenbus.client.EntityKeySet":{"name":"EntityKeySet","package":"greenbus.client","description":"<p>Collection of keys that identify a set of Entities.</p>\n","fields":[{"name":"uuids","type":{"messageType":"ModelUUID","messagePackage":"greenbus.client","multiplicity":"multiple"},"label":"repeated","description":"<p>UUIDs of Entities.</p>\n","requirement":"optional"},{"name":"names","type":{"simpleType":"string","multiplicity":"multiple"},"label":"repeated","description":"<p>Names of Entities.</p>\n","requirement":"optional"}],"simple":false},"greenbus.client.MeasOverride":{"name":"MeasOverride","package":"greenbus.client","description":"<p>Provide the ability to block new Measurements from being published, and to optionally\nreplace the latest value provided by a front end with a user-specified override value. Blocked (not in service)\nMeasurements will not be stored in the current value and historian databases, and will not be published to the\nMeasurement notification stream.</p>\n","fields":[{"name":"point_uuid","type":{"messageType":"ModelUUID","messagePackage":"greenbus.client","multiplicity":"single"},"label":"optional","description":"<p>UUID for the Point to be overridden.</p>\n","requirement":"required"},{"name":"measurement","type":{"messageType":"Measurement","messagePackage":"greenbus.client","multiplicity":"single"},"label":"optional","description":"<p>If provided, will appear as the latest Measurement value for the point.</p>\n","requirement":"optional"},{"name":"test_value","type":{"simpleType":"bool","multiplicity":"single"},"label":"optional","description":"<p>If a Measurement is present, specifies that the replacement value should be\nprocessed as if it were a communications value.</p>\n<p>Does nothing if a Measurement value is not provided.</p>\n","requirement":"optional"}],"simple":false},"greenbus.client.OverrideSubscriptionQuery":{"name":"OverrideSubscriptionQuery","package":"greenbus.client","description":"<p>Subscription parameters for MeasOverrides. Notifications can be filtered by Point or Endpoint.</p>\n<ul>\n<li>Including key parameters (and no Endpoint UUIDs) will return the current state of the MeasOverrides for those Points\nand subscribe to notifications for them.</li>\n<li>Including Endpoint UUIDs will subscribe to MeasOverride notifications for Points associated with those Endpoints,\nbut return no immediate results.</li>\n<li>Including no parameters will subscribe to MeasOverride notifications for all Points, but return no immediate results.</li>\n</ul>\n<p><strong>Note</strong>: MeasOverride notifications are filtered by Point UUID, not Point name. Using a name parameter resolves\nthe UUID of the Point associated with that name at the time of the request, and is\nequivalent to the client resolving the UUID before making the request. As a result, if the\nPoint a particular name refers to changes (due to a deletion/addition or two renames) notifications will be delivered\nfor only for the original Point.</p>\n<p>Endpoint UUIDs are <em>not</em> resolved to a set of Points at request time, and updates in the system model to associations between Points\nand Endpoints will affect what notifications are delivered to the subscription.</p>\n","fields":[{"name":"point_uuids","type":{"messageType":"ModelUUID","messagePackage":"greenbus.client","multiplicity":"multiple"},"label":"repeated","description":"<p>UUIDs of Points to subscribe to MeasOverrides for.</p>\n","requirement":"optional"},{"name":"point_names","type":{"simpleType":"string","multiplicity":"multiple"},"label":"repeated","description":"<p>Names of Points to subscribe to MeasOverrides for.</p>\n","requirement":"optional"},{"name":"endpoint_uuids","type":{"messageType":"ModelUUID","messagePackage":"greenbus.client","multiplicity":"multiple"},"label":"repeated","description":"<p>UUIDs of Endpoints to subscribe to MeasOverrides for.</p>\n","requirement":"optional"}],"simple":false}}};
+
+  	</script>
+</head>
+<body ng-controller="serviceControl">
+<div class="container">
+    <div class="page-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-1"><h4><span class="label label-success">service</span></h4></div>
+                <div class="col-md-8"><h4><i>{{package}}</i></h4></div>
+                <div class="col-md-3 text-right"><h5><small>Version:</small> {{version}}</h5></div>
+            </div>
+        </div>
+        <h1>{{name}}</h1>
+    </div>
+
+    <div ng-bind-html="description"></div>
+
+    <div ng-repeat="method in methods" class="panel panel-success">
+        <div class="panel-heading">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-3">
+                        <span style="font-size: 110%" ng-if="method.returnValue.simpleType">{{method.returnValue.simpleType}} <span ng-if="method.returnValue.multiplicity === 'multiple'">[]</span></span>
+		  				<span style="font-size: 110%" ng-if="!method.returnValue.simpleType">
+		  					<a href="{{method.returnValue.messagePackage}}.{{method.returnValue.messageType}}.html">{{method.returnValue.messagePackage}}.{{method.returnValue.messageType}}</a><a ng-if="method.returnValue.multiplicity === 'multiple'">[]</a>
+						</span>
+                    </div>
+                    <div class="col-md-9">
+                        <strong style="font-size: 120%">{{method.name}} (</strong>
+		  				<span style="font-size: 110%" ng-repeat="param in method.parameters">
+		  					<span ng-if="param.type.simpleType">{{param.type.simpleType}}<a ng-if="param.type.multiplicity === 'multiple'">[]</a> {{param.name}}</span>
+		  					<span ng-if="!param.type.simpleType">
+			  					<a href="{{param.type.messagePackage}}.{{param.type.messageType}}.html">{{param.type.messagePackage}}.{{param.type.messageType}}</a><a ng-if="param.type.multiplicity === 'multiple'">[]</a>
+		  						{{param.name}}</span><span ng-if="!$last">,</span>
+		  				</span>
+                        <span style="font-size: 120%"><strong>)</strong></span>
+                    </div>
+                </div></div>
+        </div>
+        <div class="panel-body">
+
+            <div>
+                <table ng-if="method.subscription || method.addressing" style="font-size: 100%; margin-bottom: 10px;">
+                    <tr ng-if="method.subscription">
+                        <td><h4><span class="label label-primary"><strong>Subscription:</strong></span></h4></td>
+                        <td style="padding-left: 10px">
+                            <a href="{{method.subscription.messagePackage}}.{{method.subscription.messageType}}.html">{{method.subscription.messagePackage}}.{{method.subscription.messageType}}</a>
+                        </td>
+                    </tr>
+                    <tr ng-if="method.addressing">
+                        <td><h4><span class="label label-warning"><strong>Addressing:</strong></span></h4></td>
+                        <td style="padding-left: 10px"><em class="text-muted">{{method.addressing}}</em></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div ng-bind-html="method.description"></div>
+
+            <div ng-repeat="param in method.parameters" >
+
+                <div class="panel panel-default" ng-if="param.type.messageType && nested[param.type.messagePackage + '.' + param.type.messageType]" ng-init="message = nested[param.type.messagePackage + '.' + param.type.messageType]">
+                    <div class="panel-heading"><a href="{{param.type.messagePackage}}.{{param.type.messageType}}.html"><em>{{param.type.messagePackage}}.{{param.type.messageType}}</em></a></div>
+                    <div class="panel-body">
+                        <div ng-bind-html="message.description"></div>
+                        <table class="table" style="font-size: 100%">
+
+                            <thead class="text-info">
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                            </thead>
+                            <tr ng-repeat-start="field in message.fields">
+                                <td><span class="clearfix"><strong>{{field.name}}</strong></span><span class="pull-left text-muted"><em>{{field.requirement}}</em></span></td>
+
+                                <td ng-if="field.type.simpleType">
+                                    <strong style="font-size: 110%">{{field.type.simpleType}}<span ng-if="field.type.multiplicity === 'multiple'">[]</span></strong>
+                                </td>
+                                <td ng-if="!field.type.simpleType">
+                                    <strong style="font-size: 110%"><a href="{{field.type.messagePackage}}.{{field.type.messageType}}.html">{{field.type.messagePackage}}.{{field.type.messageType}}</a><span ng-if="field.type.multiplicity === 'multiple'">[]</span></strong>
+                                </td>
+
+                                <td ng-bind-html="field.description"></td>
+                            </tr>
+                            <tr ng-repeat-end ng-if="field.nested" ng-init="message = nested[field.type.messagePackage + '.' + field.type.messageType]">
+
+                                <!-- RECURSE 1 -->
+                                <td colspan="3" style="border-top: 0px;">
+                                    <div class="panel panel-default"  style="margin-left: 50px;">
+                                        <div class="panel-heading"><a href="{{field.type.messagePackage}}.{{field.type.messageType}}.html"><em>{{field.type.messagePackage}}.{{field.type.messageType}}</em></a></div>
+                                        <div class="panel-body">
+                                            <div ng-bind-html="message.description"></div>
+                                            <table class="table" style="font-size: 100%">
+                                                <thead class="text-info">
+                                                <th>Name</th>
+                                                <th>Type</th>
+                                                <th>Description</th>
+                                                </thead>
+                                                <tr ng-repeat-start="subField1 in message.fields">
+                                                    <td><span class="clearfix"><strong>{{subField1.name}}</strong></span><span class="pull-left text-muted"><em>{{subField1.requirement}}</em></span></td>
+
+                                                    <td ng-if="subField1.type.simpleType">
+                                                        <strong style="font-size: 110%">{{subField1.type.simpleType}}<span ng-if="subField1.type.multiplicity === 'multiple'">[]</span></strong>
+                                                    </td>
+                                                    <td ng-if="!subField1.type.simpleType">
+                                                        <strong style="font-size: 110%"><a href="{{subField1.type.messagePackage}}.{{subField1.type.messageType}}.html">{{subField1.type.messagePackage}}.{{subField1.type.messageType}}</a><span ng-if="subField1.type.multiplicity === 'multiple'">[]</span></strong>
+                                                    </td>
+
+                                                    <td ng-bind-html="subField1.description"></td>
+                                                </tr>
+                                                <tr ng-repeat-end ng-if="subField1.nested" ng-init="message = nested[subField1.type.messagePackage + '.' + subField1.type.messageType]">
+
+                                                    <!-- RECURSE 2 -->
+                                                    <td colspan="3" style="border-top: 0px;">
+                                                        <div class="panel panel-default"  style="margin-left: 50px;">
+                                                            <div class="panel-heading"><a href="{{subField1.type.messagePackage}}.{{subField1.type.messageType}}.html"><em>{{subField1.type.messagePackage}}.{{subField1.type.messageType}}</em></a></div>
+                                                            <div class="panel-body">
+                                                                <div ng-bind-html="message.description"></div>
+                                                                <table class="table" style="font-size: 100%">
+                                                                    <thead class="text-info">
+                                                                    <th>Name</th>
+                                                                    <th>Type</th>
+                                                                    <th>Description</th>
+                                                                    </thead>
+                                                                    <tr ng-repeat="subField2 in message.fields">
+                                                                        <td><span class="clearfix"><strong>{{subField2.name}}</strong></span><span class="pull-left text-muted"><em>{{subField2.requirement}}</em></span></td>
+
+                                                                        <td ng-if="subField2.type.simpleType">
+                                                                            <strong style="font-size: 110%">{{subField2.type.simpleType}}<span ng-if="subField2.type.multiplicity === 'multiple'">[]</span></strong>
+                                                                        </td>
+                                                                        <td ng-if="!subField2.type.simpleType">
+                                                                            <strong style="font-size: 110%"><a href="{{subField2.type.messagePackage}}.{{subField2.type.messageType}}.html">{{subField2.type.messagePackage}}.{{subField2.type.messageType}}</a><span ng-if="subField2.type.multiplicity === 'multiple'">[]</span></strong>
+                                                                        </td>
+
+                                                                        <td ng-bind-html="subField2.description"></td>
+                                                                    </tr>
+                                                                    <!--<tr ng-repeat-end ng-if="subField2.nested">
+
+                                                                    </tr>-->
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

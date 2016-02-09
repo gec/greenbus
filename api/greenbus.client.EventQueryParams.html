@@ -1,0 +1,86 @@
+<!--
+
+    Copyright 2011-2016 Green Energy Corp.
+
+    Licensed to Green Energy Corp (www.greenenergycorp.com) under one or more
+    contributor license agreements. See the NOTICE file distributed with this
+    work for additional information regarding copyright ownership. Green Energy
+    Corp licenses this file to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations under
+    the License.
+
+-->
+<html ng-app="apiApp">
+<head>
+	<title>Message</title>
+	<link rel="stylesheet" href="bootstrap-3.2.0-dist/css/bootstrap.min.css">
+	<script src="bootstrap-3.2.0-dist/js/bootstrap.min.js"></script>
+  	<script src="angular/angular.min.js"></script>
+  	<script src="angular/controller.js"></script>
+  	<script type="text/javascript">
+
+  	apiData = {"version":"3.0.0","message":{"name":"EventQueryParams","package":"greenbus.client","description":"<p>Query parameters to select a set of Events.</p>\n","fields":[{"name":"event_type","type":{"simpleType":"string","multiplicity":"multiple"},"label":"repeated","description":"<p>Specifies a set of Event types to be directly matched. Events with one of any of the included Event types will\nbe returned.</p>\n","requirement":"optional"},{"name":"time_from","type":{"simpleType":"uint64","multiplicity":"single"},"label":"optional","description":"<p>Searches for Events with a time greater than or equal to this value.</p>\n<p>Time is measured in milliseconds since midnight, January 1, 1970 UTC.</p>\n","requirement":"optional"},{"name":"time_to","type":{"simpleType":"uint64","multiplicity":"single"},"label":"optional","description":"<p>Searches for Events with a time less than or equal to this value.</p>\n<p>Time is measured in milliseconds since midnight, January 1, 1970 UTC.</p>\n","requirement":"optional"},{"name":"severity","type":{"simpleType":"uint32","multiplicity":"multiple"},"label":"repeated","description":"<p>Specifies a set of Event severities to be directly matched. Events with one of any of the included Event severities will\nbe returned.</p>\n","requirement":"optional"},{"name":"severity_or_higher","type":{"simpleType":"uint32","multiplicity":"single"},"label":"optional","description":"<p>Specifies a lower bound on severities. Any Event at this severity or higher (numerically lower) will\nbe returned.</p>\n<p>If present, overrides the <code>severity</code> parameter.</p>\n","requirement":"optional"},{"name":"subsystem","type":{"simpleType":"string","multiplicity":"multiple"},"label":"repeated","description":"<p>Specifies a set of Event subystem fields to be directly matched. Events with one of any of the included subystems will\nbe returned.</p>\n","requirement":"optional"},{"name":"agent","type":{"simpleType":"string","multiplicity":"multiple"},"label":"repeated","description":"<p>Specifies a set of Event agent names to be directly matched. Events with one of any of the included agent names will\nbe returned.</p>\n","requirement":"optional"},{"name":"entities","type":{"messageType":"EntityKeySet","messagePackage":"greenbus.client","multiplicity":"single"},"label":"optional","description":"<p>Specifies a set of Entities by keys. Events associated with any of the specified Entities will be returned.</p>\n","requirement":"optional","nested":true},{"name":"model_group","type":{"simpleType":"string","multiplicity":"multiple"},"label":"repeated","description":"<p>Specifies a set of model segments. Events associated with any of the specified model segments will be returned.</p>\n","requirement":"optional"},{"name":"is_alarm","type":{"simpleType":"bool","multiplicity":"single"},"label":"optional","description":"<p>If <code>true</code>, only returns Events that caused an Alarm to be raised. If <code>false</code>, only returns Events that did not\nraise an Alarm.</p>\n","requirement":"optional"},{"name":"latest","type":{"simpleType":"bool","multiplicity":"single"},"label":"optional","description":"<p>Specifies which side of a page window to return Events for.</p>\n<p>If the number of Events in the time window exceeds the limit on the number of Events to be\nreturned by the query, the sequence of Events will be justified to either the lower or higher\nboundary of the window.</p>\n<ul>\n<li>If <code>false</code>, the returned Events will begin with the first in the time window and proceed until the time window\nends or the limit is met. Paging using this method would move forward in time.</li>\n<li>If <code>true</code>, the sequence of returned Events begins at the <code>limit</code>th value below the high boundary of the time window,\nand proceeds to the high boundary. Paging using this method would move backward in time.</li>\n</ul>\n<p>In both cases, the sequence of Events is returned in ascending time-order (oldest to newest).</p>\n<p>The default value is <code>true</code>.</p>\n","requirement":"optional"}],"simple":false},"mentions":{"messageMentions":["greenbus.client.EventQuery","greenbus.client.AlarmQuery"]}};
+
+  	</script>
+</head>
+<body ng-controller="msgControl">
+<div class="container">
+    <div class="page-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-1"><h4><span class="label label-primary">message</span></h4></div>
+                <div class="col-md-8"><h4><i>{{message.package}}</i></h4></div>
+                <div class="col-md-3 text-right"><h5><small>Version:</small> {{version}}</h5></div>
+            </div>
+        </div>
+        <h1>{{message.name}}</h1>
+    </div>
+
+    <div ng-bind-html="message.description"></div>
+
+    <div>
+        <p ng-if="mentions.messageMentions"><strong>Used in: </strong>
+            <span ng-repeat="mention in mentions.messageMentions"><a href="{{mention}}.html">{{mention}}</a><span ng-if="!$last">, </span></span>
+        </p>
+        <p ng-if="mentions.serviceParamMentions"><strong>Parameter for: </strong>
+            <span ng-repeat="m in mentions.serviceParamMentions"><a href="{{m.service}}.html">{{m.service}}.{{m.method}}</a><span ng-if="!$last">, </span></span>
+        </p>
+        <p ng-if="mentions.serviceResultMentions"><strong>Result of: </strong>
+            <span ng-repeat="m in mentions.serviceResultMentions"><a href="{{m.service}}.html">{{m.service}}.{{m.method}}</a><span ng-if="!$last">, </span></span>
+        </p>
+    </div>
+
+    <div>
+
+        <table class="table" style="font-size: 100%">
+            <thead class="text-info">
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            </thead>
+            <tr ng-repeat="field in message.fields">
+                <td><span class="clearfix"><strong>{{field.name}}</strong></span><span class="pull-left text-muted"><em>{{field.requirement}}</em></span></td>
+
+                <td ng-if="field.type.simpleType">
+                    <strong style="font-size: 110%">{{field.type.simpleType}}<span ng-if="field.type.multiplicity === 'multiple'">[]</span></strong>
+                </td>
+                <td ng-if="!field.type.simpleType">
+                    <strong style="font-size: 110%"><a href="{{field.type.messagePackage}}.{{field.type.messageType}}.html">{{field.type.messagePackage}}.{{field.type.messageType}}</a><span ng-if="field.type.multiplicity === 'multiple'">[]</span></strong>
+                </td>
+
+                <td ng-bind-html="field.description"></td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

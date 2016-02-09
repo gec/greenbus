@@ -1,0 +1,189 @@
+<!--
+
+    Copyright 2011-2016 Green Energy Corp.
+
+    Licensed to Green Energy Corp (www.greenenergycorp.com) under one or more
+    contributor license agreements. See the NOTICE file distributed with this
+    work for additional information regarding copyright ownership. Green Energy
+    Corp licenses this file to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations under
+    the License.
+
+-->
+<html ng-app="apiApp">
+<head>
+	<title>Service</title>
+	<link rel="stylesheet" href="bootstrap-3.2.0-dist/css/bootstrap.min.css">
+	<script src="bootstrap-3.2.0-dist/js/bootstrap.min.js"></script>
+  	<script src="angular/angular.min.js"></script>
+  	<script src="angular/controller.js"></script>
+  	<script type="text/javascript">
+
+  	apiData = {"version":"3.0.0","name":"FrontEndService","package":"greenbus.client","description":"","methods":[{"name":"put_front_end_registration","parameters":[{"name":"request","type":{"messageType":"FrontEndRegistrationTemplate","messagePackage":"greenbus.client","multiplicity":"single"}}],"returnValue":{"messageType":"FrontEndRegistration","messagePackage":"greenbus.client","multiplicity":"single"},"addressing":"optional","description":"<p>Registers a set of front-ends to provide services for a set of Endpoints.</p>\n"},{"name":"get_front_end_connection_statuses","parameters":[{"name":"endpoints","type":{"messageType":"EntityKeySet","messagePackage":"greenbus.client","multiplicity":"single"}}],"returnValue":{"messageType":"FrontEndConnectionStatus","messagePackage":"greenbus.client","multiplicity":"multiple"},"description":"<p>Gets front-end connection statuses by Endpoint UUIDs and names.</p>\n"},{"name":"put_front_end_connection_statuses","parameters":[{"name":"updates","type":{"messageType":"FrontEndStatusUpdate","messagePackage":"greenbus.client","multiplicity":"multiple"}}],"returnValue":{"messageType":"FrontEndConnectionStatus","messagePackage":"greenbus.client","multiplicity":"multiple"},"addressing":"optional","description":"<p>Notifies the system of updates to the status of front-end services for a set of Endpoints.</p>\n"},{"name":"subscribe_to_front_end_connection_statuses","parameters":[{"name":"endpoints","type":{"messageType":"EndpointSubscriptionQuery","messagePackage":"greenbus.client","multiplicity":"single"}}],"returnValue":{"messageType":"FrontEndConnectionStatus","messagePackage":"greenbus.client","multiplicity":"multiple"},"subscription":{"messageType":"FrontEndConnectionStatusNotification","messagePackage":"greenbus.client","multiplicity":"single"},"description":"<p>Subscribes to notifications for changes to the statuses of front-end connections for a particular set of Endpoints.</p>\n"}],"nested":{"greenbus.client.FrontEndRegistrationTemplate":{"name":"FrontEndRegistrationTemplate","package":"greenbus.client","description":"<p>Represents a front-end's registration to provide service for an Endpoint.</p>\n<p>An address may be provided where CommandRequests for this Endpoint should be sent. If no address is included, the\nEndpoint will not support CommandRequests.</p>\n","fields":[{"name":"endpoint_uuid","type":{"messageType":"ModelUUID","messagePackage":"greenbus.client","multiplicity":"single"},"label":"optional","description":"<p>UUID of the Endpoint the front-end is registering for.</p>\n","requirement":"required"},{"name":"command_address","type":{"simpleType":"string","multiplicity":"single"},"label":"optional","description":"<p>Service address that should be used to send CommandRequests to this front-end for this Endpoint.</p>\n","requirement":"optional"},{"name":"fep_node_id","type":{"simpleType":"string","multiplicity":"single"},"label":"optional","description":"<p>Allows the front-end instance to associate the registration with a unique persistent identity. If the front-end loses\nthe registration information (perhaps due to a restart) re-registration with the same node ID may be\naccepted even if the registration has not timed out.</p>\n<p>Node IDs should be unique for all front-ends and only re-used by the same logical process on restarts.</p>\n","requirement":"optional"},{"name":"holding_lock","type":{"simpleType":"bool","multiplicity":"single"},"label":"optional","description":"<p>Used by the front-end to indicate that it is currently excluding other front-ends from make a connection for this Endpoint\n(perhaps by holding open a connection that will only accept a single client). Registrations using this flag\ntake precedence and will abort the registrations of other front-ends (which presumably are unable to connect).</p>\n<p>This is intended to allow front-end instances that were separated from the network for long enough for a fail-over to\noccur to reclaim their registration instead of releasing an expensive external connection.</p>\n","requirement":"optional"}],"simple":false},"greenbus.client.EntityKeySet":{"name":"EntityKeySet","package":"greenbus.client","description":"<p>Collection of keys that identify a set of Entities.</p>\n","fields":[{"name":"uuids","type":{"messageType":"ModelUUID","messagePackage":"greenbus.client","multiplicity":"multiple"},"label":"repeated","description":"<p>UUIDs of Entities.</p>\n","requirement":"optional"},{"name":"names","type":{"simpleType":"string","multiplicity":"multiple"},"label":"repeated","description":"<p>Names of Entities.</p>\n","requirement":"optional"}],"simple":false},"greenbus.client.FrontEndStatusUpdate":{"name":"FrontEndStatusUpdate","package":"greenbus.client","description":"<p>Used by a front-end to notify the system of updates to the status of itself or the external source it communicates with.</p>\n","fields":[{"name":"endpoint_uuid","type":{"messageType":"ModelUUID","messagePackage":"greenbus.client","multiplicity":"single"},"label":"optional","description":"<p>UUID of the Endpoint the front-end is registering for.</p>\n","requirement":"required"},{"name":"status","type":{"messageType":"Status","messagePackage":"greenbus.client.FrontEndConnectionStatus","multiplicity":"single"},"label":"optional","description":"<p>UUID of the Endpoint the front-end is registering for.</p>\n","requirement":"required"}],"simple":false},"greenbus.client.EndpointSubscriptionQuery":{"name":"EndpointSubscriptionQuery","package":"greenbus.client","description":"<p>Subscription parameters for Endpoints. Notifications can be filtered by key or by protocol.</p>\n<ul>\n<li>Including key parameters  will return the current state of those Endpoints\nand subscribe to notifications for them.</li>\n<li>Including protocol parameters will subscribe to notifications for Endpoints associated with those Endpoints,\nbut return no immediate results.</li>\n<li>Including no parameters will subscribe to notifications for all Endpoints, but return no immediate results.</li>\n</ul>\n<p><strong>Note</strong>: Endpoint notifications are filtered by UUID, not name. Using a name parameter resolves\nthe UUID of the Endpoint associated with that name at the time of the request, and is\nequivalent to the client resolving the UUID before making the request. As a result, if the\nEndpoint a particular name refers to changes (due to a deletion/addition or two renames) notifications will be delivered\nfor only for the original Endpoint.</p>\n","fields":[{"name":"uuids","type":{"messageType":"ModelUUID","messagePackage":"greenbus.client","multiplicity":"multiple"},"label":"repeated","description":"<p>UUIDs of Endpoints to subscribe to notifications for.</p>\n","requirement":"optional"},{"name":"names","type":{"simpleType":"string","multiplicity":"multiple"},"label":"repeated","description":"<p>Names of Endpoints to subscribe to notifications for.</p>\n","requirement":"optional"},{"name":"protocols","type":{"simpleType":"string","multiplicity":"multiple"},"label":"repeated","description":"<p>Parameters for subscribing to notifications by Endpoints' protocols.</p>\n","requirement":"optional"}],"simple":false}}};
+
+  	</script>
+</head>
+<body ng-controller="serviceControl">
+<div class="container">
+    <div class="page-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-1"><h4><span class="label label-success">service</span></h4></div>
+                <div class="col-md-8"><h4><i>{{package}}</i></h4></div>
+                <div class="col-md-3 text-right"><h5><small>Version:</small> {{version}}</h5></div>
+            </div>
+        </div>
+        <h1>{{name}}</h1>
+    </div>
+
+    <div ng-bind-html="description"></div>
+
+    <div ng-repeat="method in methods" class="panel panel-success">
+        <div class="panel-heading">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-3">
+                        <span style="font-size: 110%" ng-if="method.returnValue.simpleType">{{method.returnValue.simpleType}} <span ng-if="method.returnValue.multiplicity === 'multiple'">[]</span></span>
+		  				<span style="font-size: 110%" ng-if="!method.returnValue.simpleType">
+		  					<a href="{{method.returnValue.messagePackage}}.{{method.returnValue.messageType}}.html">{{method.returnValue.messagePackage}}.{{method.returnValue.messageType}}</a><a ng-if="method.returnValue.multiplicity === 'multiple'">[]</a>
+						</span>
+                    </div>
+                    <div class="col-md-9">
+                        <strong style="font-size: 120%">{{method.name}} (</strong>
+		  				<span style="font-size: 110%" ng-repeat="param in method.parameters">
+		  					<span ng-if="param.type.simpleType">{{param.type.simpleType}}<a ng-if="param.type.multiplicity === 'multiple'">[]</a> {{param.name}}</span>
+		  					<span ng-if="!param.type.simpleType">
+			  					<a href="{{param.type.messagePackage}}.{{param.type.messageType}}.html">{{param.type.messagePackage}}.{{param.type.messageType}}</a><a ng-if="param.type.multiplicity === 'multiple'">[]</a>
+		  						{{param.name}}</span><span ng-if="!$last">,</span>
+		  				</span>
+                        <span style="font-size: 120%"><strong>)</strong></span>
+                    </div>
+                </div></div>
+        </div>
+        <div class="panel-body">
+
+            <div>
+                <table ng-if="method.subscription || method.addressing" style="font-size: 100%; margin-bottom: 10px;">
+                    <tr ng-if="method.subscription">
+                        <td><h4><span class="label label-primary"><strong>Subscription:</strong></span></h4></td>
+                        <td style="padding-left: 10px">
+                            <a href="{{method.subscription.messagePackage}}.{{method.subscription.messageType}}.html">{{method.subscription.messagePackage}}.{{method.subscription.messageType}}</a>
+                        </td>
+                    </tr>
+                    <tr ng-if="method.addressing">
+                        <td><h4><span class="label label-warning"><strong>Addressing:</strong></span></h4></td>
+                        <td style="padding-left: 10px"><em class="text-muted">{{method.addressing}}</em></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div ng-bind-html="method.description"></div>
+
+            <div ng-repeat="param in method.parameters" >
+
+                <div class="panel panel-default" ng-if="param.type.messageType && nested[param.type.messagePackage + '.' + param.type.messageType]" ng-init="message = nested[param.type.messagePackage + '.' + param.type.messageType]">
+                    <div class="panel-heading"><a href="{{param.type.messagePackage}}.{{param.type.messageType}}.html"><em>{{param.type.messagePackage}}.{{param.type.messageType}}</em></a></div>
+                    <div class="panel-body">
+                        <div ng-bind-html="message.description"></div>
+                        <table class="table" style="font-size: 100%">
+
+                            <thead class="text-info">
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                            </thead>
+                            <tr ng-repeat-start="field in message.fields">
+                                <td><span class="clearfix"><strong>{{field.name}}</strong></span><span class="pull-left text-muted"><em>{{field.requirement}}</em></span></td>
+
+                                <td ng-if="field.type.simpleType">
+                                    <strong style="font-size: 110%">{{field.type.simpleType}}<span ng-if="field.type.multiplicity === 'multiple'">[]</span></strong>
+                                </td>
+                                <td ng-if="!field.type.simpleType">
+                                    <strong style="font-size: 110%"><a href="{{field.type.messagePackage}}.{{field.type.messageType}}.html">{{field.type.messagePackage}}.{{field.type.messageType}}</a><span ng-if="field.type.multiplicity === 'multiple'">[]</span></strong>
+                                </td>
+
+                                <td ng-bind-html="field.description"></td>
+                            </tr>
+                            <tr ng-repeat-end ng-if="field.nested" ng-init="message = nested[field.type.messagePackage + '.' + field.type.messageType]">
+
+                                <!-- RECURSE 1 -->
+                                <td colspan="3" style="border-top: 0px;">
+                                    <div class="panel panel-default"  style="margin-left: 50px;">
+                                        <div class="panel-heading"><a href="{{field.type.messagePackage}}.{{field.type.messageType}}.html"><em>{{field.type.messagePackage}}.{{field.type.messageType}}</em></a></div>
+                                        <div class="panel-body">
+                                            <div ng-bind-html="message.description"></div>
+                                            <table class="table" style="font-size: 100%">
+                                                <thead class="text-info">
+                                                <th>Name</th>
+                                                <th>Type</th>
+                                                <th>Description</th>
+                                                </thead>
+                                                <tr ng-repeat-start="subField1 in message.fields">
+                                                    <td><span class="clearfix"><strong>{{subField1.name}}</strong></span><span class="pull-left text-muted"><em>{{subField1.requirement}}</em></span></td>
+
+                                                    <td ng-if="subField1.type.simpleType">
+                                                        <strong style="font-size: 110%">{{subField1.type.simpleType}}<span ng-if="subField1.type.multiplicity === 'multiple'">[]</span></strong>
+                                                    </td>
+                                                    <td ng-if="!subField1.type.simpleType">
+                                                        <strong style="font-size: 110%"><a href="{{subField1.type.messagePackage}}.{{subField1.type.messageType}}.html">{{subField1.type.messagePackage}}.{{subField1.type.messageType}}</a><span ng-if="subField1.type.multiplicity === 'multiple'">[]</span></strong>
+                                                    </td>
+
+                                                    <td ng-bind-html="subField1.description"></td>
+                                                </tr>
+                                                <tr ng-repeat-end ng-if="subField1.nested" ng-init="message = nested[subField1.type.messagePackage + '.' + subField1.type.messageType]">
+
+                                                    <!-- RECURSE 2 -->
+                                                    <td colspan="3" style="border-top: 0px;">
+                                                        <div class="panel panel-default"  style="margin-left: 50px;">
+                                                            <div class="panel-heading"><a href="{{subField1.type.messagePackage}}.{{subField1.type.messageType}}.html"><em>{{subField1.type.messagePackage}}.{{subField1.type.messageType}}</em></a></div>
+                                                            <div class="panel-body">
+                                                                <div ng-bind-html="message.description"></div>
+                                                                <table class="table" style="font-size: 100%">
+                                                                    <thead class="text-info">
+                                                                    <th>Name</th>
+                                                                    <th>Type</th>
+                                                                    <th>Description</th>
+                                                                    </thead>
+                                                                    <tr ng-repeat="subField2 in message.fields">
+                                                                        <td><span class="clearfix"><strong>{{subField2.name}}</strong></span><span class="pull-left text-muted"><em>{{subField2.requirement}}</em></span></td>
+
+                                                                        <td ng-if="subField2.type.simpleType">
+                                                                            <strong style="font-size: 110%">{{subField2.type.simpleType}}<span ng-if="subField2.type.multiplicity === 'multiple'">[]</span></strong>
+                                                                        </td>
+                                                                        <td ng-if="!subField2.type.simpleType">
+                                                                            <strong style="font-size: 110%"><a href="{{subField2.type.messagePackage}}.{{subField2.type.messageType}}.html">{{subField2.type.messagePackage}}.{{subField2.type.messageType}}</a><span ng-if="subField2.type.multiplicity === 'multiple'">[]</span></strong>
+                                                                        </td>
+
+                                                                        <td ng-bind-html="subField2.description"></td>
+                                                                    </tr>
+                                                                    <!--<tr ng-repeat-end ng-if="subField2.nested">
+
+                                                                    </tr>-->
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

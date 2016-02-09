@@ -1,0 +1,86 @@
+<!--
+
+    Copyright 2011-2016 Green Energy Corp.
+
+    Licensed to Green Energy Corp (www.greenenergycorp.com) under one or more
+    contributor license agreements. See the NOTICE file distributed with this
+    work for additional information regarding copyright ownership. Green Energy
+    Corp licenses this file to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations under
+    the License.
+
+-->
+<html ng-app="apiApp">
+<head>
+	<title>Message</title>
+	<link rel="stylesheet" href="bootstrap-3.2.0-dist/css/bootstrap.min.css">
+	<script src="bootstrap-3.2.0-dist/js/bootstrap.min.js"></script>
+  	<script src="angular/angular.min.js"></script>
+  	<script src="angular/controller.js"></script>
+  	<script type="text/javascript">
+
+  	apiData = {"version":"3.0.0","message":{"name":"Trigger","package":"greenbus.client","description":"<p>Description of a condition and a set of Actions.</p>\n<p>For every new Measurement value, the current boolean value of the condition is evaluated. The current value\nand the previous value are compared to the ActivationType of each Action to determine if the Action should\nbe taken.</p>\n<p>When multiple condition types are specified, the boolean value is the logical <em>and</em> of all conditions.</p>\n","fields":[{"name":"trigger_name","type":{"simpleType":"string","multiplicity":"single"},"label":"optional","description":"<p>Name that identifies the Trigger uniquely in the TriggerSet</p>\n","requirement":"required"},{"name":"stop_processing_when","type":{"messageType":"ActivationType","messagePackage":"greenbus.client","multiplicity":"single"},"label":"optional","description":"<p>If the activation type is matched no further Triggers in the TriggerSet will be evaluated.</p>\n","requirement":"optional"},{"name":"actions","type":{"messageType":"Action","messagePackage":"greenbus.client","multiplicity":"multiple"},"label":"repeated","description":"<p>Sequence of Actions to be evaluated.</p>\n","requirement":"required"},{"name":"analog_limit","type":{"messageType":"AnalogLimit","messagePackage":"greenbus.client","multiplicity":"single"},"label":"optional","description":"<p>Condition describing boundaries for analog values in Measurements.</p>\n","requirement":"optional"},{"name":"quality","type":{"messageType":"Quality","messagePackage":"greenbus.client","multiplicity":"single"},"label":"optional","description":"<p>Condition matching Quality annotations of Measurements. Will be triggered if any fields set in the Trigger\nQuality match the values of the same field set in the Measurement Quality.</p>\n","requirement":"optional"},{"name":"value_type","type":{"messageType":"Type","messagePackage":"greenbus.client.Measurement","multiplicity":"single"},"label":"optional","description":"<p>Condition triggered when the Measurement value type enumeration matches this value.</p>\n","requirement":"optional"},{"name":"bool_value","type":{"simpleType":"bool","multiplicity":"single"},"label":"optional","description":"<p>Condition triggered when the Measurement has a boolean value that matches this value.</p>\n","requirement":"optional"},{"name":"string_value","type":{"simpleType":"string","multiplicity":"single"},"label":"optional","description":"<p>Condition triggered when the Measurement has a string value that matches this value.</p>\n","requirement":"optional"},{"name":"int_value","type":{"simpleType":"sint64","multiplicity":"single"},"label":"optional","description":"<p>Condition triggered when the Measurement has an integer value that matches this value.</p>\n","requirement":"optional"},{"name":"filter","type":{"messageType":"Filter","messagePackage":"greenbus.client","multiplicity":"single"},"label":"optional","description":"<p>Condition triggered when the Measurement value and quality are not the same as the\npreviously published/stored Measurement.</p>\n","requirement":"optional"}],"simple":false},"mentions":{"messageMentions":["greenbus.client.TriggerSet"]}};
+
+  	</script>
+</head>
+<body ng-controller="msgControl">
+<div class="container">
+    <div class="page-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-1"><h4><span class="label label-primary">message</span></h4></div>
+                <div class="col-md-8"><h4><i>{{message.package}}</i></h4></div>
+                <div class="col-md-3 text-right"><h5><small>Version:</small> {{version}}</h5></div>
+            </div>
+        </div>
+        <h1>{{message.name}}</h1>
+    </div>
+
+    <div ng-bind-html="message.description"></div>
+
+    <div>
+        <p ng-if="mentions.messageMentions"><strong>Used in: </strong>
+            <span ng-repeat="mention in mentions.messageMentions"><a href="{{mention}}.html">{{mention}}</a><span ng-if="!$last">, </span></span>
+        </p>
+        <p ng-if="mentions.serviceParamMentions"><strong>Parameter for: </strong>
+            <span ng-repeat="m in mentions.serviceParamMentions"><a href="{{m.service}}.html">{{m.service}}.{{m.method}}</a><span ng-if="!$last">, </span></span>
+        </p>
+        <p ng-if="mentions.serviceResultMentions"><strong>Result of: </strong>
+            <span ng-repeat="m in mentions.serviceResultMentions"><a href="{{m.service}}.html">{{m.service}}.{{m.method}}</a><span ng-if="!$last">, </span></span>
+        </p>
+    </div>
+
+    <div>
+
+        <table class="table" style="font-size: 100%">
+            <thead class="text-info">
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            </thead>
+            <tr ng-repeat="field in message.fields">
+                <td><span class="clearfix"><strong>{{field.name}}</strong></span><span class="pull-left text-muted"><em>{{field.requirement}}</em></span></td>
+
+                <td ng-if="field.type.simpleType">
+                    <strong style="font-size: 110%">{{field.type.simpleType}}<span ng-if="field.type.multiplicity === 'multiple'">[]</span></strong>
+                </td>
+                <td ng-if="!field.type.simpleType">
+                    <strong style="font-size: 110%"><a href="{{field.type.messagePackage}}.{{field.type.messageType}}.html">{{field.type.messagePackage}}.{{field.type.messageType}}</a><span ng-if="field.type.multiplicity === 'multiple'">[]</span></strong>
+                </td>
+
+                <td ng-bind-html="field.description"></td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

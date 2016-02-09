@@ -1,0 +1,189 @@
+<!--
+
+    Copyright 2011-2016 Green Energy Corp.
+
+    Licensed to Green Energy Corp (www.greenenergycorp.com) under one or more
+    contributor license agreements. See the NOTICE file distributed with this
+    work for additional information regarding copyright ownership. Green Energy
+    Corp licenses this file to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations under
+    the License.
+
+-->
+<html ng-app="apiApp">
+<head>
+	<title>Service</title>
+	<link rel="stylesheet" href="bootstrap-3.2.0-dist/css/bootstrap.min.css">
+	<script src="bootstrap-3.2.0-dist/js/bootstrap.min.js"></script>
+  	<script src="angular/angular.min.js"></script>
+  	<script src="angular/controller.js"></script>
+  	<script type="text/javascript">
+
+  	apiData = {"version":"3.0.0","name":"MeasurementService","package":"greenbus.client","description":"","methods":[{"name":"get_current_values","parameters":[{"name":"point_uuids","type":{"messageType":"ModelUUID","messagePackage":"greenbus.client","multiplicity":"multiple"}}],"returnValue":{"messageType":"PointMeasurementValue","messagePackage":"greenbus.client","multiplicity":"multiple"},"description":"<p>Gets current Measurement values for Points specified by UUID.</p>\n"},{"name":"get_history","parameters":[{"name":"request","type":{"messageType":"MeasurementHistoryQuery","messagePackage":"greenbus.client","multiplicity":"single"}}],"returnValue":{"messageType":"PointMeasurementValues","messagePackage":"greenbus.client","multiplicity":"single"},"description":"<p>Queries for a time series of previous Measurement values.</p>\n"},{"name":"get_current_values_and_subscribe","parameters":[{"name":"point_uuids","type":{"messageType":"ModelUUID","messagePackage":"greenbus.client","multiplicity":"multiple"}}],"returnValue":{"messageType":"PointMeasurementValue","messagePackage":"greenbus.client","multiplicity":"multiple"},"subscription":{"messageType":"MeasurementNotification","messagePackage":"greenbus.client","multiplicity":"single"},"description":"<p>Gets current Measurement values for Points specified by UUID, and subscribes to subsequent Measurements for\nthose Points.</p>\n"},{"name":"subscribe_to_batches","parameters":[{"name":"query","type":{"messageType":"MeasurementBatchSubscriptionQuery","messagePackage":"greenbus.client","multiplicity":"single"}}],"returnValue":{"simpleType":"void","multiplicity":"single"},"subscription":{"messageType":"MeasurementBatchNotification","messagePackage":"greenbus.client","multiplicity":"single"},"description":"<p>Subscribes to notifications for batches of Measurements. Measurements are in the batches they were published\nto the measurement processor.</p>\n<p>The subscription can be filtered by the UUIDs of the Endpoints they are associated with.</p>\n"},{"name":"post_measurements","parameters":[{"name":"batch","type":{"messageType":"MeasurementBatch","messagePackage":"greenbus.client","multiplicity":"single"}}],"returnValue":{"simpleType":"void","multiplicity":"single"},"addressing":"required","description":"<p>Posts a batch of Measurements to a measurement processor.</p>\n"}],"nested":{"greenbus.client.MeasurementHistoryQuery":{"name":"MeasurementHistoryQuery","package":"greenbus.client","description":"<p>Specifies a sequence of historical Measurement values for a Point by time-order, with constraints.</p>\n<p>The resulting sequence of Measurements is always returned in ascending time-order (oldest to newest).</p>\n","fields":[{"name":"point_uuid","type":{"messageType":"ModelUUID","messagePackage":"greenbus.client","multiplicity":"single"},"label":"optional","description":"<p>UUID of Point to find Measurements for.</p>\n","requirement":"required"},{"name":"time_from","type":{"simpleType":"uint64","multiplicity":"single"},"label":"optional","description":"<p>Boundary of earliest time, exclusive, in the window of Measurements to return.</p>\n<p>If not included, the beginning of the time window is unbounded, or practically, bounded to the\nfirst Measurement published.</p>\n<p>Time is measured in milliseconds since midnight, January 1, 1970 UTC.</p>\n","requirement":"optional"},{"name":"time_to","type":{"simpleType":"uint64","multiplicity":"single"},"label":"optional","description":"<p>Boundary of latest time, inclusive, in the window of Measurements to return.</p>\n<p>If not included, the end of the time window is unbounded, or practically, bounded to the current time.</p>\n<p>Time is measured in milliseconds since midnight, January 1, 1970 UTC.</p>\n","requirement":"optional"},{"name":"limit","type":{"simpleType":"uint32","multiplicity":"single"},"label":"optional","description":"<p>Maximum number of Measurement values to return.</p>\n<p>If not specified, the server provides a default value.</p>\n","requirement":"optional"},{"name":"latest","type":{"simpleType":"bool","multiplicity":"single"},"label":"optional","description":"<p>If the number of Measurements in the time window exceeds the limit on the number of Measurements to be\nreturned by the query, the sequence of Measurements will be justified to either the lower or higher\nboundary of the window.</p>\n<ul>\n<li>If <code>false</code>, the returned Measurements will begin with the first in the time window and proceed until the time window\nends or the limit is met. Paging using this method would move forward in time.</li>\n<li>If <code>true</code>, the sequence of returned Measurements begins at the <code>limit</code>th value below the high boundary of the time window,\nand proceeds to the high boundary. Paging using this method would move backward in time.</li>\n</ul>\n<p>In both cases, the sequence of Measurements is returned in ascending time-order (oldest to newest).</p>\n<p>The default value is <code>false</code>.</p>\n","requirement":"optional"}],"simple":false},"greenbus.client.MeasurementBatchSubscriptionQuery":{"name":"MeasurementBatchSubscriptionQuery","package":"greenbus.client","description":"<p>Selects Measurement batches to subscribe to. Can be narrowed by the UUIDs of Endpoints. If no Endpoints are\nspecified, subscribes to all notifications.</p>\n","fields":[{"name":"endpoint_uuids","type":{"messageType":"ModelUUID","messagePackage":"greenbus.client","multiplicity":"multiple"},"label":"repeated","description":"<p>UUIDs of Endpoint to receive batch notifications for.</p>\n","requirement":"required"}],"simple":false},"greenbus.client.MeasurementBatch":{"name":"MeasurementBatch","package":"greenbus.client","description":"<p>Batch of Measurements to be published simultaneously. Measurements in the batch are associated with\nPoints identified by UUID or name.</p>\n<p>At least one Measurement must be included.</p>\n","fields":[{"name":"point_measurements","type":{"messageType":"PointMeasurementValue","messagePackage":"greenbus.client","multiplicity":"multiple"},"label":"repeated","description":"<p>Measurements associated with Points by UUID.</p>\n","requirement":"optional"},{"name":"named_measurements","type":{"messageType":"NamedMeasurementValue","messagePackage":"greenbus.client","multiplicity":"multiple"},"label":"repeated","description":"<p>Measurements associated with Points by name.</p>\n","requirement":"optional"},{"name":"wall_time","type":{"simpleType":"uint64","multiplicity":"single"},"label":"optional","description":"<p>A collective timestamp for Measurements that are bundled in the batch without individual timestamps. For example, this may be\nthe time that the values were collected from the field.</p>\n<p>If no wall time is specified, the measurement processor will use the time at which it received the batch.</p>\n<p>Time is measured in milliseconds since midnight, January 1, 1970 UTC.</p>\n","requirement":"optional"}],"simple":false}}};
+
+  	</script>
+</head>
+<body ng-controller="serviceControl">
+<div class="container">
+    <div class="page-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-1"><h4><span class="label label-success">service</span></h4></div>
+                <div class="col-md-8"><h4><i>{{package}}</i></h4></div>
+                <div class="col-md-3 text-right"><h5><small>Version:</small> {{version}}</h5></div>
+            </div>
+        </div>
+        <h1>{{name}}</h1>
+    </div>
+
+    <div ng-bind-html="description"></div>
+
+    <div ng-repeat="method in methods" class="panel panel-success">
+        <div class="panel-heading">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-3">
+                        <span style="font-size: 110%" ng-if="method.returnValue.simpleType">{{method.returnValue.simpleType}} <span ng-if="method.returnValue.multiplicity === 'multiple'">[]</span></span>
+		  				<span style="font-size: 110%" ng-if="!method.returnValue.simpleType">
+		  					<a href="{{method.returnValue.messagePackage}}.{{method.returnValue.messageType}}.html">{{method.returnValue.messagePackage}}.{{method.returnValue.messageType}}</a><a ng-if="method.returnValue.multiplicity === 'multiple'">[]</a>
+						</span>
+                    </div>
+                    <div class="col-md-9">
+                        <strong style="font-size: 120%">{{method.name}} (</strong>
+		  				<span style="font-size: 110%" ng-repeat="param in method.parameters">
+		  					<span ng-if="param.type.simpleType">{{param.type.simpleType}}<a ng-if="param.type.multiplicity === 'multiple'">[]</a> {{param.name}}</span>
+		  					<span ng-if="!param.type.simpleType">
+			  					<a href="{{param.type.messagePackage}}.{{param.type.messageType}}.html">{{param.type.messagePackage}}.{{param.type.messageType}}</a><a ng-if="param.type.multiplicity === 'multiple'">[]</a>
+		  						{{param.name}}</span><span ng-if="!$last">,</span>
+		  				</span>
+                        <span style="font-size: 120%"><strong>)</strong></span>
+                    </div>
+                </div></div>
+        </div>
+        <div class="panel-body">
+
+            <div>
+                <table ng-if="method.subscription || method.addressing" style="font-size: 100%; margin-bottom: 10px;">
+                    <tr ng-if="method.subscription">
+                        <td><h4><span class="label label-primary"><strong>Subscription:</strong></span></h4></td>
+                        <td style="padding-left: 10px">
+                            <a href="{{method.subscription.messagePackage}}.{{method.subscription.messageType}}.html">{{method.subscription.messagePackage}}.{{method.subscription.messageType}}</a>
+                        </td>
+                    </tr>
+                    <tr ng-if="method.addressing">
+                        <td><h4><span class="label label-warning"><strong>Addressing:</strong></span></h4></td>
+                        <td style="padding-left: 10px"><em class="text-muted">{{method.addressing}}</em></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div ng-bind-html="method.description"></div>
+
+            <div ng-repeat="param in method.parameters" >
+
+                <div class="panel panel-default" ng-if="param.type.messageType && nested[param.type.messagePackage + '.' + param.type.messageType]" ng-init="message = nested[param.type.messagePackage + '.' + param.type.messageType]">
+                    <div class="panel-heading"><a href="{{param.type.messagePackage}}.{{param.type.messageType}}.html"><em>{{param.type.messagePackage}}.{{param.type.messageType}}</em></a></div>
+                    <div class="panel-body">
+                        <div ng-bind-html="message.description"></div>
+                        <table class="table" style="font-size: 100%">
+
+                            <thead class="text-info">
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                            </thead>
+                            <tr ng-repeat-start="field in message.fields">
+                                <td><span class="clearfix"><strong>{{field.name}}</strong></span><span class="pull-left text-muted"><em>{{field.requirement}}</em></span></td>
+
+                                <td ng-if="field.type.simpleType">
+                                    <strong style="font-size: 110%">{{field.type.simpleType}}<span ng-if="field.type.multiplicity === 'multiple'">[]</span></strong>
+                                </td>
+                                <td ng-if="!field.type.simpleType">
+                                    <strong style="font-size: 110%"><a href="{{field.type.messagePackage}}.{{field.type.messageType}}.html">{{field.type.messagePackage}}.{{field.type.messageType}}</a><span ng-if="field.type.multiplicity === 'multiple'">[]</span></strong>
+                                </td>
+
+                                <td ng-bind-html="field.description"></td>
+                            </tr>
+                            <tr ng-repeat-end ng-if="field.nested" ng-init="message = nested[field.type.messagePackage + '.' + field.type.messageType]">
+
+                                <!-- RECURSE 1 -->
+                                <td colspan="3" style="border-top: 0px;">
+                                    <div class="panel panel-default"  style="margin-left: 50px;">
+                                        <div class="panel-heading"><a href="{{field.type.messagePackage}}.{{field.type.messageType}}.html"><em>{{field.type.messagePackage}}.{{field.type.messageType}}</em></a></div>
+                                        <div class="panel-body">
+                                            <div ng-bind-html="message.description"></div>
+                                            <table class="table" style="font-size: 100%">
+                                                <thead class="text-info">
+                                                <th>Name</th>
+                                                <th>Type</th>
+                                                <th>Description</th>
+                                                </thead>
+                                                <tr ng-repeat-start="subField1 in message.fields">
+                                                    <td><span class="clearfix"><strong>{{subField1.name}}</strong></span><span class="pull-left text-muted"><em>{{subField1.requirement}}</em></span></td>
+
+                                                    <td ng-if="subField1.type.simpleType">
+                                                        <strong style="font-size: 110%">{{subField1.type.simpleType}}<span ng-if="subField1.type.multiplicity === 'multiple'">[]</span></strong>
+                                                    </td>
+                                                    <td ng-if="!subField1.type.simpleType">
+                                                        <strong style="font-size: 110%"><a href="{{subField1.type.messagePackage}}.{{subField1.type.messageType}}.html">{{subField1.type.messagePackage}}.{{subField1.type.messageType}}</a><span ng-if="subField1.type.multiplicity === 'multiple'">[]</span></strong>
+                                                    </td>
+
+                                                    <td ng-bind-html="subField1.description"></td>
+                                                </tr>
+                                                <tr ng-repeat-end ng-if="subField1.nested" ng-init="message = nested[subField1.type.messagePackage + '.' + subField1.type.messageType]">
+
+                                                    <!-- RECURSE 2 -->
+                                                    <td colspan="3" style="border-top: 0px;">
+                                                        <div class="panel panel-default"  style="margin-left: 50px;">
+                                                            <div class="panel-heading"><a href="{{subField1.type.messagePackage}}.{{subField1.type.messageType}}.html"><em>{{subField1.type.messagePackage}}.{{subField1.type.messageType}}</em></a></div>
+                                                            <div class="panel-body">
+                                                                <div ng-bind-html="message.description"></div>
+                                                                <table class="table" style="font-size: 100%">
+                                                                    <thead class="text-info">
+                                                                    <th>Name</th>
+                                                                    <th>Type</th>
+                                                                    <th>Description</th>
+                                                                    </thead>
+                                                                    <tr ng-repeat="subField2 in message.fields">
+                                                                        <td><span class="clearfix"><strong>{{subField2.name}}</strong></span><span class="pull-left text-muted"><em>{{subField2.requirement}}</em></span></td>
+
+                                                                        <td ng-if="subField2.type.simpleType">
+                                                                            <strong style="font-size: 110%">{{subField2.type.simpleType}}<span ng-if="subField2.type.multiplicity === 'multiple'">[]</span></strong>
+                                                                        </td>
+                                                                        <td ng-if="!subField2.type.simpleType">
+                                                                            <strong style="font-size: 110%"><a href="{{subField2.type.messagePackage}}.{{subField2.type.messageType}}.html">{{subField2.type.messagePackage}}.{{subField2.type.messageType}}</a><span ng-if="subField2.type.multiplicity === 'multiple'">[]</span></strong>
+                                                                        </td>
+
+                                                                        <td ng-bind-html="subField2.description"></td>
+                                                                    </tr>
+                                                                    <!--<tr ng-repeat-end ng-if="subField2.nested">
+
+                                                                    </tr>-->
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

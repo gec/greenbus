@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Calculation Protocol  - GreenBus</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+
+    <style type="text/css">code{white-space: pre;}</style>
+    <style type="text/css">
+        table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+        margin: 0; padding: 0; vertical-align: baseline; border: none; }
+        table.sourceCode { width: 100%; line-height: 100%; }
+        td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+        td.sourceCode { padding-left: 5px; }
+        /*code > span.kw { color: #007020; font-weight: bold; }
+        code > span.dt { color: #902000; }
+        code > span.dv { color: #40a070; }
+        code > span.bn { color: #40a070; }
+        code > span.fl { color: #40a070; }
+        code > span.ch { color: #4070a0; }
+        code > span.st { color: #4070a0; }
+        code > span.co { color: #60a0b0; font-style: italic; }
+        code > span.ot { color: #007020; }
+        code > span.al { color: #ff0000; font-weight: bold; }
+        code > span.fu { color: #06287e; }
+        code > span.er { color: #ff0000; font-weight: bold; }*/
+
+        code > span.kw { color: #63a35c; }
+        code > span.dt { color: #183691; }
+        code > span.dv { color: #40a070; }
+        code > span.bn { color: #40a070; }
+        code > span.fl { color: #40a070; }
+        code > span.ch { color: #4070a0; }
+        code > span.st { color: #183691; }
+        code > span.co { color: #60a0b0; font-style: italic; }
+        code > span.ot { color: #795da3; }
+        code > span.al { color: #ff0000; font-weight: bold; }
+        code > span.fu { color: #06287e; }
+        code > span.er { color: #ff0000; font-weight: bold; }
+    </style>
+    <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" />
+    <style type="text/css">
+        body {
+            padding-top: 50px;
+            font-size: 16px;
+        }
+        h2 {
+            /* padding-bottom: 15px; */
+            border-bottom-width: 2px;
+            border-bottom-color: #8cc63e;
+            border-bottom-style: solid;
+            padding-bottom: 7px;
+            margin-bottom: 22px;
+        }
+        .navbar-brand {
+            /*border-top-color: #8cc63e;
+            border-top-style: solid;
+            border-top-width: 8px;
+            margin-right: 40px;*/
+        }
+        span#gb_title {
+            /*border-right-style: solid;
+            border-right-width: 7px;
+            border-right-color: #8cc63e;
+            padding-right: 5px;*/
+
+            /*border-left-style: solid;
+            border-left-width: 4px;
+            border-left-color: #8cc63e;
+            padding-left: 6px;*/
+        }
+        div.jumbotron {
+            background-color: #8cc63e;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="index.html" style="color: #fff"><span class="glyphicon glyphicon-stop" aria-hidden="true" style="color: #8cc63e"></span> <span id="gb_title"> GreenBus</span> Platform</a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">System Overview <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="arch.html">Architecture Overview</a></li>
+                        <li><a href="system_model.html">System Model</a></li>
+                        <li><a href="measurement_stream.html">Measurement Stream</a></li>
+                        <li><a href="command_requests.html">Command Requests</a></li>
+                        <li><a href="events_alarms.html">Events and Alarms</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="auth_model.html">Authorization Model</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="calculation.html">Calculation Protocol</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">User Docs <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="model_xml.html">System Model XML</a></li>
+                        <li><a href="processing_xml.html">Measurement Processing XML</a></li>
+                        <li><a href="calculation_xml.html">Calculation XML</a></li>
+                        <li><a href="event_xml.html">Event Configuration XML</a></li>
+                        <li><a href="auth_xml.html">Authorization System XML</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="frontend_json.html">Frontend Configuration</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Programming Docs <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="api/">API Reference</a></li>
+                        <li><a href="https://github.com/gec/greenbus-examples">API Examples</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="program_java.html">Java Tutorial</a></li>
+                    </ul>
+                </li>
+                <li><a href="hmi.html">HMI</a></li>
+                <li><a href="downloads.html">Downloads</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+<div id="doc-content" class="container">
+<div id="calculation-protocol" class="section level2">
+<h2>Calculation Protocol</h2>
+<p>The calculation protocol enables the creation synthetic Points whose Measurement values are based on the result of mathematical and logical expressions that may take other Points as their inputs. Calculated points are included in the equipment model just like telemetered points, but are assigned to an Endpoint configured with the calculator protocol. The calculator front-end process for these Endpoints maintains a subscription to any input Points, and publishes new values according to each calculated Point's configuration.</p>
+<p>The configuration for a calculated Point is stored the &quot;calculation&quot; EntityKeyValue for that Point. The serialized format is the &quot;Calculation&quot; protocol buffer structure defined in the service APIs. The calculation configuration can therefore be created or updated programmatically using the modeling APIs. Additionally, the XML loading format contains the ability to configure calculations in XML as part of the importing process.</p>
+<div id="inputs" class="section level3">
+<h3>Inputs</h3>
+<p>Calculations may be based on <em>inputs</em>, which specify another Point in the system whose Measurement values the evaluation uses. Inputs are assigned to a variable that can be referenced in the calculation formula.</p>
+<p>Calculations may also refer to a time range over a single input (such as computing average, or integration). A multi-valued input defines a time offset into the past that specifies the valid range for samples, and can be configured to retrieve history when initialized.</p>
+</div>
+<div id="formula" class="section level3">
+<h3>Formula</h3>
+<p>The formula to be evaluated by the calculation is user-provided expression that includes input symbols, arithmetic, and function calls. The formula language is designed to be as similar as possible to spreadsheet calculations.</p>
+<p>Examples:</p>
+<p>Inputs are <code>A</code> and <code>B</code>:</p>
+<pre><code>(A + B) / 1000.0</code></pre>
+<p>Inputs are <code>A</code>, <code>B</code>, and <code>C</code>, and the <code>SUM()</code> function is used:</p>
+<pre><code>SUM(A, B, C)</code></pre>
+<p>Inputs are <code>STATUS</code>, <code>A</code>, <code>B</code> and <code>SCALE</code> and the <code>IF()</code> function is used:</p>
+<pre><code>IF(STATUS &gt; 0, A, B) * SCALE </code></pre>
+</div>
+<div id="update-triggering" class="section level3">
+<h3>Update Triggering</h3>
+<p>When new values are calculated and posted is configured by the <em>trigger strategy</em> of the calculation. The choices of strategies are:</p>
+<table class="table table-bordered">
+<thead>
+<tr class="header">
+<th align="left">Strategy</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">On any update</td>
+<td align="left">The calculation is re-evaluated whenever a new Measurement arrives for one of the input Points.</td>
+</tr>
+<tr class="even">
+<td align="left">Periodic</td>
+<td align="left">The calculation is re-evaluated on a fixed interval provided in the configuration for the calculated Point.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="input-quality" class="section level3">
+<h3>Input Quality</h3>
+<p>Input values from Measurements in the system may not all have valid quality. The <em>input quality strategy</em> configures how calculations are evaluated when invalid qualities are present.</p>
+<table class="table table-bordered">
+<thead>
+<tr class="header">
+<th align="left">Strategy</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">ACCEPT_ALL</td>
+<td align="left">Measurements of any quality will be used as inputs.</td>
+</tr>
+<tr class="even">
+<td align="left">ONLY_WHEN_ALL_OK</td>
+<td align="left">Only evaluate the calculation when all input Measurements have <code>GOOD</code> quality.</td>
+</tr>
+<tr class="odd">
+<td align="left">REMOVE_BAD_AND_CALC</td>
+<td align="left">Removes bad quality Measurements from the inputs and evaluates the calculation. For singular inputs, this will result in an input not being present and the calculation not being evaluated. For ranged inputs, only the poor quality Measurements in the range will be filtered out, and the calculation will proceed.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="output-quality" class="section level3">
+<h3>Output Quality</h3>
+<p>The <em>output quality strategy</em> defines the quality of the resulting Measurements produced by evaluating the calculation.</p>
+<table class="table table-bordered">
+<thead>
+<tr class="header">
+<th align="left">Strategy</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">WORST_QUALITY</td>
+<td align="left">Uses the &quot;worst&quot; quality of the input Measurements.</td>
+</tr>
+<tr class="even">
+<td align="left">ALWAYS_OK</td>
+<td align="left">Calculated Measurements always have good quality.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="function-listing" class="section level3">
+<h3>Function Listing</h3>
+<p>The following are the functions and symbols that can be used in calculation formulas:</p>
+<table class="table table-bordered">
+<thead>
+<tr class="header">
+<th align="left">Function(s)</th>
+<th align="left">Symbol</th>
+<th align="left">Arg #</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">SUM</td>
+<td align="left">+</td>
+<td align="left">1..n</td>
+<td align="left">Outputs the sum of all arguments.</td>
+</tr>
+<tr class="even">
+<td align="left">--</td>
+<td align="left">-</td>
+<td align="left">2</td>
+<td align="left">Outputs the difference between two arguments.</td>
+</tr>
+<tr class="odd">
+<td align="left">PRODUCT</td>
+<td align="left">*</td>
+<td align="left">1..n</td>
+<td align="left">Outputs the product of all arguments.</td>
+</tr>
+<tr class="even">
+<td align="left">QUOTIENT</td>
+<td align="left">/</td>
+<td align="left">2</td>
+<td align="left">Outputs the quotient of two arguments.</td>
+</tr>
+<tr class="odd">
+<td align="left">POWER</td>
+<td align="left">^</td>
+<td align="left">2</td>
+<td align="left">Outputs the first argument to the power of the second.</td>
+</tr>
+<tr class="even">
+<td align="left">SQRT</td>
+<td align="left"></td>
+<td align="left">1</td>
+<td align="left">Outputs the square root of the single argument.</td>
+</tr>
+<tr class="odd">
+<td align="left">AVERAGE</td>
+<td align="left"></td>
+<td align="left">1..n</td>
+<td align="left">Outputs the average of the arguments.</td>
+</tr>
+<tr class="even">
+<td align="left">MAX</td>
+<td align="left"></td>
+<td align="left">1..n</td>
+<td align="left">Outputs the highest value of the arguments.</td>
+</tr>
+<tr class="odd">
+<td align="left">MIN</td>
+<td align="left"></td>
+<td align="left">1..n</td>
+<td align="left">Outputs the lowest value of the arguments.</td>
+</tr>
+<tr class="even">
+<td align="left">ABS</td>
+<td align="left"></td>
+<td align="left">1</td>
+<td align="left">Outputs the absolute value of the argument.</td>
+</tr>
+<tr class="odd">
+<td align="left">GT</td>
+<td align="left"></td>
+<td align="left">2</td>
+<td align="left">Outputs 'true' if first argument is greater than the second, otherwise 'false'.</td>
+</tr>
+<tr class="even">
+<td align="left">GTE</td>
+<td align="left"></td>
+<td align="left">2</td>
+<td align="left">Outputs 'true' if first argument is greater than or equal to the second, otherwise 'false'.</td>
+</tr>
+<tr class="odd">
+<td align="left">LT</td>
+<td align="left"></td>
+<td align="left">2</td>
+<td align="left">Outputs 'true' if first argument is less than the second, otherwise 'false'.</td>
+</tr>
+<tr class="even">
+<td align="left">LTE</td>
+<td align="left"></td>
+<td align="left">2</td>
+<td align="left">Outputs 'true' if first argument is less than or equal to the second, otherwise 'false'.</td>
+</tr>
+<tr class="odd">
+<td align="left">EQ</td>
+<td align="left"></td>
+<td align="left">2</td>
+<td align="left">Outputs 'true' if arguments are equal, otherwise 'false'.</td>
+</tr>
+<tr class="even">
+<td align="left">COUNT</td>
+<td align="left"></td>
+<td align="left">1..n</td>
+<td align="left">Outputs the number of the boolean arguments that are 'true'.</td>
+</tr>
+<tr class="odd">
+<td align="left">AND</td>
+<td align="left"></td>
+<td align="left">1..n</td>
+<td align="left">Outputs 'true' if all arguments are boolean 'true', otherwise 'false'.</td>
+</tr>
+<tr class="even">
+<td align="left">OR</td>
+<td align="left"></td>
+<td align="left">1..n</td>
+<td align="left">Outputs 'true' if any of the arguments are boolean 'true', otherwise 'false'.</td>
+</tr>
+<tr class="odd">
+<td align="left">NOT</td>
+<td align="left"></td>
+<td align="left">1</td>
+<td align="left">Outputs 'false' if the boolean argument is 'true', otherwise 'true'.</td>
+</tr>
+<tr class="even">
+<td align="left">IF</td>
+<td align="left"></td>
+<td align="left">3</td>
+<td align="left">Takes three arguments. If the first argument is boolean 'true', outputs the second argument. Otherwise outputs the third argument.</td>
+</tr>
+<tr class="odd">
+<td align="left">LATEST</td>
+<td align="left"></td>
+<td align="left">1..n</td>
+<td align="left">Outputs the latest value of the arguments to arrive.</td>
+</tr>
+<tr class="even">
+<td align="left">INTEGRATE</td>
+<td align="left"></td>
+<td align="left">1</td>
+<td align="left">Outputs the integral of the single argument's time-series values.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+<footer>
+    <div class="container" style="margin-bottom: 20px">
+        <hr>
+        <div class="row">
+            <div class="col-md-4"><p>&copy; Green Energy Corp 2016</p></div>
+            <div class="col-md-2 col-md-offset-6"><a href="http://www.greenenergycorp.com"><img src="img/gec_sm.jpg"></img></a></div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
