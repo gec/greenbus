@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Installation Guide  - GreenBus</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+
+    <style type="text/css">code{white-space: pre;}</style>
+    <style type="text/css">
+        table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+        margin: 0; padding: 0; vertical-align: baseline; border: none; }
+        table.sourceCode { width: 100%; line-height: 100%; }
+        td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+        td.sourceCode { padding-left: 5px; }
+
+        code > span.kw { color: #63a35c; }
+        code > span.dt { color: #183691; }
+        code > span.dv { color: #40a070; }
+        code > span.bn { color: #40a070; }
+        code > span.fl { color: #40a070; }
+        code > span.ch { color: #4070a0; }
+        code > span.st { color: #183691; }
+        code > span.co { color: #60a0b0; font-style: italic; }
+        code > span.ot { color: #795da3; }
+        code > span.al { color: #ff0000; font-weight: bold; }
+        code > span.fu { color: #06287e; }
+        code > span.er { color: #ff0000; font-weight: bold; }
+    </style>
+    <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" />
+    <style type="text/css">
+        body {
+            padding-top: 50px;
+            font-size: 16px;
+        }
+        h2 {
+            border-bottom-width: 2px;
+            border-bottom-color: #8cc63e;
+            border-bottom-style: solid;
+            padding-bottom: 7px;
+            margin-bottom: 22px;
+        }
+        div.jumbotron {
+            background-color: #8cc63e;
+        }
+        pre {
+            margin: 20px 0 20px 0;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="index.html" style="color: #fff"><span class="glyphicon glyphicon-stop" aria-hidden="true" style="color: #8cc63e"></span> <span id="gb_title"> GreenBus</span> Platform</a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">System Overview <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="arch.html">Architecture Overview</a></li>
+                        <li><a href="system_model.html">System Model</a></li>
+                        <li><a href="measurement_stream.html">Measurement Stream</a></li>
+                        <li><a href="command_requests.html">Command Requests</a></li>
+                        <li><a href="events_alarms.html">Events and Alarms</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="auth_model.html">Authorization Model</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="calculation.html">Calculation Protocol</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">User Docs <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="install.html">Installation Guide</a></li>
+                        <li><a href="user_tutorial.html">User Tutorial</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="model_xml.html">System Model XML</a></li>
+                        <li><a href="processing_xml.html">Measurement Processing XML</a></li>
+                        <li><a href="calculation_xml.html">Calculation XML</a></li>
+                        <li><a href="event_xml.html">Event Configuration XML</a></li>
+                        <li><a href="auth_xml.html">Authorization System XML</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="frontend_json.html">Frontend Configuration</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Programming Docs <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="api/">API Reference</a></li>
+                        <li><a href="https://github.com/gec/greenbus-examples">API Examples</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="program_java.html">Java Tutorial</a></li>
+                    </ul>
+                </li>
+                <li><a href="hmi.html">HMI</a></li>
+                <li><a href="downloads.html">Downloads</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+<div id="doc-content" class="container">
+<div id="installation-guide" class="section level2">
+<h2>Installation Guide</h2>
+<div id="install-dependencies" class="section level3">
+<h3>Install Dependencies</h3>
+<p>This guide was written for Ubuntu 14.04 LTS. GreenBus runs on any platform that supports Java, PostgreSQL, and Apache Qpid.</p>
+<p>First, update the package manager and install the GreenBus dependencies:</p>
+<pre><code>ubuntu@ubuntu:~$ sudo apt-get update
+
+ubuntu@ubuntu:~$ sudo apt-get install openjdk-7-jdk postgresql qpidd</code></pre>
+</div>
+<div id="broker-configuration" class="section level3">
+<h3>Broker Configuration</h3>
+<p>By default, the Qpid distribution has SASL authorization enabled. For testing and development purposes, the Qpid broker can be configured to run without SSL or authorization.</p>
+<p>The Qpid broker configuration file is at the following path: <code>/etc/qpid/qpidd.conf</code></p>
+<p>Replace the configuration file with this simplified version:</p>
+<pre><code>auth=no
+tcp-nodelay=1
+
+log-to-syslog=yes
+log-to-stderr=no
+log-time=no
+
+pid-dir=/var/run/qpid
+
+data-dir=/var/spool/qpid
+mgmt-enable=yes</code></pre>
+<p>Restart the broker:</p>
+<pre><code>ubuntu@ubuntu:~$ sudo service qpidd restart</code></pre>
+</div>
+<div id="download-and-install-greenbus" class="section level3">
+<h3>Download And Install GreenBus</h3>
+<p>GreenBus needs to be downloaded and unpackaged, and the PostgreSQL database needs to be initialized.</p>
+<p>Download the GreenBus distribution:</p>
+<pre><code>ubuntu@ubuntu:~$ wget https://github.com/gec/greenbus/releases/download/v3.0.0/greenbus-3.0.0.tar.gz
+
+ubuntu@ubuntu:~$ tar -xf greenbus-3.0.0.tar.gz</code></pre>
+<p>PostgreSQL needs to be initialized with the GreenBus user and databases. The <code>init_postgres.sql</code> SQL script in the <code>etc/</code> subdirectory contains the initialization and needs to be fed to the <code>psql</code> utility:</p>
+<pre><code>ubuntu@ubuntu:~$ cd greenbus-3.0.0/
+
+ubuntu@ubuntu:~/greenbus-3.0.0$ sudo su postgres -c psql &lt; etc/init_postgres.sql</code></pre>
+<p>The <code>resetdb</code> utility needs to be run to (re-)initialize the database tables. Note that this will wipe all data in an existing GreenBus installation.</p>
+<pre><code>ubuntu@ubuntu:~/greenbus-3.0.0$ bin/greenbus resetdb
+Proceed with modifications? (y/N)
+y
+
+ubuntu@ubuntu:~/greenbus-3.0.0$</code></pre>
+</div>
+<div id="distribution-directory" class="section level3">
+<h3>Distribution Directory</h3>
+<p>In the distribution tarball are the following directories:</p>
+<table class="table table-bordered">
+<thead>
+<tr class="header">
+<th align="left">Directory</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>bin/</code></td>
+<td align="left">Contains the <code>greenbus</code> script used to run services and utilities.</td>
+</tr>
+<tr class="even">
+<td align="left"><code>etc/</code></td>
+<td align="left">Contains configuration for processes.</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>install/</code></td>
+<td align="left">Contains a script, <code>install_service_alias.sh</code> that creates a Linux init.d service for a GreenBus service.</td>
+</tr>
+<tr class="even">
+<td align="left"><code>lib/</code></td>
+<td align="left">Contains binary libraries and the configuration necessary to start Java processes.</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>samples/</code></td>
+<td align="left">Contains model XML samples.</td>
+</tr>
+<tr class="even">
+<td align="left"><code>var/</code></td>
+<td align="left">Contains log files under <code>var/log/[process name]/</code>.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="running-processes" class="section level3">
+<h3>Running Processes</h3>
+<p>To run service (background) processes:</p>
+<pre><code>bin/greenbus services start</code></pre>
+<p>To run utility processes:</p>
+<pre><code>bin/greenbus import config.xml</code></pre>
+<p>To see help for utility processes:</p>
+<pre><code>bin/greenbus export --help</code></pre>
+</div>
+<div id="services" class="section level3">
+<h3>Services</h3>
+<table class="table table-bordered">
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">services</td>
+<td align="left">Core stateless services.</td>
+</tr>
+<tr class="even">
+<td align="left">processing</td>
+<td align="left">Measurement processor front end register with.</td>
+</tr>
+<tr class="odd">
+<td align="left">calculation</td>
+<td align="left">Calculation protocol front end.</td>
+</tr>
+<tr class="even">
+<td align="left">simulator</td>
+<td align="left">Simulator protocol front end.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="utilities" class="section level3">
+<h3>Utilities</h3>
+<table class="table table-bordered">
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">auth-export</td>
+<td align="left">Exports the authorization XML format.</td>
+</tr>
+<tr class="even">
+<td align="left">auth-import</td>
+<td align="left">Imports the authorization XML format.</td>
+</tr>
+<tr class="odd">
+<td align="left">cli</td>
+<td align="left">Runs the command line interface utility.</td>
+</tr>
+<tr class="even">
+<td align="left">event-export</td>
+<td align="left">Exports the event configuration XML format.</td>
+</tr>
+<tr class="odd">
+<td align="left">event-import</td>
+<td align="left">Imports the event configuration XML format.</td>
+</tr>
+<tr class="even">
+<td align="left">export</td>
+<td align="left">Exports the system model configuration format.</td>
+</tr>
+<tr class="odd">
+<td align="left">import</td>
+<td align="left">Imports the system model configuration format.</td>
+</tr>
+<tr class="even">
+<td align="left">resetdb</td>
+<td align="left">Initializes or wipes the PostgreSQL database.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="installing-system-services" class="section level3">
+<h3>Installing System Services</h3>
+<p>The <code>install/</code> directory contains a script to create init.d scripts for Linux in order to install GreenBus processes as system-wide services that start on boot.</p>
+<p>Use the <code>install_service_alias.sh</code> script by specifying the local name first followed by the init.d service name to create:</p>
+<pre><code>ubuntu@ubuntu:~/greenbus-3.0.0$ sudo install/install_service_alias.sh services greenbus-services</code></pre>
+<p>The GreenBus process can then be called with <code>start</code>, <code>stop</code>, or <code>restart</code>:</p>
+<pre><code>ubuntu@ubuntu:~/greenbus-3.0.0$ sudo service greenbus-services start
+Starting services...
+19611
+ubuntu@ubuntu:~/greenbus-3.0.0$ sudo service greenbus-services stop
+Stopping services.
+Waiting for services to stop....
+ubuntu@ubuntu:~/greenbus-3.0.0$</code></pre>
+</div>
+<div id="installing-add-on-modules" class="section level3">
+<h3>Installing Add-On Modules</h3>
+<p>GreenBus modules like the Modbus and DNP3 adapters come in their own distributions. To run, they need to be folded into an existing copy of the base GreenBus installation.</p>
+<p>First, download and unpackage the module:</p>
+<pre><code>cd ../
+wget https://github.com/gec/greenbus-modbus/releases/download/v3.0.0/greenbus-modbus-3.0.0.tar.gz
+tar -xf greenbus-modbus-3.0.0.tar.gz</code></pre>
+<p>Then, copy all files from the module into the installation:</p>
+<pre><code>cp -r greenbus-modbus-3.0.0/** greenbus-3.0.0</code></pre>
+<p>The module's process is now added to the installation directory:</p>
+<pre><code>cd greenbus-3.0.0/
+bin/greenbus modbus start</code></pre>
+</div>
+</div>
+</div>
+
+
+<footer>
+    <div class="container" style="margin-bottom: 20px">
+        <hr>
+        <div class="row">
+            <div class="col-md-4"><p>&copy; Green Energy Corp 2016</p></div>
+            <div class="col-md-2 col-md-offset-6"><a href="http://www.greenenergycorp.com"><img src="img/gec_sm.jpg"></img></a></div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

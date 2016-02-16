@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>User Tutorial  - GreenBus</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+
+    <style type="text/css">code{white-space: pre;}</style>
+    <style type="text/css">
+        table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+        margin: 0; padding: 0; vertical-align: baseline; border: none; }
+        table.sourceCode { width: 100%; line-height: 100%; }
+        td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+        td.sourceCode { padding-left: 5px; }
+
+        code > span.kw { color: #63a35c; }
+        code > span.dt { color: #183691; }
+        code > span.dv { color: #40a070; }
+        code > span.bn { color: #40a070; }
+        code > span.fl { color: #40a070; }
+        code > span.ch { color: #4070a0; }
+        code > span.st { color: #183691; }
+        code > span.co { color: #60a0b0; font-style: italic; }
+        code > span.ot { color: #795da3; }
+        code > span.al { color: #ff0000; font-weight: bold; }
+        code > span.fu { color: #06287e; }
+        code > span.er { color: #ff0000; font-weight: bold; }
+    </style>
+    <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" />
+    <style type="text/css">
+        body {
+            padding-top: 50px;
+            font-size: 16px;
+        }
+        h2 {
+            border-bottom-width: 2px;
+            border-bottom-color: #8cc63e;
+            border-bottom-style: solid;
+            padding-bottom: 7px;
+            margin-bottom: 22px;
+        }
+        div.jumbotron {
+            background-color: #8cc63e;
+        }
+        pre {
+            margin: 20px 0 20px 0;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="index.html" style="color: #fff"><span class="glyphicon glyphicon-stop" aria-hidden="true" style="color: #8cc63e"></span> <span id="gb_title"> GreenBus</span> Platform</a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">System Overview <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="arch.html">Architecture Overview</a></li>
+                        <li><a href="system_model.html">System Model</a></li>
+                        <li><a href="measurement_stream.html">Measurement Stream</a></li>
+                        <li><a href="command_requests.html">Command Requests</a></li>
+                        <li><a href="events_alarms.html">Events and Alarms</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="auth_model.html">Authorization Model</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="calculation.html">Calculation Protocol</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">User Docs <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="install.html">Installation Guide</a></li>
+                        <li><a href="user_tutorial.html">User Tutorial</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="model_xml.html">System Model XML</a></li>
+                        <li><a href="processing_xml.html">Measurement Processing XML</a></li>
+                        <li><a href="calculation_xml.html">Calculation XML</a></li>
+                        <li><a href="event_xml.html">Event Configuration XML</a></li>
+                        <li><a href="auth_xml.html">Authorization System XML</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="frontend_json.html">Frontend Configuration</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Programming Docs <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="api/">API Reference</a></li>
+                        <li><a href="https://github.com/gec/greenbus-examples">API Examples</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="program_java.html">Java Tutorial</a></li>
+                    </ul>
+                </li>
+                <li><a href="hmi.html">HMI</a></li>
+                <li><a href="downloads.html">Downloads</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+<div id="doc-content" class="container">
+<div id="user-tutorial" class="section level2">
+<h2>User Tutorial</h2>
+<div id="initialize-clear-database" class="section level3">
+<h3>Initialize / Clear Database</h3>
+<p>On a new install, the <code>resetdb</code> utility needs to be run to initialize the database tables. For existing installations, it will wipe all user data.</p>
+<p>Run the <code>resetdb</code> utility, and confirm with <code>y</code>:</p>
+<pre><code>ubuntu@ubuntu:~/greenbus-3.0.0$ bin/greenbus resetdb
+Proceed with modifications? (y/N)
+y
+
+ubuntu@ubuntu:~/greenbus-3.0.0$</code></pre>
+</div>
+<div id="start-the-services" class="section level3">
+<h3>Start the Services</h3>
+<p>The first background process to start is the GreenBus services, which provide the core service APIs to the state of the system. Processes are started using the <code>bin/greenbus</code> script and specifying the process name:</p>
+<pre><code>ubuntu@ubuntu:~/greenbus-3.0.0$ bin/greenbus services start
+Starting services...
+19160</code></pre>
+<p>To verify that the services have started, we can check the log file:</p>
+<pre><code>ubuntu@ubuntu:~/greenbus-3.0.0$ tail var/log/services/services.log
+13:46:44.739 [services-akka.actor.default-dispatcher-2] INFO  akka.event.slf4j.Slf4jLogger - Slf4jLogger started
+13:46:44.920 [IoReceiver - /127.0.0.1:5672] INFO  o.a.q.c.s.DynamicSaslRegistrar - Additional SASL providers successfully registered.
+13:46:44.922 [IoReceiver - /127.0.0.1:5672] INFO  o.a.q.c.s.CallbackHandlerRegistry - Callback handlers available for SASL mechanisms: [EXTERNAL, GSSAPI, SCRAM-SHA-256, SCRAM-SHA-1, CRAM-MD5-HASHED, CRAM-MD5, PLAIN, AMQPLAIN, ANONYMOUS]
+13:46:44.993 [services-akka.actor.default-dispatcher-5] INFO  io.greenbus.sql.postgres.Connector - Initializing postgres connection pool: core@jdbc:postgresql://127.0.0.1:5432/greenbus3_d
+13:46:45.193 [services-akka.actor.default-dispatcher-5] INFO  io.greenbus.services.CoreServices$ - Binding services
+13:46:45.393 [services-akka.actor.default-dispatcher-5] INFO  io.greenbus.services.CoreServices$ - Services bound</code></pre>
+<p>Log files for various processes and utilities can be found in <code>var/log/[process]/[process].log</code></p>
+</div>
+<div id="cli-access" class="section level3">
+<h3>CLI Access</h3>
+<p>The GreenBus command-line interface (CLI) provides terminal access to the GreenBus services. To run it we use the <code>cli</code> utility in the GreenBus distribution:</p>
+<pre><code>ubuntu@ubuntu:~/greenbus-3.0.0$ bin/greenbus cli
+
+    _____                     ____
+   / ____|                   |  _ \
+  | |  __ _ __ ___  ___ _ __ | |_) |_   _ ___
+  | | |_ | &#39;__/ _ \/ _ \ &#39;_ \|  _ &lt;| | | / __|
+  | |__| | | |  __/  __/ | | | |_) | |_| \__ \
+   \_____|_|  \___|\___|_| |_|____/ \__,_|___/
+
+GreenBus Platform (3.0.0)
+Dedicated to enabling the smart grid.
+
+Green Energy Corp (www.greenenergycorp.com)
+
+Hit &#39;&lt;tab&gt;&#39; for a list of available commands
+and &#39;help [cmd]&#39; for help on a specific command.
+Hit &#39;&lt;ctrl-c&gt;&#39; to close console.
+
+Attempting auto-login for user system.
+
+system@127.0.0.1&gt;</code></pre>
+<p>While the CLI is connected to the services through AMQP, with no model loaded most commands return empty results:</p>
+<pre><code>system@127.0.0.1&gt; entity:list
+
+
+system@127.0.0.1&gt;</code></pre>
+</div>
+<div id="model-loading" class="section level3">
+<h3>Model Loading</h3>
+<p>The <code>samples/</code> directory in the distribution contains a sample model in the <a href="model_xml.html">GreenBus XML import/export format</a>. To load it into the system, use the <code>import</code> utility by providing it the path to the file:</p>
+<pre><code>ubuntu@ubuntu:~/greenbus-3.0.0$ bin/greenbus import samples/model/config.xml
+
+[...]
+
+Proceed with modifications? (y/N)
+y
+
+== Progress:
+.......
+
+== Finished in 1245 ms
+ubuntu@ubuntu:~/greenbus-3.0.0$</code></pre>
+<p>The importer lists the modifications to the system model loading the XML file will cause. In this case the model is empty and all objects are being added.</p>
+<p>The GreenBus CLI now shows the objects present in the system:</p>
+<pre><code>system@127.0.0.1&gt; entity:list
+
+Name                            Types
+-----------------------------------------------------------------
+Calculations                 |  (Endpoint)
+MGSite                       |  (EquipmentGroup, MicroGrid, Root)
+MGSite.PCC_cbr_cust          |  (CustomerBreaker, Equipment, PCC)
+MGSite.PCC_cbr_cust.Amps     |  (PCCCurrent, Point)
+MGSite.PCC_cbr_cust.Close    |  (BreakerClose, Command)
+MGSite.PCC_cbr_cust.Hz       |  (FreqSource, Frequency, Point)
+MGSite.PCC_cbr_cust.kV       |  (PCCVoltage, Point)
+MGSite.PCC_cbr_cust.kW       |  (DemandPower, Point)
+MGSite.PCC_cbr_cust.PwrFact  |  (Point, PowerFactor)
+MGSite.PCC_cbr_cust.Status   |  (BreakerStatus, Point)
+MGSite.PCC_cbr_cust.Trip     |  (BreakerTrip, Command)
+MGSite.RoofPV                |  (Equipment, Generation, PV)
+MGSite.RoofPV.%_cap          |  (PercentCapacity, Point)
+MGSite.RoofPV.Disable        |  (BreakerTrip, Command)
+MGSite.RoofPV.Enable         |  (BreakerClose, Command)
+MGSite.RoofPV.kW_cap         |  (Point, PowerCapacity)
+MGSite.RoofPV.kW_tot         |  (OutputPower, Point)
+MGSite.RoofPV.Status         |  (PVStatus, Point)
+PCC_DNP3                     |  (Endpoint)
+Simulated_PV                 |  (Endpoint)
+
+system@127.0.0.1&gt;</code></pre>
+</div>
+<div id="measurements-front-ends" class="section level3">
+<h3>Measurements / Front Ends</h3>
+<p>Currently only the (stateless) services are running, and while the system model is populated, no data is present because there are no connections to data sources.</p>
+<p>To see the data sources defined by the sample model, use the CLI to list the <em>Endpoints</em>:</p>
+<pre><code>system@127.0.0.1&gt; endpoint:list
+
+Name             Status      Last Status     Protocol       Disabled     Types
+-----------------------------------------------------------------------------------
+Calculations  |  --       |  --           |  calculator  |  false     |  (Endpoint)
+PCC_DNP3      |  --       |  --           |  dnp3        |  false     |  (Endpoint)
+Simulated_PV  |  --       |  --           |  simulator   |  false     |  (Endpoint)
+
+system@127.0.0.1&gt;</code></pre>
+<p>The &quot;Simulated_PV&quot; Endpoint is defined to use the <code>simulator</code> protocol, which is implemented by a front end processor/protocol adapter included in the distribution.</p>
+<p>First, to bring data into the system the <em>measurement processor</em> needs to be running. The measurement processor accepts registrations and handles measurement batches from protocol front ends regardless of their protocol (so the <code>dnp3</code> and <code>calculator</code> listed above might use the same processor service). To start it, run the <code>processing</code> GreenBus process:</p>
+<pre><code>ubuntu@ubuntu:~/greenbus-3.0.0$ bin/greenbus processing start
+Starting processing...
+19410
+ubuntu@ubuntu:~/greenbus-3.0.0$</code></pre>
+<p>Then start the <code>simulator</code> process to run the simulator protocol front end:</p>
+<pre><code>ubuntu@ubuntu:~/greenbus-3.0.0$ bin/greenbus simulator start
+Starting simulator...
+19468
+ubuntu@ubuntu:~/greenbus-3.0.0$</code></pre>
+<p>With the process up and running, the <code>meas:list</code> command in the CLI can be used to see the current values of Points in the system:</p>
+<pre><code>system@127.0.0.1&gt; meas:list
+
+Name                            Value       Type       Unit       Q      Time                             Off
+-------------------------------------------------------------------------------------------------------------
+MGSite.PCC_cbr_cust.Amps     |  --       |  --      |  --      |  --  |  --                            |  --
+MGSite.PCC_cbr_cust.Hz       |  --       |  --      |  --      |  --  |  --                            |  --
+MGSite.PCC_cbr_cust.kV       |  --       |  --      |  --      |  --  |  --                            |  --
+MGSite.PCC_cbr_cust.kW       |  --       |  --      |  --      |  --  |  --                            |  --
+MGSite.PCC_cbr_cust.PwrFact  |  --       |  --      |  --      |  --  |  --                            |  --
+MGSite.PCC_cbr_cust.Status   |  --       |  --      |  --      |  --  |  --                            |  --
+MGSite.RoofPV.%_cap          |  --       |  --      |  --      |  --  |  --                            |  --
+MGSite.RoofPV.kW_cap         |  200.000  |  Analog  |  kW      |      |  Mon Feb 15 13:52:55 EST 2016  |  --
+MGSite.RoofPV.kW_tot         |  99.161   |  Analog  |  kW      |      |  Mon Feb 15 13:53:37 EST 2016  |  --
+MGSite.RoofPV.Status         |  OPEN     |  String  |  status  |      |  Mon Feb 15 13:53:29 EST 2016  |  --
+
+system@127.0.0.1&gt;</code></pre>
+<p>Note that only values associated with the &quot;Simulated_PV&quot; Endpoint have current values.</p>
+<p>In the sample, the simulator is configured to publish values with some noise to demonstrate measurement flow. To see values as they arrive in the system, the CLI can subscribe to measurement updates:</p>
+<pre><code>system@127.0.0.1&gt; meas:subscribe --all
+
+MGSite.RoofPV.kW_tot  |  98.193  |  Analog  |  --  |    |  Mon Feb 15 13:54:36 EST 2016  |  --
+MGSite.RoofPV.Status  |  OPEN    |  String  |  --  |    |  Mon Feb 15 13:54:36 EST 2016  |  --
+MGSite.RoofPV.kW_tot  |  97.856  |  Analog  |  --  |    |  Mon Feb 15 13:54:38 EST 2016  |  --
+MGSite.RoofPV.Status  |  CLOSED  |  String  |  --  |    |  Mon Feb 15 13:54:38 EST 2016  |  --
+MGSite.RoofPV.kW_tot  |  98.062  |  Analog  |  --  |    |  Mon Feb 15 13:54:42 EST 2016  |  --
+MGSite.RoofPV.kW_tot  |  98.176  |  Analog  |  --  |    |  Mon Feb 15 13:54:44 EST 2016  |  --
+
+system@127.0.0.1&gt;</code></pre>
+</div>
+<div id="model-updates" class="section level3">
+<h3>Model Updates</h3>
+<p>Despite the sample model being an XML format, the GreenBus system model lives in the database and is accessed by the <a href="api/">GreenBus API services</a>. The XML loader uses the same APIs available to all developers in order to create, update, or delete model elements.</p>
+<p>In order to make modifications to the model through the XML format, first the current state of the model should be exported using the <code>export</code> utility:</p>
+<pre><code>ubuntu@ubuntu:~/greenbus-3.0.0$ bin/greenbus export --root MGSite -k -d mgsite_export/
+ubuntu@ubuntu:~/greenbus-3.0.0$ ls mgsite_export/
+config.xml  PCC_DNP3.protocolConfig  Simulated_PV.protocolConfig
+ubuntu@ubuntu:~/greenbus-3.0.0$</code></pre>
+<p>The command takes the root element of a fragment of the model (here, &quot;MGSite&quot;), writes opaque key values to files, and puts all results in the <code>mgsite_export/</code> directory, as shown above.</p>
+<p>The <code>config.xml</code> file looks like this:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;?xml</span> version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;yes&quot;<span class="kw">?&gt;</span>
+<span class="kw">&lt;configuration</span><span class="ot"> xmlns=</span><span class="st">&quot;xml.ldr.greenbus.io&quot;</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;equipmentModel&gt;</span>
+        <span class="kw">&lt;equipment</span><span class="ot"> name=</span><span class="st">&quot;MGSite&quot;</span><span class="ot"> uuid=</span><span class="st">&quot;03cdee65-634c-49b9-8e8d-e06c6cd72116&quot;</span><span class="kw">&gt;</span>
+            <span class="kw">&lt;type</span><span class="ot"> name=</span><span class="st">&quot;EquipmentGroup&quot;</span><span class="kw">/&gt;</span>
+            <span class="kw">&lt;type</span><span class="ot"> name=</span><span class="st">&quot;MicroGrid&quot;</span><span class="kw">/&gt;</span>
+            <span class="kw">&lt;type</span><span class="ot"> name=</span><span class="st">&quot;Root&quot;</span><span class="kw">/&gt;</span>
+            <span class="kw">&lt;equipment</span><span class="ot"> name=</span><span class="st">&quot;MGSite.PCC_cbr_cust&quot;</span><span class="ot"> uuid=</span><span class="st">&quot;f0e5ba66-2966-4641-88d3-7b4908d6ce40&quot;</span><span class="kw">&gt;</span>
+                <span class="kw">&lt;type</span><span class="ot"> name=</span><span class="st">&quot;CustomerBreaker&quot;</span><span class="kw">/&gt;</span>
+                <span class="kw">&lt;type</span><span class="ot"> name=</span><span class="st">&quot;Equipment&quot;</span><span class="kw">/&gt;</span>
+                <span class="kw">&lt;type</span><span class="ot"> name=</span><span class="st">&quot;PCC&quot;</span><span class="kw">/&gt;</span>
+                <span class="kw">&lt;analog</span><span class="ot"> name=</span><span class="st">&quot;MGSite.PCC_cbr_cust.Amps&quot;</span><span class="ot"> unit=</span><span class="st">&quot;A&quot;</span><span class="ot"> uuid=</span><span class="st">&quot;7662c786-46b2-47e1-8917-a0ae80e52e1d&quot;</span><span class="kw">&gt;</span>
+                    <span class="kw">&lt;type</span><span class="ot"> name=</span><span class="st">&quot;PCCCurrent&quot;</span><span class="kw">/&gt;</span>
+                    <span class="kw">&lt;type</span><span class="ot"> name=</span><span class="st">&quot;Point&quot;</span><span class="kw">/&gt;</span>
+                    <span class="kw">&lt;triggers&gt;</span>
+                        <span class="kw">&lt;filter&gt;</span>
+                            <span class="kw">&lt;suppress</span><span class="ot"> activation=</span><span class="st">&quot;LOW&quot;</span><span class="kw">/&gt;</span>
+                        <span class="kw">&lt;/filter&gt;</span>
+                    <span class="kw">&lt;/triggers&gt;</span>
+                <span class="kw">&lt;/analog&gt;</span>
+                ...</code></pre>
+<p>Note that <code>uuid</code> attributes are now present that were not specified in the source file, <code>samples/model/config.xml</code>. When created, the services assigned unique identifiers. When re-imported, any name changes are correlated to the original object by this UUID.</p>
+<p>To modify the model, change the name and unit of the &quot;MGSite.PCC_cbr_cust.Amps&quot; Point like so:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;analog</span><span class="ot"> name=</span><span class="st">&quot;MGSite.PCC_cbr_cust.Current&quot;</span><span class="ot"> unit=</span><span class="st">&quot;kA&quot;</span><span class="ot"> uuid=</span><span class="st">&quot;7662c786-46b2-47e1-8917-a0ae80e52e1d&quot;</span><span class="kw">&gt;</span>
+    ...</code></pre>
+<p>Note that the UUID has been left the same.</p>
+<p>The &quot;MGSite.PCC_cbr_cust.Amps&quot; Point is also referenced in the communications model, towards the end of the file:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;endpoint</span><span class="ot"> name=</span><span class="st">&quot;PCC_DNP3&quot;</span><span class="ot"> uuid=</span><span class="st">&quot;b310356a-679a-489a-8fb1-d34c77771820&quot;</span><span class="ot"> protocol=</span><span class="st">&quot;dnp3&quot;</span><span class="kw">&gt;</span>
+            <span class="kw">&lt;type</span><span class="ot"> name=</span><span class="st">&quot;Endpoint&quot;</span><span class="kw">/&gt;</span>
+            <span class="kw">&lt;keyValue</span><span class="ot"> key=</span><span class="st">&quot;protocolConfig&quot;</span><span class="ot"> fileName=</span><span class="st">&quot;PCC_DNP3.protocolConfig&quot;</span><span class="kw">/&gt;</span>
+            <span class="kw">&lt;source</span><span class="ot"> uuid=</span><span class="st">&quot;7662c786-46b2-47e1-8917-a0ae80e52e1d&quot;</span><span class="ot"> name=</span><span class="st">&quot;MGSite.PCC_cbr_cust.Amps&quot;</span><span class="kw">/&gt;</span>
+            ...</code></pre>
+<p>Change this <code>source</code> reference as well:</p>
+<pre><code>&lt;source uuid=&quot;7662c786-46b2-47e1-8917-a0ae80e52e1d&quot; name=&quot;MGSite.PCC_cbr_cust.Current&quot;/&gt;</code></pre>
+<p>With these changes made, the updates can be effected in the system be re-importing the configuration:</p>
+<pre><code>ubuntu@ubuntu:~/greenbus-3.0.0$ bin/greenbus import mgsite_export/config.xml
+Modified points:
+    MGSite.PCC_cbr_cust.Amps
+        Name change: MGSite.PCC_cbr_cust.Amps -&gt; MGSite.PCC_cbr_cust.Current
+        Unit change: A -&gt; kA
+
+Proceed with modifications? (y/N)
+y
+
+== Progress:
+.
+
+== Finished in 150 ms
+ubuntu@ubuntu:~/greenbus-3.0.0$</code></pre>
+<p>The importer compares the current running system to the state of the XML document, and lists any modifications to be made.</p>
+<p>After the update, the modification can be verified with the CLI:</p>
+<pre><code>system@127.0.0.1&gt; point:list
+
+Name                            Category     Unit        Types
+---------------------------------------------------------------------------------------
+MGSite.PCC_cbr_cust.Current  |  ANALOG    |  kA       |  (PCCCurrent, Point)
+MGSite.PCC_cbr_cust.Hz       |  ANALOG    |  Hz       |  (FreqSource, Frequency, Point)
+MGSite.PCC_cbr_cust.kV       |  ANALOG    |  kV       |  (PCCVoltage, Point)</code></pre>
+</div>
+<div id="event-configuration-importexport" class="section level3">
+<h3>Event Configuration Import/Export</h3>
+<p>The <a href="events_alarms.html">event configuration</a> specifies the set of event types recognized by the system. The configuration can be modified by first exporting the current state to the <a href="event_xml.html">event configuration XML format</a>:</p>
+<pre><code>ubuntu@ubuntu:~/greenbus-3.0.0$ bin/greenbus event-export -d mgsite_events
+ubuntu@ubuntu:~/greenbus-3.0.0$ ls mgsite_events/
+event-config.xml
+ubuntu@ubuntu:~/greenbus-3.0.0$</code></pre>
+<p>Which produces a file with all event types represented by <code>eventConfig</code> elements:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;?xml</span> version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;yes&quot;<span class="kw">?&gt;</span>
+<span class="kw">&lt;events</span><span class="ot"> xmlns=</span><span class="st">&quot;events.xml.ldr.greenbus.io&quot;</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;eventConfigs&gt;</span>
+        <span class="kw">&lt;eventConfig</span><span class="ot"> eventType=</span><span class="st">&quot;System.ControlIssued&quot;</span><span class="ot"> severity=</span><span class="st">&quot;3&quot;</span><span class="ot"> designation=</span><span class="st">&quot;EVENT&quot;</span><span class="ot"> initialAlarmState=</span><span class="st">&quot;UNACK_SILENT&quot;</span><span class="kw">&gt;</span>Executed control {command}<span class="kw">&lt;/eventConfig&gt;</span>
+        <span class="kw">&lt;eventConfig</span><span class="ot"> eventType=</span><span class="st">&quot;System.EndpointDisabled&quot;</span><span class="ot"> severity=</span><span class="st">&quot;3&quot;</span><span class="ot"> designation=</span><span class="st">&quot;EVENT&quot;</span><span class="ot"> initialAlarmState=</span><span class="st">&quot;UNACK_SILENT&quot;</span><span class="kw">&gt;</span>Endpoint {name} disabled<span class="kw">&lt;/eventConfig&gt;</span>
+        <span class="kw">&lt;eventConfig</span><span class="ot"> eventType=</span><span class="st">&quot;System.EndpointEnabled&quot;</span><span class="ot"> severity=</span><span class="st">&quot;3&quot;</span><span class="ot"> designation=</span><span class="st">&quot;EVENT&quot;</span><span class="ot"> initialAlarmState=</span><span class="st">&quot;UNACK_SILENT&quot;</span><span class="kw">&gt;</span>Endpoint {name} enabled<span class="kw">&lt;/eventConfig&gt;</span>
+        <span class="kw">&lt;eventConfig</span><span class="ot"> eventType=</span><span class="st">&quot;System.RemoveNotInService&quot;</span><span class="ot"> severity=</span><span class="st">&quot;3&quot;</span><span class="ot"> designation=</span><span class="st">&quot;EVENT&quot;</span><span class="ot"> initialAlarmState=</span><span class="st">&quot;UNACK_SILENT&quot;</span><span class="kw">&gt;</span>Returned point to service: {point}<span class="kw">&lt;/eventConfig&gt;</span>
+        <span class="kw">&lt;eventConfig</span><span class="ot"> eventType=</span><span class="st">&quot;System.RemoveOverride&quot;</span><span class="ot"> severity=</span><span class="st">&quot;3&quot;</span><span class="ot"> designation=</span><span class="st">&quot;EVENT&quot;</span><span class="ot"> initialAlarmState=</span><span class="st">&quot;UNACK_SILENT&quot;</span><span class="kw">&gt;</span>Removed override on point: {point}<span class="kw">&lt;/eventConfig&gt;</span>
+        <span class="kw">&lt;eventConfig</span><span class="ot"> eventType=</span><span class="st">&quot;System.SetNotInService&quot;</span><span class="ot"> severity=</span><span class="st">&quot;3&quot;</span><span class="ot"> designation=</span><span class="st">&quot;EVENT&quot;</span><span class="ot"> initialAlarmState=</span><span class="st">&quot;UNACK_SILENT&quot;</span><span class="kw">&gt;</span>Point removed from service: {point}<span class="kw">&lt;/eventConfig&gt;</span>
+        <span class="kw">&lt;eventConfig</span><span class="ot"> eventType=</span><span class="st">&quot;System.SetOverride&quot;</span><span class="ot"> severity=</span><span class="st">&quot;3&quot;</span><span class="ot"> designation=</span><span class="st">&quot;EVENT&quot;</span><span class="ot"> initialAlarmState=</span><span class="st">&quot;UNACK_SILENT&quot;</span><span class="kw">&gt;</span>Point overridden: {point}<span class="kw">&lt;/eventConfig&gt;</span>
+        <span class="kw">&lt;eventConfig</span><span class="ot"> eventType=</span><span class="st">&quot;System.SetpointIssued&quot;</span><span class="ot"> severity=</span><span class="st">&quot;3&quot;</span><span class="ot"> designation=</span><span class="st">&quot;EVENT&quot;</span><span class="ot"> initialAlarmState=</span><span class="st">&quot;UNACK_SILENT&quot;</span><span class="kw">&gt;</span>Updated setpoint {command} to {value}<span class="kw">&lt;/eventConfig&gt;</span>
+        <span class="kw">&lt;eventConfig</span><span class="ot"> eventType=</span><span class="st">&quot;System.UserLogin&quot;</span><span class="ot"> severity=</span><span class="st">&quot;5&quot;</span><span class="ot"> designation=</span><span class="st">&quot;EVENT&quot;</span><span class="ot"> initialAlarmState=</span><span class="st">&quot;UNACK_SILENT&quot;</span><span class="kw">&gt;</span>User logged in: {user}<span class="kw">&lt;/eventConfig&gt;</span>
+        <span class="kw">&lt;eventConfig</span><span class="ot"> eventType=</span><span class="st">&quot;System.UserLoginFailure&quot;</span><span class="ot"> severity=</span><span class="st">&quot;1&quot;</span><span class="ot"> designation=</span><span class="st">&quot;ALARM&quot;</span><span class="ot"> initialAlarmState=</span><span class="st">&quot;UNACK_SILENT&quot;</span><span class="kw">&gt;</span>User login failed {reason}<span class="kw">&lt;/eventConfig&gt;</span>
+    <span class="kw">&lt;/eventConfigs&gt;</span>
+<span class="kw">&lt;/events&gt;</span></code></pre>
+<p>To add a configuration entry, add a new <code>eventConfig</code> element like so:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;eventConfig</span><span class="ot"> eventType=</span><span class="st">&quot;UserEventType&quot;</span><span class="ot"> severity=</span><span class="st">&quot;5&quot;</span><span class="ot"> designation=</span><span class="st">&quot;EVENT&quot;</span><span class="ot"> initialAlarmState=</span><span class="st">&quot;UNACK_SILENT&quot;</span><span class="kw">&gt;</span>User defined event<span class="kw">&lt;/eventConfig&gt;</span></code></pre>
+<p>Then re-import the XML configuration:</p>
+<pre><code>ubuntu@ubuntu:~/greenbus-3.0.0$ bin/greenbus event-import mgsite_events/event-config.xml
+
+== Progress:
+.
+
+== Finished in 75 ms
+ubuntu@ubuntu:~/greenbus-3.0.0$</code></pre>
+<p>The CLI can be used to confirm the presence of the new event type:</p>
+<pre><code>system@127.0.0.1&gt; event-config:list
+
+EventType                     Dest      Sev     Audible     Resources                                 BuiltIn
+-------------------------------------------------------------------------------------------------------------
+System.ControlIssued       |  EVENT  |  3    |  false    |  Executed control {command}             |  true
+System.EndpointDisabled    |  EVENT  |  3    |  false    |  Endpoint {name} disabled               |  true
+System.EndpointEnabled     |  EVENT  |  3    |  false    |  Endpoint {name} enabled                |  true
+System.RemoveNotInService  |  EVENT  |  3    |  false    |  Returned point to service: {point}     |  true
+System.RemoveOverride      |  EVENT  |  3    |  false    |  Removed override on point: {point}     |  true
+System.SetNotInService     |  EVENT  |  3    |  false    |  Point removed from service: {point}    |  true
+System.SetOverride         |  EVENT  |  3    |  false    |  Point overridden: {point}              |  true
+System.SetpointIssued      |  EVENT  |  3    |  false    |  Updated setpoint {command} to {value}  |  true
+System.UserLogin           |  EVENT  |  5    |  false    |  User logged in: {user}                 |  true
+System.UserLoginFailure    |  ALARM  |  1    |  false    |  User login failed {reason}             |  true
+UserEventType              |  EVENT  |  5    |  false    |  User defined event                     |  false
+
+system@127.0.0.1&gt;</code></pre>
+</div>
+<div id="authorization-importexport" class="section level3">
+<h3>Authorization Import/Export</h3>
+<p>The <a href="auth_model.html">authorization model</a> defines the authorized system <em>agents</em> and the <em>permission sets</em> they are granted. This configuration can be modified by first exporting the current state to the <a href="auth_xml.html">authorization XML format</a>:</p>
+<pre><code>ubuntu@ubuntu:~/greenbus-3.0.0$ bin/greenbus auth-export -d mgsite_auth
+ubuntu@ubuntu:~/greenbus-3.0.0$ ls mgsite_auth/
+authorization.xml
+ubuntu@ubuntu:~/greenbus-3.0.0$</code></pre>
+<p>The <code>authorization.xml</code> file will look like this:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;?xml</span> version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;yes&quot;<span class="kw">?&gt;</span>
+<span class="kw">&lt;authorization</span><span class="ot"> xmlns=</span><span class="st">&quot;auth.xml.ldr.greenbus.io&quot;</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;permissionSets&gt;</span>
+        <span class="kw">&lt;permissionSet</span><span class="ot"> name=</span><span class="st">&quot;all&quot;</span><span class="ot"> id=</span><span class="st">&quot;1&quot;</span><span class="kw">&gt;</span>
+            <span class="kw">&lt;allow&gt;</span>
+                <span class="kw">&lt;action</span><span class="ot"> name=</span><span class="st">&quot;*&quot;</span><span class="kw">/&gt;</span>
+                <span class="kw">&lt;resource</span><span class="ot"> name=</span><span class="st">&quot;*&quot;</span><span class="kw">/&gt;</span>
+                <span class="kw">&lt;selector</span><span class="ot"> style=</span><span class="st">&quot;*&quot;</span><span class="kw">/&gt;</span>
+            <span class="kw">&lt;/allow&gt;</span>
+        <span class="kw">&lt;/permissionSet&gt;</span>
+        <span class="kw">&lt;permissionSet</span><span class="ot"> name=</span><span class="st">&quot;read_only&quot;</span><span class="ot"> id=</span><span class="st">&quot;2&quot;</span><span class="kw">&gt;</span>
+            <span class="kw">&lt;allow&gt;</span>
+                <span class="kw">&lt;action</span><span class="ot"> name=</span><span class="st">&quot;read&quot;</span><span class="kw">/&gt;</span>
+                <span class="kw">&lt;action</span><span class="ot"> name=</span><span class="st">&quot;delete&quot;</span><span class="kw">/&gt;</span>
+                <span class="kw">&lt;resource</span><span class="ot"> name=</span><span class="st">&quot;auth_token&quot;</span><span class="kw">/&gt;</span>
+                <span class="kw">&lt;selector</span><span class="ot"> style=</span><span class="st">&quot;self&quot;</span><span class="kw">/&gt;</span>
+            <span class="kw">&lt;/allow&gt;</span>
+            <span class="kw">&lt;deny&gt;</span>
+                <span class="kw">&lt;action</span><span class="ot"> name=</span><span class="st">&quot;read&quot;</span><span class="kw">/&gt;</span>
+                <span class="kw">&lt;action</span><span class="ot"> name=</span><span class="st">&quot;delete&quot;</span><span class="kw">/&gt;</span>
+                <span class="kw">&lt;resource</span><span class="ot"> name=</span><span class="st">&quot;auth_token&quot;</span><span class="kw">/&gt;</span>
+                <span class="kw">&lt;selector</span><span class="ot"> style=</span><span class="st">&quot;*&quot;</span><span class="kw">/&gt;</span>
+            <span class="kw">&lt;/deny&gt;</span>
+            <span class="kw">&lt;allow&gt;</span>
+                <span class="kw">&lt;action</span><span class="ot"> name=</span><span class="st">&quot;read&quot;</span><span class="kw">/&gt;</span>
+                <span class="kw">&lt;resource</span><span class="ot"> name=</span><span class="st">&quot;*&quot;</span><span class="kw">/&gt;</span>
+                <span class="kw">&lt;selector</span><span class="ot"> style=</span><span class="st">&quot;*&quot;</span><span class="kw">/&gt;</span>
+            <span class="kw">&lt;/allow&gt;</span>
+        <span class="kw">&lt;/permissionSet&gt;</span>
+    <span class="kw">&lt;/permissionSets&gt;</span>
+    <span class="kw">&lt;agents&gt;</span>
+        <span class="kw">&lt;agent</span><span class="ot"> name=</span><span class="st">&quot;guest&quot;</span><span class="ot"> uuid=</span><span class="st">&quot;2873d636-5bb8-4460-b7d6-a53d04dd9274&quot;</span><span class="kw">&gt;</span>
+            <span class="kw">&lt;permissionSet</span><span class="ot"> name=</span><span class="st">&quot;read_only&quot;</span><span class="kw">/&gt;</span>
+        <span class="kw">&lt;/agent&gt;</span>
+        <span class="kw">&lt;agent</span><span class="ot"> name=</span><span class="st">&quot;system&quot;</span><span class="ot"> uuid=</span><span class="st">&quot;ff7b4c1c-8a56-4208-bd5f-eeb30cff395d&quot;</span><span class="kw">&gt;</span>
+            <span class="kw">&lt;permissionSet</span><span class="ot"> name=</span><span class="st">&quot;all&quot;</span><span class="kw">/&gt;</span>
+        <span class="kw">&lt;/agent&gt;</span>
+    <span class="kw">&lt;/agents&gt;</span>
+<span class="kw">&lt;/authorization&gt;</span></code></pre>
+<p>To create a new agent, add an <code>agent</code> element at the end of the list that looks like:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;agent</span><span class="ot"> name=</span><span class="st">&quot;new_agent&quot;</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;permissionSet</span><span class="ot"> name=</span><span class="st">&quot;read_only&quot;</span><span class="kw">/&gt;</span>
+<span class="kw">&lt;/agent&gt;</span></code></pre>
+<p>This will create an agent name &quot;new_agent&quot; and grant it the permission set &quot;read_only&quot;. Note that agent passwords are not included in the XML format. Creating a new agent will cause the importer to prompt for a password, and passwords can be updated from the CLI.</p>
+<p>To make modifications to the authorization model, re-import the XML configuration:</p>
+<pre><code>ubuntu@ubuntu:~/greenbus-3.0.0$ bin/greenbus auth-import mgsite_auth/authorization.xml
+Enter new password for agent new_agent:
+password
+Re-enter password:
+password
+
+== Progress:
+..
+
+== Finished in 282 ms</code></pre>
+<p>The presence of the agent can be verified with the CLI:</p>
+<pre><code>system@127.0.0.1&gt; agent:list
+
+Name          Permission Sets
+-----------------------------
+guest      |  read_only
+new_agent  |  read_only
+system     |  all
+
+system@127.0.0.1&gt;</code></pre>
+</div>
+<div id="stopping-the-processes" class="section level3">
+<h3>Stopping the Processes</h3>
+<p>Finally, shutdown all the long running processing by calling <code>stop</code>:</p>
+<pre><code>ubuntu@ubuntu:~/greenbus-3.0.0$ bin/greenbus simulator stop
+Stopping simulator.
+Waiting for simulator to stop....
+ubuntu@ubuntu:~/greenbus-3.0.0$ bin/greenbus processing stop
+Stopping processing.
+Waiting for processing to stop....
+ubuntu@ubuntu:~/greenbus-3.0.0$ bin/greenbus services stop
+Stopping services.
+Waiting for services to stop....
+ubuntu@ubuntu:~/greenbus-3.0.0$</code></pre>
+</div>
+</div>
+</div>
+
+
+<footer>
+    <div class="container" style="margin-bottom: 20px">
+        <hr>
+        <div class="row">
+            <div class="col-md-4"><p>&copy; Green Energy Corp 2016</p></div>
+            <div class="col-md-2 col-md-offset-6"><a href="http://www.greenenergycorp.com"><img src="img/gec_sm.jpg"></img></a></div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

@@ -2,15 +2,6 @@
 <html lang="en">
 <head>
     <title>Downloads  - GreenBus</title>
-    <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-      ga('create', 'UA-73604816-1', 'auto');
-      ga('send', 'pageview');
-    </script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script type="text/javascript" src="js/bootstrap.min.js"></script>
 
@@ -48,12 +39,11 @@
             padding-bottom: 7px;
             margin-bottom: 22px;
         }
-        .navbar-brand {
-        }
-        span#gb_title {
-        }
         div.jumbotron {
             background-color: #8cc63e;
+        }
+        pre {
+            margin: 20px 0 20px 0;
         }
     </style>
 </head>
@@ -90,6 +80,9 @@
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">User Docs <span class="caret"></span></a>
                     <ul class="dropdown-menu">
+                        <li><a href="install.html">Installation Guide</a></li>
+                        <li><a href="user_tutorial.html">User Tutorial</a></li>
+                        <li role="separator" class="divider"></li>
                         <li><a href="model_xml.html">System Model XML</a></li>
                         <li><a href="processing_xml.html">Measurement Processing XML</a></li>
                         <li><a href="calculation_xml.html">Calculation XML</a></li>
@@ -124,105 +117,6 @@
 <li><a href="https://github.com/gec/greenbus-modbus/releases/download/v3.0.0/greenbus-modbus-3.0.0.tar.gz">GreenBus Modbus 3.0.0</a></li>
 <li><a href="https://github.com/gec/greenbus-dnp3/releases/download/v3.0.0/greenbus-dnp3-3.0.0.tar.gz">GreenBus DNP3 3.0.0</a></li>
 </ul>
-<div id="distribution-directory" class="section level3">
-<h3>Distribution Directory</h3>
-<p>In the distribution tarball are the following directories:</p>
-<pre><code>bin/</code></pre>
-<p>Contains the <code>greenbus</code> script used to run services and utilities.</p>
-<pre><code>etc/</code></pre>
-<p>Contains configuration for processes.</p>
-<pre><code>install/</code></pre>
-<p>Contains a script, <code>install_service_alias.sh</code> that creates a Linux init.d service for a GreenBus service.</p>
-<pre><code>lib/</code></pre>
-<p>Contains binary libraries and the configuration necessary to start Java processes.</p>
-<pre><code>samples/</code></pre>
-<p>Model XML samples.</p>
-<pre><code>var/</code></pre>
-<p>Contains log files under <code>var/log/[process name]/</code>.</p>
-</div>
-<div id="running-processes" class="section level3">
-<h3>Running processes</h3>
-<p>To run service (background) processes:</p>
-<pre><code>bin/greenbus services start</code></pre>
-<p>To run utility processes:</p>
-<pre><code>bin/greenbus import config.xml</code></pre>
-<p>To see help for utility processes:</p>
-<pre><code>bin/greenbus export --help</code></pre>
-</div>
-<div id="services" class="section level3">
-<h3>Services</h3>
-<table class="table table-bordered">
-<thead>
-<tr class="header">
-<th align="left">Name</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">services</td>
-<td align="left">Core stateless services.</td>
-</tr>
-<tr class="even">
-<td align="left">processing</td>
-<td align="left">Measurement processor front end register with.</td>
-</tr>
-<tr class="odd">
-<td align="left">calculation</td>
-<td align="left">Calculation protocol front end.</td>
-</tr>
-<tr class="even">
-<td align="left">simulator</td>
-<td align="left">Simulator protocol front end.</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="utilities" class="section level3">
-<h3>Utilities</h3>
-<table class="table table-bordered">
-<thead>
-<tr class="header">
-<th align="left">Name</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">auth-export</td>
-<td align="left">Exports the authorization XML format.</td>
-</tr>
-<tr class="even">
-<td align="left">auth-import</td>
-<td align="left">Imports the authorization XML format.</td>
-</tr>
-<tr class="odd">
-<td align="left">cli</td>
-<td align="left">Runs the command line interface utility.</td>
-</tr>
-<tr class="even">
-<td align="left">event-export</td>
-<td align="left">Exports the event configuration XML format.</td>
-</tr>
-<tr class="odd">
-<td align="left">event-import</td>
-<td align="left">Imports the event configuration XML format.</td>
-</tr>
-<tr class="even">
-<td align="left">export</td>
-<td align="left">Exports the system model configuration format.</td>
-</tr>
-<tr class="odd">
-<td align="left">import</td>
-<td align="left">Imports the system model configuration format.</td>
-</tr>
-<tr class="even">
-<td align="left">resetdb</td>
-<td align="left">Initializes or wipes the PostgreSQL database.</td>
-</tr>
-</tbody>
-</table>
-</div>
 </div>
 </div>
 

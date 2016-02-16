@@ -2,15 +2,6 @@
 <html lang="en">
 <head>
     <title>Architecture  - GreenBus</title>
-    <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-      ga('create', 'UA-73604816-1', 'auto');
-      ga('send', 'pageview');
-    </script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script type="text/javascript" src="js/bootstrap.min.js"></script>
 
@@ -48,12 +39,11 @@
             padding-bottom: 7px;
             margin-bottom: 22px;
         }
-        .navbar-brand {
-        }
-        span#gb_title {
-        }
         div.jumbotron {
             background-color: #8cc63e;
+        }
+        pre {
+            margin: 20px 0 20px 0;
         }
     </style>
 </head>
@@ -90,6 +80,9 @@
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">User Docs <span class="caret"></span></a>
                     <ul class="dropdown-menu">
+                        <li><a href="install.html">Installation Guide</a></li>
+                        <li><a href="user_tutorial.html">User Tutorial</a></li>
+                        <li role="separator" class="divider"></li>
                         <li><a href="model_xml.html">System Model XML</a></li>
                         <li><a href="processing_xml.html">Measurement Processing XML</a></li>
                         <li><a href="calculation_xml.html">Calculation XML</a></li>
