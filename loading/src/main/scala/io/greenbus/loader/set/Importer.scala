@@ -734,16 +734,19 @@ object Importer {
         val parentName = uuidMap.getOrElse(parentUuid, throw new LoadingException(s"Existing edge referred to UUID $parentUuid that was unresolved"))
         val childName = uuidMap.getOrElse(childUuid, throw new LoadingException(s"Existing edge referred to UUID $childUuid that was unresolved"))
 
-        def permute(uuid: UUID, name: String) = Seq(FullEntId(uuid, name), UuidEntId(uuid), NamedEntId(name))
-
-        val equivalentDescs: Seq[EdgeDesc] = for {
-          parentId <- permute(parentUuid, parentName)
-          childId <- permute(childUuid, childName)
-        } yield {
-          EdgeDesc(parentId, relationship, childId)
+        def matchWithPriority(leftUuid: UUID, leftName: String, right: EntityId): Boolean = {
+          EntityId.optional(right) match {
+            case (Some(uuid), _) => uuid == leftUuid
+            case (None, Some(name)) => name == leftName
+            case _ => false
+          }
         }
 
-        !equivalentDescs.exists(updateSet.contains)
+        !updateDescs.exists { upEdge =>
+          relationship == upEdge.relationship &&
+            matchWithPriority(parentUuid, parentName, upEdge.parent) &&
+            matchWithPriority(childUuid, childName, upEdge.child)
+        }
     }
 
     (adds, removes)

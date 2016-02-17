@@ -19,6 +19,7 @@
 package io.greenbus.integration.ldr
 
 import java.io.File
+import java.util.UUID
 
 import akka.actor.{ ActorRef, ActorSystem }
 import com.typesafe.scalalogging.slf4j.Logging
@@ -28,7 +29,7 @@ import io.greenbus.client.service.proto.Model.ModelUUID
 import io.greenbus.client.service.proto.ModelRequests.{ EndpointQuery, EntityKeySet, EntityEdgeQuery, EntityQuery }
 import io.greenbus.ldr.XmlImporter
 import io.greenbus.ldr.xml.Configuration
-import io.greenbus.loader.set.LoadingException
+import io.greenbus.loader.set.{ UUIDHelpers, LoadingException }
 import io.greenbus.msg.Session
 import io.greenbus.msg.amqp.AmqpSettings
 import io.greenbus.msg.qpid.QpidBroker
@@ -76,6 +77,15 @@ class LoaderTest extends FunSuite with ShouldMatchers with Logging with BeforeAn
     system.shutdown()
     system.awaitTermination()
     this.conn.get.disconnect()
+  }
+
+  def nameToUuidMap(session: Session): Map[String, ModelUUID] = {
+
+    val modelClient = ModelService.client(session)
+
+    val allEntities = Await.result(modelClient.entityQuery(EntityQuery.newBuilder().build()), 5000.milliseconds)
+
+    allEntities.map(e => (e.getName, e.getUuid)).toMap
   }
 
   test("initial import") {
@@ -137,6 +147,53 @@ class LoaderTest extends FunSuite with ShouldMatchers with Logging with BeforeAn
       (endpointA.getUuid, "source", commandA.getUuid))
 
     allEdges.map(e => (e.getParent, e.getRelationship, e.getChild)).toSet should equal(edgeSet)
+  }
+
+  test("rename name, with source name unchanged") {
+    val session = this.session.get
+
+    val modelClient = ModelService.client(session)
+
+    val keySet = EntityKeySet.newBuilder()
+      .addNames("PointA")
+      .build()
+
+    val initialResult = Await.result(modelClient.get(keySet), 5000.milliseconds)
+    initialResult.size should equal(1)
+    val pointAUuid = initialResult.get(0).getUuid
+
+    val xml = XmlHelper.read(TestXml.buildXmlSimple("RenamedPointA", Some(UUIDHelpers.protoUUIDToUuid(pointAUuid))), classOf[Configuration])
+
+    XmlImporter.importFromXml(amqpConfig, userConfig, None, xml, parentDir, prompt = false)
+
+    val laterKeySet = EntityKeySet.newBuilder()
+      .addUuids(pointAUuid)
+      .build()
+
+    val laterResult = Await.result(modelClient.get(laterKeySet), 5000.milliseconds)
+    laterResult.size should equal(1)
+    laterResult.get(0).getName should equal("RenamedPointA")
+
+    val edgeQuery = EntityEdgeQuery.newBuilder()
+      .addChildUuids(pointAUuid)
+      .setDepthLimit(1)
+      .setPageSize(Int.MaxValue)
+      .build()
+
+    val allEdges = Await.result(modelClient.edgeQuery(edgeQuery), 5000.milliseconds)
+
+    val nameToUuid = nameToUuidMap(session)
+
+    val edgeSet = Set(
+      (nameToUuid("EquipA"), "owns", pointAUuid),
+      (nameToUuid("EndpointA"), "source", pointAUuid))
+
+    val allEdgeSet = allEdges.map(e => (e.getParent, e.getRelationship, e.getChild)).toSet
+
+    println(allEdgeSet)
+
+    //edgeSet.forall(allEdgeSet.contains) should equal(true)
+    edgeSet should equal(allEdgeSet)
   }
 
   test("dangling endpoint doesn't prevent re-upload") {
@@ -281,8 +338,12 @@ class LoaderTest extends FunSuite with ShouldMatchers with Logging with BeforeAn
 
 object TestXml {
 
-  val xmlSimple =
-    """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  def uuidTag(uuid: Option[UUID]): String = {
+    uuid.map(u => "uuid=\"" + u + "\"").getOrElse("")
+  }
+
+  def buildXmlSimple(pointAEquipName: String, pointAUuid: Option[UUID]): String = {
+    s"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
       |<configuration xmlns="xml.ldr.greenbus.io">
       |    <equipmentModel>
       |        <equipment name="RootA">
@@ -290,7 +351,7 @@ object TestXml {
       |            <equipment name="EquipA">
       |                <type name="Equip"/>
       |                <keyValue key="keyA" stringValue="valueA"/>
-      |                <analog name="PointA" unit="UnitA">
+      |                <analog name="${pointAEquipName}" unit="UnitA" ${uuidTag(pointAUuid)}>
       |                   <type name="PointTypeA"/>
       |                   <commands>
       |                       <reference name="CommandA"/>
@@ -310,7 +371,7 @@ object TestXml {
       |       <endpoint name="EndpointA" protocol="protocolA">
       |         <type name="Endpoint"/>
       |         <type name="EndpointTypeA"/>
-      |         <source name="PointA"/>
+      |         <source name="PointA" ${uuidTag(pointAUuid)}/>
       |         <source name="CommandA"/>
       |       </endpoint>
       |       <endpoint name="DanglingEndpoint" protocol="danglingProtocol">
@@ -319,6 +380,9 @@ object TestXml {
       |    </endpointModel>
       |</configuration>
     """.stripMargin
+  }
+
+  val xmlSimple = buildXmlSimple("PointA", None)
 
   val xmlSimpleDeleted =
     """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
