@@ -41,6 +41,11 @@ import io.greenbus.sql.DbConnection
 object CoreServices extends Logging {
 
   def main(args: Array[String]) {
+
+    if (Option(System.getProperty("akka.logger-startup-timeout")).isEmpty) {
+      System.setProperty("akka.logger-startup-timeout", "30s")
+    }
+
     val rootConfig = ConfigFactory.load()
     val slf4jConfig = ConfigFactory.parseString("""akka { loggers = ["akka.event.slf4j.Slf4jLogger"] }""")
     val akkaConfig = slf4jConfig.withFallback(rootConfig)

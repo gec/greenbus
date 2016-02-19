@@ -35,6 +35,10 @@ object CalculationEngine {
 
     val opSource = BasicOperations.getSource
 
+    if (Option(System.getProperty("akka.logger-startup-timeout")).isEmpty) {
+      System.setProperty("akka.logger-startup-timeout", "30s")
+    }
+
     val rootConfig = ConfigFactory.load()
     val slf4jConfig = ConfigFactory.parseString("""akka { loggers = ["akka.event.slf4j.Slf4jLogger"] }""")
     val akkaConfig = slf4jConfig.withFallback(rootConfig)

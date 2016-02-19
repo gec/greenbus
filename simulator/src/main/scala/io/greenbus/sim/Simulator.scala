@@ -29,6 +29,10 @@ object Simulator {
 
   def main(args: Array[String]) {
 
+    if (Option(System.getProperty("akka.logger-startup-timeout")).isEmpty) {
+      System.setProperty("akka.logger-startup-timeout", "30s")
+    }
+
     val baseDir = Option(System.getProperty("io.greenbus.config.base")).getOrElse("")
     val amqpConfigPath = Option(System.getProperty("io.greenbus.config.amqp")).map(baseDir + _).getOrElse(baseDir + "io.greenbus.msg.amqp.cfg")
     val userConfigPath = Option(System.getProperty("io.greenbus.config.user")).map(baseDir + _).getOrElse(baseDir + "io.greenbus.user.cfg")
