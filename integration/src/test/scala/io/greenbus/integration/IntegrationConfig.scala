@@ -23,17 +23,14 @@ import io.greenbus.client.service.proto.Events.EventConfig
 import io.greenbus.client.service.proto.Measurements.Quality
 import io.greenbus.client.service.proto.Processing._
 import io.greenbus.client.service.proto.{ Model, Processing }
-import io.greenbus.loader.set.Actions._
-import io.greenbus.loader.set.Mdl.EdgeDesc
-import io.greenbus.loader.set.{ NamedEntId, ByteArrayValue, Upload }
+import io.greenbus.loader.set.Downloader.DownloadSet
+import io.greenbus.loader.set.Mdl.{ EndpointDesc, PointDesc, FlatModelFragment, EdgeDesc }
+import io.greenbus.loader.set._
 import io.greenbus.msg.Session
 
 object IntegrationConfig {
 
-  def buildAnalogPoint(prefix: String, cache: ActionCache): String = {
-
-    val name = prefix + "PointA"
-    cache.pointPuts += PutPoint(None, name, Set("TypeA"), Model.PointCategory.ANALOG, "unit1")
+  def buildAnalogPoint(prefix: String): (String, PointDesc) = {
 
     val rangeTrigger = Trigger.newBuilder()
       .setAnalogLimit(AnalogLimit.newBuilder()
@@ -59,15 +56,16 @@ object IntegrationConfig {
 
     val ts = TriggerSet.newBuilder().addTriggers(rangeTrigger).build()
 
-    cache.keyValuePutByNames += PutKeyValueByName(name, "triggerSet", ByteArrayValue(ts.toByteArray))
+    val keyValueTup = ("triggerSet", ByteArrayValue(ts.toByteArray))
 
-    name
+    val name = prefix + "PointA"
+
+    val desc = PointDesc(EntityFields(NamedEntId(name), Set("TypeA"), Seq(keyValueTup)), Model.PointCategory.ANALOG, "unit1", NoCalculation)
+
+    (name, desc)
   }
 
-  def buildStatusPoint(prefix: String, cache: ActionCache): String = {
-
-    val name = prefix + "PointB"
-    cache.pointPuts += PutPoint(None, name, Set("TypeA"), Model.PointCategory.STATUS, "unit1")
+  def buildStatusPoint(prefix: String): (String, PointDesc) = {
 
     val rangeTrigger = Trigger.newBuilder()
       .setBoolValue(false)
@@ -80,9 +78,13 @@ object IntegrationConfig {
 
     val ts = TriggerSet.newBuilder().addTriggers(rangeTrigger).build()
 
-    cache.keyValuePutByNames += PutKeyValueByName(name, "triggerSet", ByteArrayValue(ts.toByteArray))
+    val keyValueTup = ("triggerSet", ByteArrayValue(ts.toByteArray))
 
-    name
+    val name = prefix + "PointB"
+
+    val desc = PointDesc(EntityFields(NamedEntId(name), Set("TypeA"), Seq(keyValueTup)), Model.PointCategory.STATUS, "unit1", NoCalculation)
+
+    (name, desc)
   }
 
   def eventConfigs(): Seq[EventConfigTemplate] = {
@@ -101,24 +103,27 @@ object IntegrationConfig {
         .build())
   }
 
-  def loadActions(actionSet: ActionsList, session: Session): Unit = {
-    Upload.push(session, actionSet, Seq())
+  def loadFragment(flatModel: FlatModelFragment, session: Session): Unit = {
+
+    val downloadSet = DownloadSet(Seq(), Seq(), Seq(), Seq(), Seq(), Seq())
+
+    val ((actions, diff), idTuples) = Importer.importDiff(session, flatModel, downloadSet)
+
+    Upload.push(session, actions, idTuples)
   }
 
-  def buildConfig(prefix: String): ActionsList = {
+  def buildConfigModel(prefix: String): FlatModelFragment = {
 
-    val cache = new ActionCache
-
-    val pointAName = buildAnalogPoint(prefix, cache)
-    val pointBName = buildStatusPoint(prefix, cache)
+    val (pointAName, pointA) = buildAnalogPoint(prefix)
+    val (pointBName, pointB) = buildStatusPoint(prefix)
 
     val endpointName = prefix + "Endpoint"
-    cache.endpointPuts += PutEndpoint(None, endpointName, Set(), "test")
+    val endpoint = EndpointDesc(EntityFields(NamedEntId(endpointName), Set(), Seq()), "test")
 
-    cache.edgePuts += PutEdge(EdgeDesc(NamedEntId(endpointName), "source", NamedEntId(pointAName)))
-    cache.edgePuts += PutEdge(EdgeDesc(NamedEntId(endpointName), "source", NamedEntId(pointBName)))
+    val edges = Seq(EdgeDesc(NamedEntId(endpointName), "source", NamedEntId(pointAName)),
+      EdgeDesc(NamedEntId(endpointName), "source", NamedEntId(pointBName)))
 
-    cache.result()
+    FlatModelFragment(Seq(), Seq(pointA, pointB), Seq(), Seq(endpoint), edges)
   }
 
   def buildFilterTrigger(): TriggerSet = {

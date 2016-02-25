@@ -82,7 +82,7 @@ class FailoverTests extends FunSuite with ShouldMatchers with Logging with Befor
 
     this.session = Some(session)
 
-    IntegrationConfig.loadActions(buildConfig("Set1"), session)
+    IntegrationConfig.loadFragment(buildConfigModel("Set1"), session)
 
     logger.info("starting processor")
     processor = Some(system.actorOf(MeasurementProcessor.buildProcessor(testConfigPath, testConfigPath, testConfigPath, 1000, "testNode",
