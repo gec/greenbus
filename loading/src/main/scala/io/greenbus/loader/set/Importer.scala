@@ -35,6 +35,37 @@ object Importer {
 
   import io.greenbus.loader.set.UUIDHelpers._
 
+  def runImport(session: Session,
+    optCommandRoots: Option[Seq[String]],
+    xmlRoots: Seq[EntityId],
+    flatModel: FlatModelFragment,
+    prompt: Boolean = true) = {
+
+    val fragmentEndpointIds = flatModel.endpoints.map(_.fields.id)
+
+    val downloadSet = optCommandRoots.map { roots =>
+      Downloader.downloadByIdsAndNames(session, xmlRoots, roots, fragmentEndpointIds)
+    }.getOrElse {
+      Downloader.downloadByIds(session, xmlRoots, fragmentEndpointIds)
+    }
+
+    val ((actions, diff), idTuples) = Importer.importDiff(session, flatModel, downloadSet)
+
+    Importer.summarize(diff)
+
+    if (!diff.isEmpty) {
+      if (prompt) {
+        println("Proceed with modifications? (y/N)")
+        val answer = readLine()
+        if (Set("y", "yes").contains(answer.trim.toLowerCase)) {
+          Upload.push(session, actions, idTuples)
+        }
+      } else {
+        Upload.push(session, actions, idTuples)
+      }
+    }
+  }
+
   def importDiff(session: Session, update: FlatModelFragment, downloadSet: DownloadSet): ((ActionsList, DiffRecord), Seq[(UUID, String)]) = {
 
     performDiff(update, downloadSet, NameResolver.resolveExternalReferences(session, _, _, _), NameResolver.lookupEntitiesByName(session, _))

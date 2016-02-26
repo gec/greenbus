@@ -26,11 +26,12 @@ import io.greenbus.services.model.UUIDHelpers._
 import scala.collection.JavaConversions._
 import io.greenbus.client.proto.Envelope
 import io.greenbus.mstore.{ MeasurementHistorySource, MeasurementValueSource }
-import io.greenbus.client.service.proto.Measurements.{ PointMeasurementValues, PointMeasurementValue }
+import io.greenbus.client.service.proto.Measurements._
 import io.greenbus.services.framework.ServiceContext
 import io.greenbus.services.framework.Success
 import java.util.UUID
 import io.greenbus.services.model.FrontEndModel
+import io.greenbus.services.model.MeasurementSampling
 
 object MeasurementServices {
 
@@ -45,6 +46,7 @@ class MeasurementServices(services: ServiceRegistry, store: MeasurementValueSour
   services.fullService(Descriptors.GetCurrentValues, getCurrentValue)
   services.fullService(Descriptors.GetCurrentValuesAndSubscribe, subscribeWithCurrentValue)
   services.fullService(Descriptors.GetHistory, getHistory)
+  services.fullService(Descriptors.GetHistorySamples, getHistorySampled)
   services.fullService(Descriptors.SubscribeToBatches, subscribeToBatches)
 
   def getCurrentValue(request: GetCurrentValuesRequest, headers: Map[String, String], context: ServiceContext): Response[GetCurrentValuesResponse] = {
@@ -157,6 +159,51 @@ class MeasurementServices(services: ServiceRegistry, store: MeasurementValueSour
       .build()
 
     val response = GetMeasurementHistoryResponse.newBuilder().setResult(result).build
+    Success(Envelope.Status.OK, response)
+  }
+
+  def getHistorySampled(request: GetMeasurementHistorySampledRequest, headers: Map[String, String], context: ServiceContext): Response[GetMeasurementHistorySampledResponse] = {
+
+    val optFilter = context.auth.authorize(measurementResource, "read")
+
+    if (!request.hasRequest) {
+      throw new BadRequestException("Must include request query")
+    }
+
+    val query = request.getRequest
+
+    if (!query.hasPointUuid) {
+      throw new BadRequestException("Must include point uuid")
+    }
+
+    val pointId: UUID = query.getPointUuid
+
+    if (!frontEndModel.pointExists(pointId, optFilter)) {
+      throw new BadRequestException("No point exists for uuid")
+    }
+
+    if (!query.hasTimeFrom) {
+      throw new BadRequestException("Must set beginning of time window")
+    }
+
+    if (!query.hasTimeWindowLength) {
+      throw new BadRequestException("Must set length of time windows")
+    }
+
+    val windowStart = query.getTimeFrom
+
+    val windowEnd = if (query.hasTimeTo) query.getTimeTo else System.currentTimeMillis()
+
+    val timeWindowLength = query.getTimeWindowLength
+
+    val samples = MeasurementSampling.sampleRecur2(history, pointId, windowStart, windowEnd, timeWindowLength, MeasurementSampling.historyWindowMax)
+
+    val result = PointMeasurementSampleValues.newBuilder()
+      .setPointUuid(query.getPointUuid)
+      .setValue(samples)
+      .build()
+
+    val response = GetMeasurementHistorySampledResponse.newBuilder().setResult(result).build
     Success(Envelope.Status.OK, response)
   }
 

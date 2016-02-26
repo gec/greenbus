@@ -23,16 +23,17 @@ import javax.xml.bind.UnmarshalException
 import javax.xml.stream.{ XMLStreamException, Location }
 
 import com.typesafe.scalalogging.slf4j.Logging
-import io.greenbus.ldr.xml.Configuration
-import org.apache.commons.cli
-import org.apache.commons.cli.{ HelpFormatter, Options }
-import io.greenbus.msg.amqp.AmqpSettings
-import io.greenbus.msg.qpid.QpidBroker
 import io.greenbus.client.ServiceConnection
+import io.greenbus.ldr.xml.Configuration
 import io.greenbus.loader.set.Mdl.FlatModelFragment
 import io.greenbus.loader.set._
+import io.greenbus.msg.amqp.AmqpSettings
+import io.greenbus.msg.qpid.QpidBroker
 import io.greenbus.util.{ UserSettings, XmlHelper }
+import org.apache.commons.cli
+import org.apache.commons.cli.{ HelpFormatter, Options }
 
+import scala.concurrent.duration.Duration
 import scala.concurrent.duration._
 
 object XmlImporter extends Logging {
@@ -154,31 +155,9 @@ object XmlImporter extends Logging {
 
     try {
 
-      val fragmentEndpointIds = flatModel.endpoints.map(_.fields.id)
-
       val session = conn.login(userConfig.user, userConfig.password, Duration(5000, MILLISECONDS))
 
-      val downloadSet = optCommandRoots.map { roots =>
-        Downloader.downloadByIdsAndNames(session, xmlRoots, roots, fragmentEndpointIds)
-      }.getOrElse {
-        Downloader.downloadByIds(session, xmlRoots, fragmentEndpointIds)
-      }
-
-      val ((actions, diff), idTuples) = Importer.importDiff(session, flatModel, downloadSet)
-
-      Importer.summarize(diff)
-
-      if (!diff.isEmpty) {
-        if (prompt) {
-          println("Proceed with modifications? (y/N)")
-          val answer = readLine()
-          if (Set("y", "yes").contains(answer.trim.toLowerCase)) {
-            Upload.push(session, actions, idTuples)
-          }
-        } else {
-          Upload.push(session, actions, idTuples)
-        }
-      }
+      Importer.runImport(session, optCommandRoots, xmlRoots, flatModel, prompt)
 
     } finally {
       conn.disconnect()

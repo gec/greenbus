@@ -255,6 +255,58 @@ message Measurement {
 }
 
 /*
+    Represents a series of time windows for which Measurement sample data was generated.
+
+    Fields are grouped into equal-sized arrays for data compactness. All values for a particular time window
+    can be retrieved by using the same index into each array.
+*/
+message MeasurementSamples {
+
+    /*
+        The start of the time window for each sample.
+
+        Time is measured in milliseconds since midnight, January 1, 1970 UTC.
+    */
+    repeated uint64 time_start = 1;
+
+    /*
+        The end of the time window for each sample.
+
+        Time is measured in milliseconds since midnight, January 1, 1970 UTC.
+    */
+    repeated uint64 time_end = 2;
+
+    /*
+        The number of Measurements in the time window.
+    */
+    repeated uint64 sample_count = 3;
+
+    /*
+        The average values of the data over each time window duration.
+    */
+    repeated double average = 4;
+
+    /*
+        The maximum data value in each time window.
+    */
+    repeated double maximum = 5;
+
+    /*
+        The minimum data value in each time window.
+    */
+    repeated double minimum = 6;
+
+    /*
+        Data value in each time window selected for its significance in visualizations.
+
+        Instead of smoothing the data as an average would, attempts to preserve peaks and
+        valleys for inspection.
+    */
+    repeated double visually_significant = 7;
+
+}
+
+/*
     Associates a Measurement value with a Point identified by name.
 */
 message NamedMeasurementValue {
@@ -284,6 +336,14 @@ message PointMeasurementValue {
 message PointMeasurementValues {
     optional ModelUUID point_uuid = 1; // Point UUID.
     repeated Measurement value = 2; // Sequence of Measurement values.
+}
+
+/*
+    Associates a sampled Measurement history with a Point identified by UUID.
+*/
+message PointMeasurementSampleValues {
+    optional ModelUUID point_uuid = 1; // Point UUID.
+    optional MeasurementSamples value = 2; // Sequence of Measurement values.
 }
 
 /*

@@ -31,6 +31,51 @@ import "services/ModelRequests.proto";
 
 
 /*
+    Specifies a period of Measurement history to be divided into windows and sampled.
+*/
+message MeasurementHistorySampledQuery {
+
+
+    /*
+        UUID of Point to find Measurements for.
+
+        @required
+    */
+    optional ModelUUID point_uuid = 1;
+
+    /*
+        Boundary of earliest time, exclusive, in the window of Measurements to return.
+
+        Time is measured in milliseconds since midnight, January 1, 1970 UTC.
+
+        @required
+    */
+    optional uint64 time_from = 2;
+
+    /*
+        Boundary of latest time, inclusive, in the window of Measurements to return.
+
+        If not included, the end of the time window is unbounded, or practically, bounded to the current time.
+
+        Time is measured in milliseconds since midnight, January 1, 1970 UTC.
+
+        @optional
+    */
+    optional uint64 time_to = 3;
+
+    /*
+        Length of time of individual sample windows within the broader time boundaries for the query. The total
+        number of windows will then be the query width divided by the window duration.
+
+        Time is measured in milliseconds.
+
+        @required
+    */
+    optional uint64 time_window_length = 4;
+
+}
+
+/*
     Specifies a sequence of historical Measurement values for a Point by time-order, with constraints.
 
     The resulting sequence of Measurements is always returned in ascending time-order (oldest to newest).
@@ -124,6 +169,13 @@ message GetMeasurementHistoryResponse {
     optional PointMeasurementValues result = 2;
 }
 
+message GetMeasurementHistorySampledRequest {
+    optional MeasurementHistorySampledQuery request = 1;
+}
+message GetMeasurementHistorySampledResponse {
+    optional PointMeasurementSampleValues result = 2;
+}
+
 message GetCurrentValuesAndSubscribeRequest {
     repeated ModelUUID point_uuids = 1;
 }
@@ -156,6 +208,11 @@ service MeasurementService {
         Queries for a time series of previous Measurement values.
     */
     rpc get_history(GetMeasurementHistoryRequest) returns (GetMeasurementHistoryResponse);
+
+    /*
+        Queries for a sampled history of previous Measurement values.
+    */
+    rpc get_history_samples(GetMeasurementHistorySampledRequest) returns (GetMeasurementHistorySampledResponse);
 
     /*
         Gets current Measurement values for Points specified by UUID, and subscribes to subsequent Measurements for

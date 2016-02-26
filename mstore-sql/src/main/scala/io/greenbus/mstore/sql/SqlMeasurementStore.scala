@@ -145,7 +145,7 @@ object HistoricalValueOperations {
 
     val inOrder = if (!latest) bytes else bytes.reverse
 
-    inOrder.map(Measurement.parseFrom)
+    inOrder.map(Measurement.parseFrom).toVector
   }
 }
 
