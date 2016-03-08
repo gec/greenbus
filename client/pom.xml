@@ -179,32 +179,32 @@
         <dependency>
             <groupId>io.greenbus.msg</groupId>
             <artifactId>greenbus-msg-amqp</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>io.greenbus.msg</groupId>
             <artifactId>greenbus-msg-amqp-java</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>io.greenbus.msg</groupId>
             <artifactId>greenbus-msg-messaging</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>io.greenbus.msg</groupId>
             <artifactId>greenbus-msg-messaging-java</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>io.greenbus.msg</groupId>
             <artifactId>greenbus-msg-proto-ext</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>io.greenbus.msg</groupId>
             <artifactId>greenbus-msg-compiler</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1-SNAPSHOT</version>
             <classifier>jar-with-dependencies</classifier>
             <scope>provided</scope>
         </dependency>

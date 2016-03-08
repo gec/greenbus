@@ -1,5 +1,5 @@
 #! /bin/sh
 
-JAR=~/.m2/repository/io/greenbus/msg/greenbus-msg-compiler/1.0.0/greenbus-msg-compiler-1.0.0-jar-with-dependencies.jar
+JAR=~/.m2/repository/io/greenbus/msg/greenbus-msg-compiler/1.0.1-SNAPSHOT/greenbus-msg-compiler-1.0.1-SNAPSHOT-jar-with-dependencies.jar
 
 java -Dapi.version="3.0.1-SNAPSHOT" -cp $JAR io.greenbus.msg.compiler.doc.Compiler 2> msgdocprotoc.log
