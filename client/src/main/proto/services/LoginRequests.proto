@@ -134,6 +134,7 @@ message ValidateAuthTokenResponse {
 service LoginService {
     option (scala_package) = "io.greenbus.client.service";
     option (java_package) = "io.greenbus.japi.client.service";
+    option (uri_prefix) = "login";
 
     /*
         Provides user credentials in exchange for an auth token.

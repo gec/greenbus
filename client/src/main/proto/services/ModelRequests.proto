@@ -1098,6 +1098,7 @@ message PutEndpointDisabledResponse {
 service ModelService {
     option (scala_package) = "io.greenbus.client.service";
     option (java_package) = "io.greenbus.japi.client.service";
+    option (uri_prefix) = "model";
 
     /*
         Returns a set of Entities identified specifically by UUID or name.

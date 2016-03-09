@@ -40,4 +40,5 @@ extend google.protobuf.MethodOptions {
 extend google.protobuf.ServiceOptions {
   optional string scala_package = 50011;
   optional string java_package = 50012;
+  optional string uri_prefix = 50013;
 }
