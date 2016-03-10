@@ -26,6 +26,7 @@
         <qpid.version>0.20</qpid.version>
 
 		<greenbus.version>3.0.1-SNAPSHOT</greenbus.version>
+		<akka.version>2.3.14</akka.version>
         <squeryl.version>0.9.5-6</squeryl.version>
         <cglib.version>2.2</cglib.version>
         <commons-dbcp.version>1.4</commons-dbcp.version>
