@@ -23,16 +23,20 @@ import io.greenbus.client.service.proto.Events._
 import io.greenbus.client.service.proto.Measurements._
 import io.greenbus.client.service.proto.Model.ModelUUID
 import io.greenbus.client.service.proto.Processing.{ Action => ActionProto, ActivationType => TypeProto, LinearTransform => LinearProto }
+import io.greenbus.measproc.PointMap
 
 import scala.collection.JavaConversions._
 
 /**
  * Trigger/Action factory with constructor dependencies.
  */
-class TriggerProcessingFactory(protected val publishEvent: EventTemplate.Builder => Unit, protected val lastCache: ObjectCache[Measurement])
-  extends ProcessingResources
-  with TriggerFactory
-  with ActionFactory
+class TriggerProcessingFactory(
+  protected val publishEvent: EventTemplate.Builder => Unit,
+  protected val lastCache: ObjectCache[Measurement],
+  protected val getPointMap: () => PointMap)
+    extends ProcessingResources
+    with TriggerFactory
+    with ActionFactory
 
 /**
  * Internal interface for Trigger/Action factory dependencies
@@ -40,6 +44,7 @@ class TriggerProcessingFactory(protected val publishEvent: EventTemplate.Builder
 trait ProcessingResources {
   protected val publishEvent: (EventTemplate.Builder) => Unit
   protected val lastCache: ObjectCache[Measurement]
+  protected val getPointMap: () => PointMap
 }
 
 /**
@@ -71,7 +76,7 @@ trait ActionFactory { self: ProcessingResources =>
       } else if (proto.hasSetBool) {
         new SetBool(proto.getSetBool)
       } else if (proto.hasEvent) {
-        new EventGenerator(publishEvent, proto.getEvent.getEventType, pointUuid)
+        new EventGenerator(publishEvent, proto.getEvent.getEventType, pointUuid, getPointMap)
       } else if (proto.hasBoolTransform) {
         new BoolEnumTransformer(proto.getBoolTransform.getFalseString, proto.getBoolTransform.getTrueString)
       } else if (proto.hasIntTransform) {
@@ -145,7 +150,7 @@ object Actions {
     b.build()
   }
 
-  class EventGenerator(out: EventTemplate.Builder => Unit, eventType: String, pointUuid: ModelUUID)
+  class EventGenerator(out: EventTemplate.Builder => Unit, eventType: String, pointUuid: ModelUUID, getPointMap: () => PointMap)
       extends Action.Evaluation {
 
     def apply(m: Measurement): Measurement = {
@@ -160,7 +165,13 @@ object Actions {
         case Measurement.Type.NONE => None
       }
 
-      val attrs = Seq(validity) ++ Seq(valueAttr).flatten
+      val pointMap = getPointMap()
+      val nameAttr = pointMap.idToName.get(pointUuid.getValue) match {
+        case Some(name) => attribute("point", name)
+        case None => attribute("point", "unknown")
+      }
+
+      val attrs = Seq(validity) ++ Seq(valueAttr).flatten ++ Seq(nameAttr)
 
       val builder = EventTemplate.newBuilder
         .setEventType(eventType)

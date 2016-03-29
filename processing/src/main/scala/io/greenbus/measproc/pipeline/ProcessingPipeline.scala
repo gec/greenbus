@@ -18,6 +18,7 @@
  */
 package io.greenbus.measproc.pipeline
 
+import io.greenbus.measproc.PointMap
 import io.greenbus.measproc.processing._
 import io.greenbus.client.service.proto.Measurements.Measurement
 import io.greenbus.jmx.MetricsManager
@@ -32,6 +33,7 @@ class ProcessingPipeline(
     postMeasurements: Seq[(String, Measurement)] => Unit,
     getMeasurement: String => Option[Measurement],
     eventBatch: Seq[EventTemplate.Builder] => Unit,
+    getPointMap: () => PointMap,
     triggerStateCache: ObjectCache[Boolean],
     overrideValueCache: ObjectCache[(Option[Measurement], Option[Measurement])]) {
 
@@ -45,7 +47,7 @@ class ProcessingPipeline(
 
   private val overrideProcessor = new OverrideProcessor(handleRestoreOnOverrideRemove, handleEngFromOverrides, handleTestReplaceValue, overrideValueCache, getCurrentValue, metricsMgr.metrics("Overrides"))
 
-  private val triggerFactory = new TriggerProcessingFactory(eventSink, lastValueCache)
+  private val triggerFactory = new TriggerProcessingFactory(eventSink, lastValueCache, getPointMap)
   private val triggerProcessor = new TriggerProcessor(triggerFactory, triggerStateCache, metricsMgr.metrics("Triggers"))
 
   private val processingSteps = List(whitelistProcessor, overrideProcessor, triggerProcessor)

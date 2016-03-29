@@ -42,6 +42,7 @@ class EndpointProcessor(endpointName: String,
   import endpointMetrics._
 
   private var pointMap: PointMap = new PointMap(points)
+  private def getPointMap(): PointMap = pointMap
 
   private val service = new ProcessorService(endpointName, metrics)
 
@@ -51,6 +52,7 @@ class EndpointProcessor(endpointName: String,
     postMeasurements,
     getMeasurement,
     publishEvents,
+    getPointMap,
     new MapCache[Boolean],
     new MapCache[(Option[Measurement], Option[Measurement])])
 

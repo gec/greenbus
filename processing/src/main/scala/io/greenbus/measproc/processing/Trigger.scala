@@ -114,7 +114,6 @@ class BasicTrigger(
         case cond: KeyedCondition => cond(pointKey, m, prev)
       }
     }
-    //else conditions.forall(_(m, prev))
 
     // Store the state in the previous state cache
     cache.put(cacheId, state)

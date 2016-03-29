@@ -20,6 +20,7 @@ package io.greenbus.measproc.processing
 
 import java.util.UUID
 
+import io.greenbus.measproc.PointMap
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.junit.JUnitRunner
 import org.junit.runner.RunWith
@@ -34,11 +35,13 @@ import io.greenbus.client.service.proto.EventRequests.EventTemplate
 @RunWith(classOf[JUnitRunner])
 class FilterTriggerTest extends FunSuite with ShouldMatchers {
 
+  val pointMap = new PointMap(Seq())
+
   test("Factory") {
     val cache = new MockObjectCache[Measurement]()
     def publish(ev: EventTemplate.Builder): Unit = {}
 
-    val fac = new TriggerProcessingFactory(publish, cache)
+    val fac = new TriggerProcessingFactory(publish, cache, () => pointMap)
 
     val stateCache = new MockObjectCache[Boolean]
 

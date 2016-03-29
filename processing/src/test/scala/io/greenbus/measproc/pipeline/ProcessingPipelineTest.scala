@@ -18,6 +18,7 @@
  */
 package io.greenbus.measproc.pipeline
 
+import io.greenbus.measproc.PointMap
 import org.scalatest.FunSuite
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.junit.JUnitRunner
@@ -39,6 +40,7 @@ class ProcessingPipelineTest extends FunSuite with ShouldMatchers {
     val measCache = new MockObjectCache[Measurement]
     val overCache = new MockObjectCache[(Option[Measurement], Option[Measurement])]
     val stateCache = new MockObjectCache[Boolean]
+    val pointMap = new PointMap(Seq())
 
     def publish(meases: Seq[(String, Measurement)]) {
 
@@ -50,6 +52,7 @@ class ProcessingPipelineTest extends FunSuite with ShouldMatchers {
       measQueue.enqueue,
       measCache.get,
       eventQueue.enqueue,
+      () => pointMap,
       stateCache,
       overCache)
 
