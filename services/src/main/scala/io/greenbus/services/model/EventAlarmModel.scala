@@ -396,8 +396,6 @@ object SquerylEventAlarmModel extends EventAlarmModel {
 
   def alarmQuery(alarmStates: Seq[Alarm.State], params: EventQueryParams, filter: Option[EntityFilter] = None): Seq[Alarm] = {
 
-    val eventQuery = queryForEvents(params, filter)
-
     val stateNums = alarmStates.map(_.getNumber)
 
     val latest = params.latest
@@ -426,7 +424,7 @@ object SquerylEventAlarmModel extends EventAlarmModel {
             (al.id > params.last.?).inhibitWhen(params.latest) and
             (al.id < params.last.?).inhibitWhen(!params.latest))
           select ((ev, al))
-          orderBy (timeOrder(ev.time), idOrder(al.id))
+          orderBy (timeOrder(ev.time), idOrder(ev.id))
           on (ev.id === al.eventId))
         .page(0, params.pageSize)
         .toSeq

@@ -100,7 +100,8 @@ object ServicesSchema extends Schema {
   val alarms = table[AlarmRow]
 
   on(events)(s => declare(
-    s.time is (indexed)))
+    s.time is (indexed),
+    columns(s.time, s.id) are (indexed)))
   on(alarms)(s => declare(
     s.eventId is (indexed)))
 
