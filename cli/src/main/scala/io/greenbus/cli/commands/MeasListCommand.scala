@@ -24,11 +24,13 @@ import java.util.concurrent.atomic.AtomicReference
 
 import io.greenbus.cli.view._
 import io.greenbus.cli.{ CliContext, Command }
+import io.greenbus.client.exception.UnauthorizedException
 import io.greenbus.client.service.proto.MeasurementRequests.MeasurementHistoryQuery
-import io.greenbus.client.service.proto.Measurements.Measurement
+import io.greenbus.client.service.proto.Measurements.{ PointMeasurementValues, Measurement }
 import io.greenbus.client.service.proto.Model.{ Point, ModelUUID }
 import io.greenbus.client.service.proto.ModelRequests.{ EntityKeySet, EntityPagingParams, PointQuery }
 import io.greenbus.client.service.{ MeasurementService, ModelService }
+import io.greenbus.msg.SessionUnusableException
 
 import scala.collection.JavaConversions._
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -192,6 +194,10 @@ class MeasDownloadCommand extends Command[CliContext] {
   val rawTimeOption = optionSwitch(None, Some("raw-time"), "Write time in milliseconds since 1970 UTC")
   val dateFormatOption = strings.option(None, Some("date-format"), "Specifies format for time. See documentation for the SimpleDataFormat Java class for the syntax.")
 
+  val timeoutMsOption = ints.option(None, Some("query-timeout"), "Timeout for individual page queries. Default 10000.")
+  val retryCountOption = ints.option(None, Some("retry-count"), "Number of times to retry a failed individual page query. Default 3.")
+  val pageSizeOption = ints.option(None, Some("page-size"), "Size limit of individual pages. Default 1000.")
+
   protected def execute(context: CliContext) {
     val modelClient = ModelService.client(context.session)
     val measClient = MeasurementService.client(context.session)
@@ -249,7 +255,9 @@ class MeasDownloadCommand extends Command[CliContext] {
       Seq(time, MeasViewCommon.value(m), MeasViewCommon.shortQuality(m), MeasViewCommon.longQuality(m)).mkString(delimiter)
     }
 
-    val pageSize = 1000
+    val pageSize = pageSizeOption.value.getOrElse(1000)
+    val retries = retryCountOption.value.getOrElse(3)
+    val timeoutMs = timeoutMsOption.value.getOrElse(10000)
 
     def historyBuilder(startTime: Long): MeasurementHistoryQuery = {
       MeasurementHistoryQuery.newBuilder()
@@ -271,7 +279,23 @@ class MeasDownloadCommand extends Command[CliContext] {
       var done = false
       while (!done) {
         val query = historyBuilder(latestStartTime)
-        val results = Await.result(measClient.getHistory(query), 10000.milliseconds)
+
+        def attempt(retriesLeft: Int): PointMeasurementValues = {
+          try {
+            Await.result(measClient.getHistory(query), timeoutMs.milliseconds)
+          } catch {
+            case ex: UnauthorizedException => throw ex
+            case ex: SessionUnusableException => throw ex
+            case ex: Throwable =>
+              if (retriesLeft <= 0) {
+                throw ex
+              } else {
+                attempt(retriesLeft - 1)
+              }
+          }
+        }
+
+        val results = attempt(retries)
 
         results.getValueList.foreach { m => pw.println(toMeasLine(m)) }
 
