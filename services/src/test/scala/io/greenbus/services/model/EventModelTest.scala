@@ -525,7 +525,7 @@ class EventModelTest extends ServiceTestBase {
 
   test("Alarm sub-milli paging") {
 
-    def createSimpleEvent(id: Int, time: Long) = createEvent("type" + id, false, time, None, 2, "sub01", "agent01", None, None, Array.empty[Byte], "message01")
+    def createSimpleEvent(id: Int, time: Long) = createEvent("type" + id, true, time, None, 2, "sub01", "agent01", None, None, Array.empty[Byte], "message01")
 
     val ev01 = createSimpleEvent(1, 1)
     val ev02 = createSimpleEvent(2, 2)

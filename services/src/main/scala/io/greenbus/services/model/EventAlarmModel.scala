@@ -416,18 +416,31 @@ object SquerylEventAlarmModel extends EventAlarmModel {
       }
     }
 
+    val lastEventOpt: Option[EventRow] = params.last.flatMap { lastAlarmId =>
+      from(events, alarms)((e, a) =>
+        where(e.id === a.eventId and a.id === lastAlarmId)
+          select (e)).headOption
+    }
+
+    val lastEventIdOpt = lastEventOpt.map(_.id)
+
+    // NOTE: we must provide time in a backwards (forward in time) paging because otherwise
+    // it tries to use the (time, id) index... poorly
+    val lastEventTimeOpt = lastEventOpt.map(_.time)
+
     val results: Seq[(EventRow, AlarmRow)] =
       join(events, alarms)((ev, al) =>
         where(
           eventQueryClause(ev, params, filter) and
+            (ev.alarm === true) and
             (al.state in stateNums).inhibitWhen(stateNums.isEmpty) and
-            (al.id > params.last.?).inhibitWhen(params.latest) and
-            (al.id < params.last.?).inhibitWhen(!params.latest))
+            ((ev.id > lastEventIdOpt.?) and (ev.time >= lastEventTimeOpt.?)).inhibitWhen(params.latest) and
+            ((ev.id < lastEventIdOpt.?) and (ev.time <= lastEventTimeOpt.?)).inhibitWhen(!params.latest))
           select ((ev, al))
           orderBy (timeOrder(ev.time), idOrder(ev.id))
           on (ev.id === al.eventId))
         .page(0, params.pageSize)
-        .toSeq
+        .toVector
 
     val protos = results.map {
       case (ev, al) => alarmToProto(al, eventToProto(ev))
