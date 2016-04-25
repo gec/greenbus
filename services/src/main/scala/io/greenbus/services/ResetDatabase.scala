@@ -64,7 +64,7 @@ object ResetDatabase extends Logging {
     val line = parser.parse(options, args)
 
     def printHelp() {
-      (new HelpFormatter).printHelp("", options)
+      (new HelpFormatter).printHelp("resetdb", options)
     }
 
     if (line.hasOption("h")) {
