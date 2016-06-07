@@ -531,6 +531,7 @@ class EndpointStreamManager(
   }
 
   private def commonCleanup(data: AvailableData): Unit = {
+    data.processing.processor.unregister()
     data.regServiceBinding.cancel()
     config.edgeSubscription.cancel()
     config.pointSubscription.cancel()
@@ -623,6 +624,8 @@ class EndpointStreamManager(
       resources.store,
       measNotificationBatch(resources.serviceOps, endpoint, _),
       publishEvents)
+
+    processor.register()
 
     import io.greenbus.client.proto.Envelope.SubscriptionEventType._
 
