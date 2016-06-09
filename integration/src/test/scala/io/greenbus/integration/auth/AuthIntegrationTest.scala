@@ -62,7 +62,7 @@ class AuthIntegrationTest extends FunSuite with Matchers with LazyLogging with B
 
   override protected def beforeAll(): Unit = {
     ResetDatabase.reset(testConfigPath)
-    services = Some(system.actorOf(ServiceManager.props(testConfigPath, testConfigPath, CoreServices.runServices)))
+    services = Some(system.actorOf(ServiceManager.props(testConfigPath, testConfigPath, CoreServices.runServicesSql)))
 
     val conn = ServiceConnection.connect(amqpConfig, QpidBroker, 5000)
     connection = Some(conn)

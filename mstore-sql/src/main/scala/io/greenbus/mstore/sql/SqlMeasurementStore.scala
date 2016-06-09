@@ -24,11 +24,12 @@ import io.greenbus.sql.DbConnection
 import org.squeryl.PrimitiveTypeMode._
 import MeasurementStoreSchema._
 import io.greenbus.mstore.{ MeasurementHistorySource, MeasurementValueStore, MeasurementValueSource }
+import org.squeryl.Table
 
-trait MeasurementStore {
+/*trait MeasurementStore {
   def get(ids: Seq[UUID]): Seq[(UUID, Measurement)]
   def put(entries: Seq[(UUID, Measurement)])
-}
+}*/
 
 class SqlCurrentValueAndHistorian(sql: DbConnection) extends MeasurementValueStore with MeasurementHistorySource {
 
@@ -69,16 +70,19 @@ class SqlCurrentValueAndHistorian(sql: DbConnection) extends MeasurementValueSto
 }
 
 // Used in services that already set up a squeryl transaction
-object SimpleInTransactionCurrentValueStore extends MeasurementValueSource {
+trait SimpleInTransactionCurrentValueSource extends MeasurementValueSource {
   def get(ids: Seq[UUID]): Seq[(UUID, Measurement)] = {
     CurrentValueOperations.get(ids)
   }
 }
-object SimpleInTransactionHistoryStore extends MeasurementHistorySource {
+object SimpleInTransactionCurrentValueSource extends SimpleInTransactionCurrentValueSource
+
+trait SimpleInTransactionHistorySource extends MeasurementHistorySource {
   def getHistory(id: UUID, begin: Option[Long], end: Option[Long], limit: Int, latest: Boolean): Seq[Measurement] = {
     HistoricalValueOperations.getHistory(id, begin, end, limit, latest)
   }
 }
+object SimpleInTransactionHistorySource extends SimpleInTransactionHistorySource
 
 object CurrentValueOperations {
 
@@ -122,8 +126,11 @@ object HistoricalValueOperations {
 
     historicalValues.insert(rows)
   }
-
   def getHistory(id: UUID, begin: Option[Long], end: Option[Long], limit: Int, latest: Boolean): Seq[Measurement] = {
+    getHistory(id, begin, end, limit, latest, historicalValues)
+  }
+
+  def getHistory(id: UUID, begin: Option[Long], end: Option[Long], limit: Int, latest: Boolean, table: Table[HistoricalValueRow]): Seq[Measurement] = {
 
     import org.squeryl.dsl.ast.{ OrderByArg, ExpressionNode }
     def timeOrder(time: ExpressionNode) = {
@@ -136,7 +143,7 @@ object HistoricalValueOperations {
 
     // Switch ordering to get either beginning of the window or end of the window
     val bytes: Seq[Array[Byte]] =
-      from(historicalValues)(hv =>
+      from(table)(hv =>
         where(hv.pointId === id and
           (hv.time gt begin.?) and
           (hv.time lte end.?))

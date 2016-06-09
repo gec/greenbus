@@ -61,7 +61,7 @@ class LoaderTest extends FunSuite with Matchers with LazyLogging with BeforeAndA
     ResetDatabase.reset(testConfigPath)
 
     logger.info("starting services")
-    services = Some(system.actorOf(ServiceManager.props(testConfigPath, testConfigPath, CoreServices.runServices)))
+    services = Some(system.actorOf(ServiceManager.props(testConfigPath, testConfigPath, CoreServices.runServicesSql)))
 
     val conn = ServiceConnection.connect(amqpConfig, QpidBroker, 5000)
     this.conn = Some(conn)
