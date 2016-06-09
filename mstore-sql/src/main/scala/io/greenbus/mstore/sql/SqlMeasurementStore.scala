@@ -24,6 +24,7 @@ import io.greenbus.sql.DbConnection
 import org.squeryl.PrimitiveTypeMode._
 import MeasurementStoreSchema._
 import io.greenbus.mstore.{ MeasurementHistorySource, MeasurementValueStore, MeasurementValueSource }
+import org.squeryl.Table
 
 trait MeasurementStore {
   def get(ids: Seq[UUID]): Seq[(UUID, Measurement)]
@@ -122,8 +123,11 @@ object HistoricalValueOperations {
 
     historicalValues.insert(rows)
   }
-
   def getHistory(id: UUID, begin: Option[Long], end: Option[Long], limit: Int, latest: Boolean): Seq[Measurement] = {
+    getHistory(id, begin, end, limit, latest, historicalValues)
+  }
+
+  def getHistory(id: UUID, begin: Option[Long], end: Option[Long], limit: Int, latest: Boolean, table: Table[HistoricalValueRow]): Seq[Measurement] = {
 
     import org.squeryl.dsl.ast.{ OrderByArg, ExpressionNode }
     def timeOrder(time: ExpressionNode) = {
@@ -136,7 +140,7 @@ object HistoricalValueOperations {
 
     // Switch ordering to get either beginning of the window or end of the window
     val bytes: Seq[Array[Byte]] =
-      from(historicalValues)(hv =>
+      from(table)(hv =>
         where(hv.pointId === id and
           (hv.time gt begin.?) and
           (hv.time lte end.?))
