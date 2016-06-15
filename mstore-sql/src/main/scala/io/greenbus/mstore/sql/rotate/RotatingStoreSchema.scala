@@ -27,6 +27,7 @@ import io.greenbus.mstore.sql.{ CurrentValueOperations, HistoricalValueRow }
 import io.greenbus.sql.DbConnection
 import org.squeryl.{ Table, Schema }
 
+import scala.annotation.tailrec
 import scala.collection.mutable
 
 object RotatingStoreSchema {
@@ -44,24 +45,57 @@ class RotatingStoreSchema(count: Int) extends Schema {
 
 object RotatingHistorianStore {
 
+  def widthOfWindow(sliceCount: Int, sliceDurationMs: Long): Long = {
+    (sliceCount - 1) * sliceDurationMs
+  }
+
   def limitOfCurrentWindow(now: Long, sliceCount: Int, sliceDurationMs: Long): Long = {
 
     if (sliceCount < 3) throw new IllegalArgumentException("Must have more than 2 slices (2 active, 1 dead)")
 
-    val numberOfSlicesSinceEpochToNow = now / sliceDurationMs
-
-    val startOfActiveSlice = numberOfSlicesSinceEpochToNow * sliceDurationMs
+    val startOfActiveSlice = startOfLatestActiveSlice(now, sliceCount, sliceDurationMs)
 
     val numberOfArchivedSlices = sliceCount - 2 // 1 is current, 1 is "dead"
 
     startOfActiveSlice - numberOfArchivedSlices * sliceDurationMs
   }
 
-  def storeForTime(time: Long, sliceCount: Int, sliceDurationMs: Long): Int = {
+  def indexOfSliceForTime(time: Long, sliceCount: Int, sliceDurationMs: Long): Int = {
 
     val numberOfSlicesSinceEpochToTime = time / sliceDurationMs
 
     (numberOfSlicesSinceEpochToTime % sliceCount).toInt
+  }
+
+  def indexOfSliceForTimeWithBeginTime(time: Long, sliceCount: Int, sliceDurationMs: Long): (Int, Long) = {
+
+    val numberOfSlicesSinceEpochToTime = time / sliceDurationMs
+
+    val beginTime = numberOfSlicesSinceEpochToTime * sliceDurationMs
+
+    ((numberOfSlicesSinceEpochToTime % sliceCount).toInt, beginTime)
+  }
+
+  private def startOfLatestActiveSlice(now: Long, sliceCount: Int, sliceDurationMs: Long): Long = {
+
+    val numberOfSlicesSinceEpochToNow = now / sliceDurationMs
+
+    numberOfSlicesSinceEpochToNow * sliceDurationMs
+  }
+
+  def earliestValidSliceIndexAndBeginTime(now: Long, sliceCount: Int, sliceDurationMs: Long): (Int, Long) = {
+
+    if (sliceCount < 3) throw new IllegalArgumentException("Must have more than 2 slices (2 active, 1 dead)")
+
+    val (indexOfLatest, latestBeginTime) = indexOfSliceForTimeWithBeginTime(now, sliceCount, sliceDurationMs)
+
+    val indexOfEarliest = (indexOfLatest + 2) % sliceCount
+
+    val numberOfArchivedSlices = sliceCount - 2 // 1 is current, 1 is "dead"
+
+    val beginOfEarliest = latestBeginTime - (numberOfArchivedSlices * sliceDurationMs)
+
+    (indexOfEarliest, beginOfEarliest)
   }
 
   type MeasTuple = (UUID, Long, Array[Byte])
@@ -73,7 +107,7 @@ object RotatingHistorianStore {
 
     entries.foreach {
       case tup =>
-        val store = storeForTime(tup._2, sliceCount, sliceDurationMs)
+        val store = indexOfSliceForTime(tup._2, sliceCount, sliceDurationMs)
         sliceInserts(store) match {
           case None =>
             val vb = Vector.newBuilder[MeasTuple]
@@ -96,11 +130,10 @@ object RotatingHistorianStore {
 class RotatingHistorianStore(sliceCount: Int, sliceDurationMs: Long, tables: Vector[Table[HistoricalValueRow]]) extends Logging {
   import RotatingHistorianStore._
 
-  def put(entries: Seq[(UUID, Long, Array[Byte])]): Unit = {
-
-    val now = System.currentTimeMillis()
+  def put(now: Long, entries: Seq[(UUID, Long, Array[Byte])]): Unit = {
 
     val limitOfWindow = limitOfCurrentWindow(now, sliceCount, sliceDurationMs)
+    val rightLimitOfWindow = limitOfWindow + widthOfWindow(sliceCount, sliceDurationMs)
 
     val splitItems = splitIntoSlices(entries, now, sliceCount, sliceDurationMs)
 
@@ -108,8 +141,8 @@ class RotatingHistorianStore(sliceCount: Int, sliceDurationMs: Long, tables: Vec
       case (i, vec) =>
         val rows = vec.flatMap {
           case (uuid, time, bytes) =>
-            if (time < limitOfWindow) {
-              logger.warn("Measurement for " + uuid + " had time older than the active window")
+            if (time < limitOfWindow || time >= rightLimitOfWindow) {
+              logger.warn("Measurement for " + uuid + " had time earlier or later than the active window")
               None
             } else {
               Some(HistoricalValueRow(uuid, time, bytes))
@@ -119,7 +152,124 @@ class RotatingHistorianStore(sliceCount: Int, sliceDurationMs: Long, tables: Vec
     }
   }
 
-  def getHistory(id: UUID, begin: Option[Long], end: Option[Long], limit: Int, latest: Boolean): Seq[Measurement] = ???
+  def getHistory(now: Long, id: UUID, begin: Option[Long], end: Option[Long], limit: Int, latest: Boolean): Seq[Measurement] = {
+
+    val (nowSliceIndex, nowSliceBeginTime) = indexOfSliceForTimeWithBeginTime(now, sliceCount, sliceDurationMs)
+    val invalidSliceIndex = (nowSliceIndex + 1) % sliceCount
+
+    val leftLimitOfWindow = limitOfCurrentWindow(now, sliceCount, sliceDurationMs)
+    val rightLimitOfWindow = leftLimitOfWindow + (sliceCount - 1) * sliceDurationMs
+
+    if (begin.exists(_ >= rightLimitOfWindow) || end.exists(_ < leftLimitOfWindow)) {
+      Seq()
+    } else if (latest) {
+
+      val (firstValidSlice, firstValidBeginTime) = end match {
+        case None =>
+          (nowSliceIndex, nowSliceBeginTime)
+        case Some(rightLimitOfQuery) =>
+          indexOfSliceForTimeWithBeginTime(rightLimitOfQuery, sliceCount, sliceDurationMs)
+      }
+
+      rightToLeftQuery(Vector(), firstValidSlice, firstValidBeginTime, invalidSliceIndex, id, begin, end, limit)
+
+    } else {
+
+      val (firstValidSlice, firstValidBeginTime) = begin match {
+        case None =>
+          earliestValidSliceIndexAndBeginTime(now, sliceCount, sliceDurationMs)
+        case Some(leftLimitOfQuery) =>
+          if (leftLimitOfQuery < leftLimitOfWindow) {
+            earliestValidSliceIndexAndBeginTime(now, sliceCount, sliceDurationMs)
+          } else {
+            indexOfSliceForTimeWithBeginTime(leftLimitOfQuery, sliceCount, sliceDurationMs)
+          }
+      }
+
+      leftToRightQuery(Vector(), firstValidSlice, firstValidBeginTime, invalidSliceIndex, id, begin, end, limit)
+    }
+
+  }
+
+  @tailrec
+  private def rightToLeftQuery(found: Vector[Measurement],
+    currentSliceIndex: Int,
+    currentSliceBegin: Long,
+    invalidSliceIndex: Int,
+    id: UUID,
+    begin: Option[Long],
+    end: Option[Long],
+    limit: Int): Seq[Measurement] = {
+
+    import org.squeryl.PrimitiveTypeMode._
+
+    val remaining = limit - found.size
+
+    val table = tables(currentSliceIndex)
+
+    println("R Found: " + found.map(_.getTime).mkString(", "))
+    println(s"R Table: $currentSliceIndex, $begin / $end; $limit")
+    val bytes: Seq[Array[Byte]] =
+      from(table)(hv =>
+        where(hv.pointId === id and
+          (hv.time gt begin.?) and
+          (hv.time lte end.?))
+          select (hv.bytes)
+          orderBy (hv.time).desc).page(0, remaining).toSeq
+
+    val measResults = bytes.reverse.map(Measurement.parseFrom).toVector
+
+    val allResults = measResults ++ found
+
+    val nextSliceIndex = (currentSliceIndex + sliceCount - 1) % sliceCount
+    val beginWasInThisWindow = begin.exists(_ > currentSliceBegin)
+
+    if (allResults.size < limit && nextSliceIndex != invalidSliceIndex && !beginWasInThisWindow) {
+      rightToLeftQuery(allResults, nextSliceIndex, currentSliceBegin + sliceDurationMs, invalidSliceIndex, id, begin, end, limit)
+    } else {
+      allResults
+    }
+  }
+
+  @tailrec
+  private def leftToRightQuery(found: Vector[Measurement],
+    currentSliceIndex: Int,
+    currentSliceBegin: Long,
+    invalidSliceIndex: Int,
+    id: UUID,
+    begin: Option[Long],
+    end: Option[Long],
+    limit: Int): Seq[Measurement] = {
+
+    import org.squeryl.PrimitiveTypeMode._
+
+    val remaining = limit - found.size
+
+    val table = tables(currentSliceIndex)
+
+    println("L Found: " + found.map(_.getTime).mkString(", "))
+    println(s"L Table: $currentSliceIndex, $begin / $end; $limit")
+    val bytes: Seq[Array[Byte]] =
+      from(table)(hv =>
+        where(hv.pointId === id and
+          (hv.time gt begin.?) and
+          (hv.time lte end.?))
+          select (hv.bytes)
+          orderBy (hv.time).asc).page(0, remaining).toSeq
+
+    val measResults = bytes.map(Measurement.parseFrom).toVector
+
+    val allResults = found ++ measResults
+
+    val nextSliceIndex = (currentSliceIndex + 1) % sliceCount
+    val endWasInThisWindow = end.exists(_ < currentSliceBegin + sliceDurationMs)
+
+    if (allResults.size < limit && nextSliceIndex != invalidSliceIndex && !endWasInThisWindow) {
+      leftToRightQuery(allResults, nextSliceIndex, currentSliceBegin + sliceDurationMs, invalidSliceIndex, id, begin, end, limit)
+    } else {
+      allResults
+    }
+  }
 
 }
 
@@ -137,9 +287,11 @@ class RotatingHistorian(sql: DbConnection, historianStore: RotatingHistorianStor
 
     val withoutTime = withTime.map(tup => (tup._1, tup._3))
 
+    val now = System.currentTimeMillis()
+
     sql.inTransaction {
       CurrentValueOperations.put(withoutTime)
-      historianStore.put(withTime)
+      historianStore.put(now, withTime)
     }
   }
 
