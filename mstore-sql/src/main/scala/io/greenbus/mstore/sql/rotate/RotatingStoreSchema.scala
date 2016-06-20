@@ -273,9 +273,21 @@ class RotatingHistorianStore(sliceCount: Int, sliceDurationMs: Long, tables: Vec
 
 }
 
+class InTransactionRotatingHistorySource(historianStore: RotatingHistorianStore) extends MeasurementHistorySource {
+  override def getHistory(id: UUID, begin: Option[Long], end: Option[Long], limit: Int, latest: Boolean): Seq[Measurement] = {
+    val now = System.currentTimeMillis()
+    historianStore.getHistory(now, id, begin, end, limit, latest)
+  }
+}
+
 class RotatingHistorian(sql: DbConnection, historianStore: RotatingHistorianStore) extends MeasurementValueStore with MeasurementHistorySource {
 
-  def getHistory(id: UUID, begin: Option[Long], end: Option[Long], limit: Int, latest: Boolean): Seq[Measurement] = ???
+  def getHistory(id: UUID, begin: Option[Long], end: Option[Long], limit: Int, latest: Boolean): Seq[Measurement] = {
+    val now = System.currentTimeMillis()
+    sql.inTransaction {
+      historianStore.getHistory(now, id, begin, end, limit, latest)
+    }
+  }
 
   def put(entries: Seq[(UUID, Measurement)]): Unit = {
     val withTime: Seq[(UUID, Long, Array[Byte])] =

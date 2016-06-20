@@ -26,10 +26,10 @@ import MeasurementStoreSchema._
 import io.greenbus.mstore.{ MeasurementHistorySource, MeasurementValueStore, MeasurementValueSource }
 import org.squeryl.Table
 
-trait MeasurementStore {
+/*trait MeasurementStore {
   def get(ids: Seq[UUID]): Seq[(UUID, Measurement)]
   def put(entries: Seq[(UUID, Measurement)])
-}
+}*/
 
 class SqlCurrentValueAndHistorian(sql: DbConnection) extends MeasurementValueStore with MeasurementHistorySource {
 
@@ -70,16 +70,19 @@ class SqlCurrentValueAndHistorian(sql: DbConnection) extends MeasurementValueSto
 }
 
 // Used in services that already set up a squeryl transaction
-object SimpleInTransactionCurrentValueStore extends MeasurementValueSource {
+trait SimpleInTransactionCurrentValueSource extends MeasurementValueSource {
   def get(ids: Seq[UUID]): Seq[(UUID, Measurement)] = {
     CurrentValueOperations.get(ids)
   }
 }
-object SimpleInTransactionHistoryStore extends MeasurementHistorySource {
+object SimpleInTransactionCurrentValueSource extends SimpleInTransactionCurrentValueSource
+
+trait SimpleInTransactionHistorySource extends MeasurementHistorySource {
   def getHistory(id: UUID, begin: Option[Long], end: Option[Long], limit: Int, latest: Boolean): Seq[Measurement] = {
     HistoricalValueOperations.getHistory(id, begin, end, limit, latest)
   }
 }
+object SimpleInTransactionHistorySource extends SimpleInTransactionHistorySource
 
 object CurrentValueOperations {
 
