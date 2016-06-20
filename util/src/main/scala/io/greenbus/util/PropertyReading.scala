@@ -37,6 +37,17 @@ object PropertyReading {
     }
   }
 
+  def optionallyLoadFile(filename: String): Map[String, String] = {
+    val properties = new Properties
+    try {
+      properties.load(new FileInputStream(filename))
+      asMap(properties)
+    } catch {
+      case ex: Throwable =>
+        Map()
+    }
+  }
+
   private def asMap(properties: Properties): Map[String, String] = {
     properties.stringPropertyNames().map(name => (name, properties.getProperty(name))).toMap
   }
@@ -73,6 +84,17 @@ object PropertyReading {
     checkSignedInt(name) {
       get(props, name).toInt
     }
+  }
+
+  def optionalBool(props: Map[String, String], name: String): Option[Boolean] = {
+    optional(props, name).map(_.trim.toLowerCase).map {
+      case "true" => true
+      case _ => false
+    }
+  }
+
+  def getBool(props: Map[String, String], name: String): Boolean = {
+    optionalBool(props, name).getOrElse(throw missing(name))
   }
 
   private def checkSignedInt[A](name: String)(fun: => A): A = {

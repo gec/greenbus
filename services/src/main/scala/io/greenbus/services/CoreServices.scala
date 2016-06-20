@@ -31,7 +31,8 @@ import io.greenbus.client.service.proto.Measurements.{ MeasurementBatchNotificat
 import io.greenbus.client.service.proto.Model._
 import io.greenbus.client.service.proto.Processing.OverrideNotification
 import io.greenbus.jmx.MetricsManager
-import io.greenbus.mstore.sql.{ SimpleInTransactionCurrentValueStore, SimpleInTransactionHistoryStore }
+import io.greenbus.mstore.{ MeasurementStoreFactory, MeasurementStoreSettings }
+import io.greenbus.mstore.sql.{ SimpleInTransactionHistorySource, SimpleInTransactionCurrentValueSource }
 import io.greenbus.services.authz.{ AuthLookup, DefaultAuthLookup }
 import io.greenbus.services.core._
 import io.greenbus.services.framework._
@@ -58,7 +59,7 @@ object CoreServices extends LazyLogging {
     val mgr = system.actorOf(ServiceManager.props(amqpConfigPath, sqlConfigPath, runServices))
   }
 
-  def runServices(sql: DbConnection, conn: ServiceConnection, exe: ExecutorService) {
+  def runServices(sql: DbConnection, conn: ServiceConnection, exe: ExecutorService): Unit = {
 
     val marshaller = new ServiceMarshaller {
       def run[U](runner: => U) {
@@ -69,6 +70,11 @@ object CoreServices extends LazyLogging {
         })
       }
     }
+
+    val baseDir = Option(System.getProperty("io.greenbus.config.base")).getOrElse("")
+    val measStoreConfigPath = Option(System.getProperty("io.greenbus.config.mstore")).map(baseDir + _).getOrElse(baseDir + "io.greenbus.mstore.cfg")
+    val measStoreSettings = MeasurementStoreSettings.load(measStoreConfigPath)
+    val (currentValueSource, historySource) = MeasurementStoreFactory.sourcesFromSettings(measStoreSettings)
 
     val authModule: AuthenticationModule = new SquerylAuthModule
     val authLookup: AuthLookup = DefaultAuthLookup
@@ -119,7 +125,7 @@ object CoreServices extends LazyLogging {
 
     val processingServices = new ProcessingServices(registry, SquerylProcessingModel, SquerylEventAlarmModel, SquerylFrontEndModel, overSubMgr)
 
-    val measurementServices = new MeasurementServices(registry, SimpleInTransactionCurrentValueStore, SimpleInTransactionHistoryStore, measChannelMgr, measBatchChannelMgr, SquerylFrontEndModel)
+    val measurementServices = new MeasurementServices(registry, currentValueSource, historySource, measChannelMgr, measBatchChannelMgr, SquerylFrontEndModel)
 
     val commandServices = new CommandServices(registry, conn.session, transSource, SquerylCommandModel, SquerylFrontEndModel, SquerylEventAlarmModel)
 
