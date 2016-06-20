@@ -30,6 +30,7 @@ import io.greenbus.measproc.EndpointStreamManager.StreamResources
 import io.greenbus.measproc.lock.TransactionPostgresLockModel
 import io.greenbus.msg.Session
 import io.greenbus.msg.amqp.AmqpServiceOperations
+import io.greenbus.mstore.{ MeasurementStoreFactory, MeasurementStoreSettings }
 import io.greenbus.mstore.sql.SqlCurrentValueAndHistorian
 import io.greenbus.services.authz.DefaultAuthLookup
 import io.greenbus.services.core.FrontEndConnectionStatusSubscriptionDescriptor
@@ -53,6 +54,7 @@ object MeasurementProcessor {
     amqpConfigPath: String,
     sqlConfigPath: String,
     userConfigPath: String,
+    measStoreConfigPath: String,
     heartbeatTimeoutMs: Long,
     nodeId: String,
     standbyLockRetryPeriodMs: Long = 5000,
@@ -68,11 +70,14 @@ object MeasurementProcessor {
 
     def processFactory(session: Session, serviceOps: AmqpServiceOperations, sql: DbConnection): Props = {
 
+      val measStoreSettings = MeasurementStoreSettings.load(measStoreConfigPath)
+      val measStore = MeasurementStoreFactory.storeFromSettings(sql, measStoreSettings)
+
       serviceOps.declareExchange(FrontEndService.Descriptors.PutFrontEndRegistration.requestId)
       serviceOps.declareExchange(MeasurementService.Descriptors.PostMeasurements.requestId)
       serviceOps.declareExchange(FrontEndService.Descriptors.PutFrontEndConnectionStatuses.requestId)
 
-      val resources = StreamResources(session, serviceOps, new SqlCurrentValueAndHistorian(sql))
+      val resources = StreamResources(session, serviceOps, measStore)
 
       val notifier = buildModelNotifier(serviceOps)
 
@@ -111,8 +116,9 @@ object MeasurementProcessor {
     val amqpConfigPath = Option(System.getProperty("io.greenbus.config.amqp")).map(baseDir + _).getOrElse(baseDir + "io.greenbus.msg.amqp.cfg")
     val sqlConfigPath = Option(System.getProperty("io.greenbus.config.sql")).map(baseDir + _).getOrElse(baseDir + "io.greenbus.sql.cfg")
     val userConfigPath = Option(System.getProperty("io.greenbus.config.user")).map(baseDir + _).getOrElse(baseDir + "io.greenbus.user.cfg")
+    val measStoreConfigPath = Option(System.getProperty("io.greenbus.config.mstore")).map(baseDir + _).getOrElse(baseDir + "io.greenbus.mstore.cfg")
 
-    val mgr = system.actorOf(buildProcessor(amqpConfigPath, sqlConfigPath, userConfigPath, heartbeatTimeoutMs, UUID.randomUUID().toString))
+    val mgr = system.actorOf(buildProcessor(amqpConfigPath, sqlConfigPath, userConfigPath, measStoreConfigPath, heartbeatTimeoutMs, UUID.randomUUID().toString))
   }
 }
 

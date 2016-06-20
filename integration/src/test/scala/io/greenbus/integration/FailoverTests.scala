@@ -85,7 +85,7 @@ class FailoverTests extends FunSuite with ShouldMatchers with Logging with Befor
     IntegrationConfig.loadFragment(buildConfigModel("Set1"), session)
 
     logger.info("starting processor")
-    processor = Some(system.actorOf(MeasurementProcessor.buildProcessor(testConfigPath, testConfigPath, testConfigPath, 1000, "testNode",
+    processor = Some(system.actorOf(MeasurementProcessor.buildProcessor(testConfigPath, testConfigPath, testConfigPath, testConfigPath, 1000, "testNode",
       standbyLockRetryPeriodMs = 500,
       standbyLockExpiryDurationMs = 1000)))
 
@@ -130,7 +130,7 @@ class FailoverTests extends FunSuite with ShouldMatchers with Logging with Befor
     }
 
     // FIRST MEASPROC IS UP, START SECOND
-    processor2 = Some(system.actorOf(MeasurementProcessor.buildProcessor(testConfigPath, testConfigPath, testConfigPath, 1000, "testNode2",
+    processor2 = Some(system.actorOf(MeasurementProcessor.buildProcessor(testConfigPath, testConfigPath, testConfigPath, testConfigPath, 1000, "testNode2",
       standbyLockRetryPeriodMs = 500,
       standbyLockExpiryDurationMs = 1000)))
     // -- CONTINUE
