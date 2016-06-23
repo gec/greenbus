@@ -33,13 +33,32 @@ import scala.collection.mutable
 object RotatingStoreSchema {
   def tableName(i: Int): String = "history_" + i
 }
-class RotatingStoreSchema(count: Int) extends Schema {
+class RotatingStoreSchema(count: Int, withIndexes: Boolean = true) extends Schema {
   import RotatingStoreSchema._
+  import org.squeryl.PrimitiveTypeMode._
 
   val rotation: Vector[Table[HistoricalValueRow]] = {
     Range(0, count).map { i =>
-      table[HistoricalValueRow](tableName(i))
+      val currentTable = table[HistoricalValueRow](tableName(i))
+      if (withIndexes) {
+        on(currentTable)(s => declare(columns(s.pointId.~, s.time) are (indexed)))
+      }
+      currentTable
     }.toVector
+  }
+
+  def createIndexesOnly(): Unit = {
+    createColumnGroupConstraintsAndIndexes
+  }
+}
+class IndividualizedRotatingStoreSchema(index: Int, withIndex: Boolean = true) extends Schema {
+  import RotatingStoreSchema._
+  import org.squeryl.PrimitiveTypeMode._
+
+  val indexTable = table[HistoricalValueRow](tableName(index))
+
+  if (withIndex) {
+    on(indexTable)(s => declare(columns(s.pointId.~, s.time) are (indexed)))
   }
 }
 
@@ -207,8 +226,6 @@ class RotatingHistorianStore(sliceCount: Int, sliceDurationMs: Long, tables: Vec
 
     val table = tables(currentSliceIndex)
 
-    println("R Found: " + found.map(_.getTime).mkString(", "))
-    println(s"R Table: $currentSliceIndex, $begin / $end; $limit")
     val bytes: Seq[Array[Byte]] =
       from(table)(hv =>
         where(hv.pointId === id and
@@ -247,8 +264,6 @@ class RotatingHistorianStore(sliceCount: Int, sliceDurationMs: Long, tables: Vec
 
     val table = tables(currentSliceIndex)
 
-    println("L Found: " + found.map(_.getTime).mkString(", "))
-    println(s"L Table: $currentSliceIndex, $begin / $end; $limit")
     val bytes: Seq[Array[Byte]] =
       from(table)(hv =>
         where(hv.pointId === id and
