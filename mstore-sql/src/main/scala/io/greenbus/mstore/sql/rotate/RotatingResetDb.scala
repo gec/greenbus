@@ -179,7 +179,7 @@ object RotatingResetDb extends Logging {
     val sliceCount = settings.sliceCount
     val sliceDurationMs = settings.sliceDurationMs
 
-    println("Current time: " + new Date(now))
+    println("Current time: " + new Date(now) + " (" + now + ")")
     println("")
 
     println(s"Slice count: $sliceCount")
@@ -202,7 +202,7 @@ object RotatingResetDb extends Logging {
     Range(0, sliceCount - 1).foreach { i =>
       val index = (i + earliestIndex) % sliceCount
       val startTime = leftEdgeOfWindow + sliceDurationMs * i
-      println(s" * $index: ${new Date(startTime)}")
+      println(s" * $index: ${new Date(startTime)} ($startTime)")
     }
     val inactiveIndex = (earliestIndex + sliceCount - 1) % sliceCount
     println(s" * $inactiveIndex: [inactive]")
