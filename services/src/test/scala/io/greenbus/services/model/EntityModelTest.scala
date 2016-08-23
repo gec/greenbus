@@ -950,8 +950,8 @@ class EntityModelTest extends ServiceTestBase {
 
   test("Relation flat query, paging") {
     val ent01 = createEntity("ent01", Seq("typeA"))
-    val ent02 = createEntity("ent02", Seq("typeA"))
-    val ent03 = createEntity("ent03", Seq("typeA"))
+    val ent02 = createEntity("ent02", Seq("typeA", "typeB", "typeC"))
+    val ent03 = createEntity("ent03", Seq("typeA", "typeC"))
     val ent04 = createEntity("ent04", Seq("typeA"))
     createEdge(ent01.id, ent02.id, "relatesTo", 1)
     createEdge(ent01.id, ent03.id, "relatesTo", 1)

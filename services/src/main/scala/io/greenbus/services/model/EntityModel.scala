@@ -299,16 +299,19 @@ object SquerylEntityModel extends EntityModel {
       case true =>
         from(entities, edges)((ent, edge) =>
           where(filterEntities(ent, filter) and
+            guard(ent) and
             edge.relationship === relation and
             (edge.distance lte depthLimit.?) and
             ((edge.parentId in startQuery) and
               (edge.childId === ent.id)).inhibitWhen(!descendantOf) and
               ((edge.childId in startQuery) and
                 (edge.parentId === ent.id)).inhibitWhen(descendantOf))
-            select (ent.id))
+            select (ent.id)
+            orderBy (ordering(ent)))
       case false =>
         from(entities, edges)((ent, edge) =>
           where(filterEntities(ent, filter) and
+            guard(ent) and
             edge.relationship === relation and
             (edge.distance lte depthLimit.?) and
             ((edge.parentId in startQuery) and
@@ -320,14 +323,17 @@ object SquerylEntityModel extends EntityModel {
                     where(typ.entityId === ent.id and
                       (typ.entType in endTypes))
                       select (typ.entityId))))
-            select (ent.id))
+            select (ent.id)
+            orderBy (ordering(ent)))
     }
 
+    val entSetResult = entSet.page(0, pageSize).toVector
+
     val results = join(entities, entityTypes.leftOuter)((ent, typ) =>
-      where(guard(ent) and (ent.id in entSet))
+      where((ent.id in entSetResult))
         select (ent, typ.map(_.entType))
         orderBy (ordering(ent))
-        on (Some(ent.id) === typ.map(_.entityId))).page(0, pageSize)
+        on (Some(ent.id) === typ.map(_.entityId)))
 
     entitiesFromJoin(results.toSeq)
   }
