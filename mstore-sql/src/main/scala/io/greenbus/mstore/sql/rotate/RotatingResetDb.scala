@@ -94,7 +94,7 @@ object RotatingResetDb extends Logging {
             println("Create indexes for all database slices...\n")
             runDatabaseModifier(createIndexessOnly, rotationSettings, line)
           } else if (line.hasOption(resetInactiveLongFlag)) {
-            println("Resetting the inactive data slice...")
+            println(s"Resetting the inactive data slice... (index ${inactiveIndex(rotationSettings)})")
             runDatabaseModifier(resetInactive, rotationSettings, line)
           } else {
             println("Must use flag to specify operation")
@@ -159,11 +159,14 @@ object RotatingResetDb extends Logging {
     }
   }
 
-  def resetInactive(conn: DbConnection, storeSettings: RotationalStoreSettings): Unit = {
+  def inactiveIndex(storeSettings: RotationalStoreSettings): Int = {
     val now = System.currentTimeMillis()
     val currentIndex = RotatingHistorianStore.indexOfSliceForTime(now, storeSettings.sliceCount, storeSettings.sliceDurationMs)
-    val inactiveIndex = (currentIndex + storeSettings.sliceCount - 1) % storeSettings.sliceCount
-    resetTable(conn, storeSettings, inactiveIndex)
+    (currentIndex + storeSettings.sliceCount + 1) % storeSettings.sliceCount
+  }
+
+  def resetInactive(conn: DbConnection, storeSettings: RotationalStoreSettings): Unit = {
+    resetTable(conn, storeSettings, inactiveIndex(storeSettings))
   }
 
   def resetTable(conn: DbConnection, storeSettings: RotationalStoreSettings, index: Int): Unit = {
