@@ -8,7 +8,7 @@
 	<parent>
 		<groupId>io.greenbus</groupId>
 		<artifactId>greenbus-parent</artifactId>
-		<version>3.0.1-SNAPSHOT</version>
+		<version>3.1.0-SNAPSHOT</version>
 		<relativePath>../</relativePath>
 	</parent>
 
@@ -120,12 +120,12 @@
 			<scope>compile</scope>
 		</dependency>
 
-        <dependency>
-            <groupId>com.typesafe</groupId>
-            <artifactId>scalalogging-slf4j_${scala.annotation}</artifactId>
-            <version>${scalalogging.version}</version>
-            <scope>compile</scope>
-        </dependency>
+		<dependency>
+			<groupId>com.typesafe.scala-logging</groupId>
+			<artifactId>scala-logging_${scala.annotation}</artifactId>
+			<version>${scalalogging.version}</version>
+			<scope>compile</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>org.scalatest</groupId>

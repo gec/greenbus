@@ -20,13 +20,13 @@ package io.greenbus.services.framework
 
 import io.greenbus.msg.amqp.{ AmqpMessage, AmqpAddressedMessage }
 import org.scalatest.FunSuite
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import scala.collection.mutable.Queue
 
 @RunWith(classOf[JUnitRunner])
-class ModelNotifierTest extends FunSuite with ShouldMatchers {
+class ModelNotifierTest extends FunSuite with Matchers {
 
   case class First(str: String)
   case class Second(str: String)

@@ -20,9 +20,9 @@ package io.greenbus.integration.tools
 
 import scala.annotation.tailrec
 import java.util.concurrent.TimeoutException
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 
-object PollingUtils extends Logging {
+object PollingUtils extends LazyLogging {
 
   def pollForSuccess[A](delayMs: Long, timeoutMs: Long)(f: => A): A = {
     pollForSuccessWithIter(delayMs, timeoutMs) { _ => f }

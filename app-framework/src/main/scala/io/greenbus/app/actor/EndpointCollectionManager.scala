@@ -20,7 +20,7 @@ package io.greenbus.app.actor
 
 import akka.actor._
 import akka.actor.Actor
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.msg.{ SessionUnusableException, SubscriptionBinding, Subscription, Session }
 import io.greenbus.msg.amqp.AmqpServiceOperations
 import io.greenbus.client.service.proto.Model.{ EndpointNotification, Endpoint }
@@ -50,7 +50,7 @@ object EndpointCollectionManager {
 
 }
 
-class EndpointCollectionManager(strategy: EndpointCollectionStrategy, session: Session, serviceOps: AmqpServiceOperations, endpointObserver: Option[ActorRef], factory: (Endpoint, CollectionMembership, Session, AmqpServiceOperations) => Props) extends Actor with Logging {
+class EndpointCollectionManager(strategy: EndpointCollectionStrategy, session: Session, serviceOps: AmqpServiceOperations, endpointObserver: Option[ActorRef], factory: (Endpoint, CollectionMembership, Session, AmqpServiceOperations) => Props) extends Actor with LazyLogging {
   import EndpointCollectionManager._
 
   private var binding = Option.empty[SubscriptionBinding]

@@ -22,10 +22,10 @@ import org.squeryl.internals.{ StatementWriter, DatabaseAdapter }
 import org.squeryl.Session
 import java.sql.SQLException
 
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.util.Timing
 
-trait SlowQueryTracing extends DatabaseAdapter with Logging {
+trait SlowQueryTracing extends DatabaseAdapter with LazyLogging {
 
   val slowQueryTimeMilli: Long
 

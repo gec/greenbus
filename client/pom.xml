@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.greenbus</groupId>
         <artifactId>greenbus-scala-base</artifactId>
-        <version>3.0.1-SNAPSHOT</version>
+        <version>3.1.0-SNAPSHOT</version>
         <relativePath>../scala-base</relativePath>
     </parent>
 
@@ -179,32 +179,32 @@
         <dependency>
             <groupId>io.greenbus.msg</groupId>
             <artifactId>greenbus-msg-amqp</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>${greenbusmsg.version}</version>
         </dependency>
         <dependency>
             <groupId>io.greenbus.msg</groupId>
             <artifactId>greenbus-msg-amqp-java</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>${greenbusmsg.version}</version>
         </dependency>
         <dependency>
             <groupId>io.greenbus.msg</groupId>
             <artifactId>greenbus-msg-messaging</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>${greenbusmsg.version}</version>
         </dependency>
         <dependency>
             <groupId>io.greenbus.msg</groupId>
             <artifactId>greenbus-msg-messaging-java</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>${greenbusmsg.version}</version>
         </dependency>
         <dependency>
             <groupId>io.greenbus.msg</groupId>
             <artifactId>greenbus-msg-proto-ext</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>${greenbusmsg.version}</version>
         </dependency>
         <dependency>
             <groupId>io.greenbus.msg</groupId>
             <artifactId>greenbus-msg-compiler</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>${greenbusmsg.version}</version>
             <classifier>jar-with-dependencies</classifier>
             <scope>provided</scope>
         </dependency>

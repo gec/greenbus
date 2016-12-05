@@ -31,6 +31,7 @@ trait RunTestsInsideTransaction extends FunSuite with BeforeAndAfterEach {
    * test classes shouldn't use beforeEach if using RunTestsInsideTransaction
    */
   final override def beforeEach() {}
+
   final override def afterEach() {}
 
   /**
@@ -45,18 +46,12 @@ trait RunTestsInsideTransaction extends FunSuite with BeforeAndAfterEach {
    */
   def afterEachInTransaction() {}
 
-  override def runTest(
-    testName: String,
-    reporter: Reporter,
-    stopper: Stopper,
-    configMap: Map[String, Any],
-    tracker: Tracker): Unit = {
-
-    // transaction will always be rolledback
+  override protected def runTest(testName: String, args: Args): Status = {
     neverCompletingTransaction {
       beforeEachInTransaction()
-      super.runTest(testName, reporter, stopper, configMap, tracker)
+      val result = super.runTest(testName, args)
       afterEachInTransaction()
+      result
     }
   }
 
@@ -64,17 +59,17 @@ trait RunTestsInsideTransaction extends FunSuite with BeforeAndAfterEach {
    * each test occur from within a transaction, that way when the test completes _all_ changes
    * made during the test are reverted so each test gets a clean environment to test against
    */
-  def neverCompletingTransaction[A](func: => A) = {
+  def neverCompletingTransaction[A](func: => A): A = {
+    var result = Option.empty[A]
     try {
       dbConnection.transaction {
-        val result = func
+        result = Some(func)
         // we abort the transaction if we get to here, so changes get rolled back
         throw new TransactionAbortException
-
-        result
       }
     } catch {
       case ex: TransactionAbortException =>
+        result.get
     }
   }
 }

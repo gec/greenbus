@@ -22,7 +22,7 @@ import java.util.concurrent.ExecutorService
 
 import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.client.ServiceConnection
 import io.greenbus.client.proto.Envelope.SubscriptionEventType
 import io.greenbus.client.service.proto.Events.{ Alarm, AlarmNotification, Event, EventNotification }
@@ -38,7 +38,7 @@ import io.greenbus.services.framework._
 import io.greenbus.services.model._
 import io.greenbus.sql.DbConnection
 
-object CoreServices extends Logging {
+object CoreServices extends LazyLogging {
 
   def main(args: Array[String]) {
 

@@ -18,7 +18,7 @@
  */
 package io.greenbus.services.core
 
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.msg.amqp.AmqpServiceOperations
 import io.greenbus.client.exception.{ BadRequestException, ForbiddenException }
 import io.greenbus.client.proto.Envelope
@@ -45,7 +45,7 @@ class FrontEndServices(
     services: ServiceRegistry,
     ops: AmqpServiceOperations,
     frontEndModel: FrontEndModel,
-    frontEndConnectionStatusBinding: SubscriptionChannelBinder) extends Logging {
+    frontEndConnectionStatusBinding: SubscriptionChannelBinder) extends LazyLogging {
   import io.greenbus.services.core.FrontEndServices._
 
   services.fullService(FrontEndService.Descriptors.GetFrontEndConnectionStatuses, getFrontEndConnectionStatuses)

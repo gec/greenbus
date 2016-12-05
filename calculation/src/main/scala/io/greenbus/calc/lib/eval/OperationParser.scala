@@ -18,7 +18,7 @@
  */
 package io.greenbus.calc.lib.eval
 
-import util.parsing.combinator.JavaTokenParsers
+import scala.util.parsing.combinator.JavaTokenParsers
 
 /**
  * expr :: = mult { "+" mult | "-" mult }

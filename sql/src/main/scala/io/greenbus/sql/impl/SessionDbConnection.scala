@@ -21,14 +21,14 @@ package io.greenbus.sql.impl
 import org.squeryl.{ PrimitiveTypeMode, Session }
 import java.sql.Connection
 import io.greenbus.sql.DbConnection
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import org.squeryl.logging.StatisticsListener
 
 /**
  * default DbConnection implementation that takes a session factory function and generates
  * a new session whenever a new transaction is needed
  */
-class SessionDbConnection(sessionFactory: (Option[StatisticsListener]) => Session) extends DbConnection with Logging {
+class SessionDbConnection(sessionFactory: (Option[StatisticsListener]) => Session) extends DbConnection with LazyLogging {
 
   def transaction[A](fun: => A): A = {
     transaction(None)(fun)

@@ -20,7 +20,7 @@ package io.greenbus.measproc.pipeline
 
 import io.greenbus.measproc.PointMap
 import org.scalatest.FunSuite
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.scalatest.junit.JUnitRunner
 import org.junit.runner.RunWith
 
@@ -32,7 +32,7 @@ import io.greenbus.measproc.processing.ProtoHelper._
 import io.greenbus.client.service.proto.EventRequests.EventTemplate
 
 @RunWith(classOf[JUnitRunner])
-class ProcessingPipelineTest extends FunSuite with ShouldMatchers {
+class ProcessingPipelineTest extends FunSuite with Matchers {
 
   class TestRig {
     val measQueue = mutable.Queue[(String, Measurement)]()

@@ -20,7 +20,7 @@ package io.greenbus.japi.frontend.impl
 
 import akka.actor.{ Props, Actor }
 import com.google.common.util.concurrent.{ FutureCallback, Futures, SettableFuture }
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.app.actor.frontend.{ StackStatusUpdated, MeasurementsPublished }
 import io.greenbus.client.service.proto.Commands.{ CommandStatus, CommandResult, CommandRequest }
 import io.greenbus.client.service.proto.Model.Endpoint
@@ -47,7 +47,7 @@ class BusDrivenProtocolHost(
     session: Session,
     publishMeasurements: MeasurementsPublished => Unit,
     updateStatus: StackStatusUpdated => Unit,
-    factory: BusDrivenProtocolFactory) extends Actor with Logging {
+    factory: BusDrivenProtocolFactory) extends Actor with LazyLogging {
 
   private val protocol = factory.initialize(endpoint, new SessionShim(session), new ProtocolUpdaterImpl(publishMeasurements, updateStatus))
 

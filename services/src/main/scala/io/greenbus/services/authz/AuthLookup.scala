@@ -18,7 +18,7 @@
  */
 package io.greenbus.services.authz
 
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.client.exception.{ ForbiddenException, UnauthorizedException }
 import io.greenbus.services.model.SquerylAuthModel
 import io.greenbus.client.service.proto.Auth.{ EntitySelector, Permission, PermissionSet }
@@ -30,7 +30,7 @@ trait AuthLookup {
   def validateAuth(headers: Map[String, String]): AuthContext
 }
 
-object DefaultAuthLookup extends AuthLookup with Logging {
+object DefaultAuthLookup extends AuthLookup with LazyLogging {
 
   def validateAuth(headers: Map[String, String]): AuthContext = {
 
@@ -60,7 +60,7 @@ trait AuthContext {
   def agentId: UUID
 }
 
-class DefaultAuthContext(val agentId: UUID, val agentName: String, sets: Seq[PermissionSet]) extends AuthContext with Logging {
+class DefaultAuthContext(val agentId: UUID, val agentName: String, sets: Seq[PermissionSet]) extends AuthContext with LazyLogging {
 
   private lazy val allPermissions: Seq[Permission] = sets.flatMap(_.getPermissionsList.toSeq)
 

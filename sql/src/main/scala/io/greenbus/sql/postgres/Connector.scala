@@ -21,12 +21,12 @@ package io.greenbus.sql.postgres
 import org.squeryl.Session
 import org.squeryl.adapters.PostgreSqlAdapter
 
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.sql.{ DbConnector, SqlSettings }
 import io.greenbus.sql.impl.{ SessionDbConnection, SlowQueryTracing }
 import org.squeryl.logging.StatisticsListener
 
-class Connector extends DbConnector with Logging {
+class Connector extends DbConnector with LazyLogging {
 
   def connect(sqlSettings: SqlSettings) = {
 

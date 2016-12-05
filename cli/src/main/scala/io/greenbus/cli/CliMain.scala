@@ -18,7 +18,7 @@
  */
 package io.greenbus.cli
 
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.msg.amqp.util.LoadingException
 import jline.console.ConsoleReader
 import io.greenbus.msg.amqp.AmqpSettings
@@ -38,7 +38,7 @@ import java.util.concurrent.TimeoutException
 import java.io.IOException
 import io.greenbus.msg.SessionUnusableException
 
-object CliMain extends Logging {
+object CliMain extends LazyLogging {
 
   val commandList = List(
     () => new LoginCommand,

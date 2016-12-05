@@ -18,7 +18,7 @@
  */
 package io.greenbus.integration
 
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.client.service.MeasurementService
 import io.greenbus.client.service.proto.Measurements.{ Measurement, MeasurementBatch, PointMeasurementValue, Quality }
 import io.greenbus.client.service.proto.Model.ModelUUID
@@ -26,13 +26,13 @@ import io.greenbus.client.service.proto.ModelRequests.EndpointDisabledUpdate
 import io.greenbus.client.service.proto.Processing
 import io.greenbus.client.service.proto.Processing._
 import io.greenbus.msg.Session
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 
 import scala.annotation.tailrec
 import scala.concurrent._
 import scala.concurrent.duration._
 
-object IntegrationHelpers extends ShouldMatchers with Logging {
+object IntegrationHelpers extends Matchers with LazyLogging {
 
   def analogBatch(uuid: ModelUUID, v: Double, time: Long): MeasurementBatch = {
     MeasurementBatch.newBuilder()

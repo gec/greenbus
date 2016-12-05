@@ -20,7 +20,7 @@ package io.greenbus.app.actor.frontend
 
 import akka.actor.{ Actor, ActorRef, Props, _ }
 import akka.pattern.ask
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.msg.SubscriptionBinding
 import io.greenbus.app.actor.frontend.CommandProxy.CommandSubscriptionRetrieved
 import io.greenbus.client.service.proto.Commands.{ CommandRequest, CommandResult, CommandStatus }
@@ -39,7 +39,7 @@ object SimpleCommandProxy {
   def props(endpoint: Endpoint): Props = Props(classOf[SimpleCommandProxy], endpoint)
 }
 
-class SimpleCommandProxy(endpoint: Endpoint) extends Actor with Logging {
+class SimpleCommandProxy(endpoint: Endpoint) extends Actor with LazyLogging {
   import io.greenbus.app.actor.frontend.SimpleCommandProxy._
   import context.dispatcher
 

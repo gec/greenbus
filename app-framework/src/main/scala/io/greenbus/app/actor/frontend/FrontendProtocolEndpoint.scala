@@ -19,7 +19,7 @@
 package io.greenbus.app.actor.frontend
 
 import akka.actor.{ ActorRef, PoisonPill, Props }
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.msg.amqp.AmqpServiceOperations
 import io.greenbus.msg.service.ServiceHandlerSubscription
 import io.greenbus.msg.{ Session, SessionUnusableException }
@@ -145,7 +145,7 @@ class FrontendProtocolEndpoint[ProtocolConfig](
     commandActorFactory: CommandActorFactory,
     configUpdaterFactory: ConfigUpdaterFactory,
     registerFunc: RegisterFunc,
-    configureFunc: ConfigureFunc) extends NestedStateMachine with MessageScheduling with Logging {
+    configureFunc: ConfigureFunc) extends NestedStateMachine with MessageScheduling with LazyLogging {
   import context.dispatcher
   import io.greenbus.app.actor.frontend.FrontendProtocolEndpoint._
 

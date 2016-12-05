@@ -21,7 +21,7 @@ package io.greenbus.app.actor
 import io.greenbus.client.ServiceConnection
 import io.greenbus.msg.{ SessionUnusableException, Session }
 import akka.actor._
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.msg.amqp.{ AmqpServiceOperations, AmqpSettings }
 import io.greenbus.msg.qpid.QpidBroker
 import io.greenbus.client.exception.{ ServiceException, UnauthorizedException }
@@ -56,7 +56,7 @@ object ConnectedApplicationManager {
 
 import ConnectedApplicationManager._
 
-class ConnectedApplicationManager(processName: String, amqpConfigPath: String, userConfigPath: String, factory: (Session, AmqpServiceOperations) => Props) extends Actor with FSM[State, Data] with Logging {
+class ConnectedApplicationManager(processName: String, amqpConfigPath: String, userConfigPath: String, factory: (Session, AmqpServiceOperations) => Props) extends Actor with FSM[State, Data] with LazyLogging {
 
   import context.dispatcher
 

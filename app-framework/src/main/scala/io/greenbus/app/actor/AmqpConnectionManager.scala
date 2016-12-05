@@ -19,7 +19,7 @@
 package io.greenbus.app.actor
 
 import akka.actor._
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.app.actor.util.NestedStateMachine
 import io.greenbus.client.ServiceConnection
 import io.greenbus.client.exception.UnauthorizedException
@@ -53,7 +53,7 @@ class FailoverConnectionManager(
     failureLimit: Int,
     retryDelayMs: Long,
     connectionTimeoutMs: Long,
-    factory: ServiceConnection => Props) extends NestedStateMachine with MessageScheduling with Logging {
+    factory: ServiceConnection => Props) extends NestedStateMachine with MessageScheduling with LazyLogging {
   import FailoverConnectionManager._
 
   protected type StateType = State

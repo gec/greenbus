@@ -27,12 +27,12 @@ import io.greenbus.measproc.processing.ProtoHelper._
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 
 import scala.collection.mutable
 
 @RunWith(classOf[JUnitRunner])
-class OverrideProcessorTest extends FunSuite with ShouldMatchers {
+class OverrideProcessorTest extends FunSuite with Matchers {
 
   class TestRig {
 

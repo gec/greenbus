@@ -20,7 +20,7 @@ package io.greenbus.app.actor.frontend
 
 import akka.actor._
 import akka.pattern.{ AskTimeoutException, ask }
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.app.actor.util.TraceMessage
 import io.greenbus.client.service.proto.Commands.{ CommandRequest, CommandResult, CommandStatus }
 import io.greenbus.client.service.proto.FrontEnd.FrontEndConnectionStatus
@@ -57,7 +57,7 @@ object ActorProtocolManager {
   type ActorProtocolFactory[ProtocolConfig] = (ModelUUID, String, ProtocolConfig, MeasurementsPublished => Unit, StackStatusUpdated => Unit) => Props
 }
 
-class ActorProtocolManager[ProtocolConfig](context: ActorContext, factory: ActorProtocolManager.ActorProtocolFactory[ProtocolConfig]) extends MasterProtocol[ProtocolConfig] with Logging {
+class ActorProtocolManager[ProtocolConfig](context: ActorContext, factory: ActorProtocolManager.ActorProtocolFactory[ProtocolConfig]) extends MasterProtocol[ProtocolConfig] with LazyLogging {
   import io.greenbus.app.actor.frontend.ActorProtocolManager._
 
   private var actors = Map.empty[ModelUUID, ActorRef]

@@ -21,7 +21,7 @@ package io.greenbus.measproc.processing
 import java.util.UUID
 
 import io.greenbus.measproc.PointMap
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.scalatest.junit.JUnitRunner
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
@@ -33,7 +33,7 @@ import ProtoHelper._
 import io.greenbus.client.service.proto.EventRequests.EventTemplate
 
 @RunWith(classOf[JUnitRunner])
-class FilterTriggerTest extends FunSuite with ShouldMatchers {
+class FilterTriggerTest extends FunSuite with Matchers {
 
   val pointMap = new PointMap(Seq())
 

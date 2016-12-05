@@ -21,7 +21,7 @@ package io.greenbus.services.core
 import java.util.UUID
 import java.util.concurrent.TimeoutException
 
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.services.{ AsyncAuthenticationModule, SqlAuthenticationModule, AuthenticationModule }
 import io.greenbus.services.framework._
 import io.greenbus.client.service.proto.LoginRequests._
@@ -39,7 +39,7 @@ object LoginServices {
 
 }
 
-class LoginServices(services: ServiceRegistry, sql: DbConnection, authenticator: AuthenticationModule, authModel: AuthModel, eventModel: EventAlarmModel, modelNotifier: ModelNotifier) extends Logging {
+class LoginServices(services: ServiceRegistry, sql: DbConnection, authenticator: AuthenticationModule, authModel: AuthModel, eventModel: EventAlarmModel, modelNotifier: ModelNotifier) extends LazyLogging {
   import LoginServices._
   import io.greenbus.client.service.LoginService.Descriptors
 

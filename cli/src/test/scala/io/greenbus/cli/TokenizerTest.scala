@@ -21,10 +21,10 @@ package io.greenbus.cli
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 
 @RunWith(classOf[JUnitRunner])
-class TokenizerTest extends FunSuite with ShouldMatchers {
+class TokenizerTest extends FunSuite with Matchers {
 
   test("line tokenizing with quotes") {
     val input = """ a thing   is "something good" I think """

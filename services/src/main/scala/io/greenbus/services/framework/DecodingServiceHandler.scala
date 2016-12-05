@@ -20,7 +20,7 @@ package io.greenbus.services.framework
 
 import java.sql.SQLException
 
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.msg.RequestDescriptor
 import io.greenbus.msg.service.ServiceHandler
 import io.greenbus.client.exception.ServiceException
@@ -48,7 +48,7 @@ class DecodingServiceHandler[A, B](decoder: RequestDescriptor[A, B], handler: Ty
   }
 }
 
-class TypedServiceInstrumenter[A, B](requestId: String, handler: TypedServiceHandler[A, B], metrics: Metrics) extends TypedServiceHandler[A, B] with Logging {
+class TypedServiceInstrumenter[A, B](requestId: String, handler: TypedServiceHandler[A, B], metrics: Metrics) extends TypedServiceHandler[A, B] with LazyLogging {
 
   val counter = metrics.counter("Count")
   val handleTime = metrics.average("HandleTime")
@@ -78,7 +78,7 @@ class TypedServiceInstrumenter[A, B](requestId: String, handler: TypedServiceHan
   }
 }
 
-class ServiceHandlerMetricsInstrumenter(requestId: String, metrics: Metrics, handler: ServiceHandler) extends ServiceHandler with Logging {
+class ServiceHandlerMetricsInstrumenter(requestId: String, metrics: Metrics, handler: ServiceHandler) extends ServiceHandler with LazyLogging {
 
   val counter = metrics.counter("Count")
   val handleTime = metrics.average("HandleTime")
@@ -102,7 +102,7 @@ class ServiceHandlerMetricsInstrumenter(requestId: String, metrics: Metrics, han
   }
 }
 
-class ModelErrorTransformingHandler[A, B](handler: TypedServiceHandler[A, B]) extends TypedServiceHandler[A, B] with Logging {
+class ModelErrorTransformingHandler[A, B](handler: TypedServiceHandler[A, B]) extends TypedServiceHandler[A, B] with LazyLogging {
   def handle(request: A, headers: Map[String, String], responseHandler: (Response[B]) => Unit): Unit = {
     try {
       handler.handle(request, headers, responseHandler)

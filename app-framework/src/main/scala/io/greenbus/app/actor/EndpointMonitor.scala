@@ -19,7 +19,7 @@
 package io.greenbus.app.actor
 
 import akka.actor._
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.msg.amqp.AmqpServiceOperations
 import io.greenbus.msg.{ Session, SessionUnusableException, Subscription, SubscriptionBinding }
 import io.greenbus.client.exception.UnauthorizedException
@@ -50,7 +50,7 @@ object EndpointMonitor {
 
 }
 
-class EndpointMonitor(endpoint: Endpoint, membership: CollectionMembership, session: Session, serviceOps: AmqpServiceOperations, factory: (Endpoint, Session, AmqpServiceOperations) => Props) extends Actor with Logging {
+class EndpointMonitor(endpoint: Endpoint, membership: CollectionMembership, session: Session, serviceOps: AmqpServiceOperations, factory: (Endpoint, Session, AmqpServiceOperations) => Props) extends Actor with LazyLogging {
   import io.greenbus.app.actor.EndpointMonitor._
 
   private var endpointBinding = Option.empty[SubscriptionBinding]

@@ -18,10 +18,10 @@
  */
 package io.greenbus.sql.test
 
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.scalatest.{ BeforeAndAfterAll, BeforeAndAfterEach, FunSuite }
 import io.greenbus.util.Timing
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import org.squeryl.Schema
 import io.greenbus.sql.{ SqlSettings, DbConnection, DbConnector }
 
@@ -40,7 +40,7 @@ object ConnectionStorage {
   var dbNeedsReset = true
 }
 
-trait DatabaseUsingTestBaseNoTransaction extends FunSuite with ShouldMatchers with BeforeAndAfterAll with BeforeAndAfterEach with Logging {
+trait DatabaseUsingTestBaseNoTransaction extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach with LazyLogging {
   lazy val dbConnection = ConnectionStorage.connect(SqlSettings.load("io.greenbus.test.cfg"))
 
   def schemas: Seq[Schema]

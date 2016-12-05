@@ -20,7 +20,7 @@ package io.greenbus.measproc
 
 import io.greenbus.msg.Session
 import akka.actor.{ Actor, Props }
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.client.exception.{ ServiceException, UnauthorizedException }
 import java.util.concurrent.TimeoutException
 import io.greenbus.client.service.EventService
@@ -38,7 +38,7 @@ object EventPublisher {
   }
 }
 
-class EventPublisher(session: Session) extends Actor with Logging {
+class EventPublisher(session: Session) extends Actor with LazyLogging {
   import EventPublisher._
 
   private case object PostSuccess

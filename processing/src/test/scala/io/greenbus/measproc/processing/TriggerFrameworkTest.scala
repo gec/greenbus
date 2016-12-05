@@ -19,7 +19,7 @@
 package io.greenbus.measproc.processing
 
 import org.scalatest.FunSuite
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.scalatest.junit.JUnitRunner
 import org.junit.runner.RunWith
 import ProtoHelper._
@@ -28,7 +28,7 @@ import scala.collection.mutable
 import io.greenbus.client.service.proto.Measurements.Measurement
 
 @RunWith(classOf[JUnitRunner])
-class TriggerFrameworkTest extends FunSuite with ShouldMatchers {
+class TriggerFrameworkTest extends FunSuite with Matchers {
 
   class TestRig {
     val triggerCalls = mutable.Queue[Measurement]()

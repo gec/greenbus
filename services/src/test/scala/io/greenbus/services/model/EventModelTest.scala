@@ -495,14 +495,14 @@ class EventModelTest extends ServiceTestBase {
     val a5 = (ev05.id, Alarm.State.ACKNOWLEDGED)
     val a6 = (ev06.id, Alarm.State.REMOVED)
 
-    val all = Seq(a1, a2, a3, a4, a5, a6)
+    val allItems = Seq(a1, a2, a3, a4, a5, a6)
   }
 
   test("Alarm query") {
     val f = new AlarmFixture
     import f._
 
-    checkOrder(all) {
+    checkOrder(allItems) {
       SquerylEventAlarmModel.alarmQuery(Nil, EventQueryParams())
     }
 

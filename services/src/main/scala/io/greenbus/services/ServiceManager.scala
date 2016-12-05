@@ -19,7 +19,7 @@
 package io.greenbus.services
 
 import akka.actor._
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import scala.concurrent.duration._
 import java.util.concurrent.{ ExecutorService, Executors }
 import io.greenbus.msg.amqp.AmqpSettings
@@ -48,7 +48,7 @@ object ServiceManager {
 }
 
 import ServiceManager._
-class ServiceManager(amqpConfigPath: String, sqlConfigPath: String, runner: ServiceRunner) extends Actor with FSM[State, Data] with Logging {
+class ServiceManager(amqpConfigPath: String, sqlConfigPath: String, runner: ServiceRunner) extends Actor with FSM[State, Data] with LazyLogging {
 
   private def connectSql(): DbConnection = {
     val config = SqlSettings.load(sqlConfigPath)

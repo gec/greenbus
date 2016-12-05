@@ -21,10 +21,10 @@ package io.greenbus.cli
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 
 @RunWith(classOf[JUnitRunner])
-class ParserTest extends FunSuite with ShouldMatchers {
+class ParserTest extends FunSuite with Matchers {
 
   class TestAll extends Command[Boolean] {
 

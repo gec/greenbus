@@ -19,7 +19,7 @@
 package io.greenbus.measproc
 
 import akka.actor._
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.msg.Session
 import io.greenbus.app.actor.MessageScheduling
 import io.greenbus.client.service.proto.Model.Endpoint
@@ -40,7 +40,7 @@ object EndpointStreamBootstrapper {
     Props(classOf[EndpointStreamBootstrapper], endpoint, session, factory)
   }
 }
-class EndpointStreamBootstrapper(endpoint: Endpoint, session: Session, factory: ChildFactory) extends Actor with MessageScheduling with Logging {
+class EndpointStreamBootstrapper(endpoint: Endpoint, session: Session, factory: ChildFactory) extends Actor with MessageScheduling with LazyLogging {
   import context.dispatcher
   import io.greenbus.measproc.EndpointStreamBootstrapper._
   import io.greenbus.measproc.ServiceConfiguration._

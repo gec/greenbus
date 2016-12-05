@@ -20,7 +20,7 @@ package io.greenbus.ldr
 
 import java.io.File
 
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.ldr.xml.Configuration
 import org.apache.commons.cli.{ HelpFormatter, Options }
 import org.apache.commons.io.FileUtils
@@ -33,7 +33,7 @@ import io.greenbus.util.{ XmlHelper, UserSettings }
 import scala.concurrent.duration._
 import org.apache.commons.cli
 
-object XmlExporter extends Logging {
+object XmlExporter extends LazyLogging {
 
   val rootFlag = "root"
   val outputFlag = "output"

@@ -18,12 +18,12 @@
  */
 package io.greenbus.measproc.processing
 
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.client.service.proto.Measurements._
 import io.greenbus.measproc.processing.Trigger.{ KeyedCondition, SimpleCondition }
 import io.greenbus.util.Optional._
 
-object Trigger extends Logging {
+object Trigger extends LazyLogging {
 
   /**
    * Super-type for condition logic.
@@ -96,7 +96,7 @@ class BasicTrigger(
   conditions: List[Trigger.Condition],
   actions: List[Action],
   stopProcessing: Option[Action.ActivationType])
-    extends Trigger with Logging {
+    extends Trigger with LazyLogging {
 
   def process(pointKey: String, m: Measurement, cache: ObjectCache[Boolean]): Option[(Measurement, Boolean)] = {
 

@@ -19,7 +19,7 @@
 package io.greenbus.measproc.processing
 
 import io.greenbus.client.service.proto.Measurements.Measurement
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.jmx.Metrics
 
 /**
@@ -27,7 +27,7 @@ import io.greenbus.jmx.Metrics
  * out the unexpected measurements and adds a log message indicating what is being ignored.
  */
 class MeasurementWhiteList(expectedKeys: Seq[String], metrics: Metrics)
-    extends ProcessingStep with Logging {
+    extends ProcessingStep with LazyLogging {
 
   private var whiteList: Set[String] = expectedKeys.toSet
   private var ignored = Set.empty[String]

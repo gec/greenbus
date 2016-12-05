@@ -21,7 +21,7 @@ package io.greenbus.integration
 import java.util.concurrent.TimeoutException
 
 import akka.actor.{ ActorRef, ActorSystem }
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.client.ServiceConnection
 import io.greenbus.client.service._
 import io.greenbus.client.service.proto.EventRequests.{ EventQuery, EventQueryParams }
@@ -40,7 +40,7 @@ import io.greenbus.services.{ CoreServices, ResetDatabase, ServiceManager }
 import io.greenbus.util.UserSettings
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.scalatest.{ BeforeAndAfterAll, FunSuite }
 
 import scala.collection.JavaConversions._
@@ -48,7 +48,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 
 @RunWith(classOf[JUnitRunner])
-class ServiceAndProcessorTest extends FunSuite with ShouldMatchers with Logging with BeforeAndAfterAll {
+class ServiceAndProcessorTest extends FunSuite with Matchers with LazyLogging with BeforeAndAfterAll {
   import IntegrationHelpers._
   import io.greenbus.integration.IntegrationConfig._
   import io.greenbus.integration.tools.PollingUtils._

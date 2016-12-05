@@ -21,13 +21,13 @@ package io.greenbus.app.actor.frontend
 import java.io.FileInputStream
 import java.util.UUID
 
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.app.actor.frontend.json.{ JsonFrontendConfiguration, JsonFrontendRegistrationConfig }
 import io.greenbus.app.actor.json.JsonAmqpConfig
 import io.greenbus.app.actor.{ AmqpConnectionConfig, EndpointCollectionStrategy, ProtocolsEndpointStrategy }
 import org.apache.commons.io.IOUtils
 
-object FepConfigLoader extends Logging {
+object FepConfigLoader extends LazyLogging {
 
   def loadConfig(jsonPath: String, defaultAmqpConfigPath: String, defaultUserConfigPath: String, protocols: Set[String]): FrontendProcessConfig = {
 

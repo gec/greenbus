@@ -20,7 +20,7 @@ package io.greenbus.ldr.auth
 
 import java.io.File
 
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.ldr.xml.auth.Authorization
 import org.apache.commons.cli
 import org.apache.commons.cli.{ HelpFormatter, Options }
@@ -33,7 +33,7 @@ import io.greenbus.util.{ UserSettings, XmlHelper }
 
 import scala.concurrent.duration._
 
-object Exporter extends Logging {
+object Exporter extends LazyLogging {
 
   val outputFlag = "output"
   val directoryFlag = "directory"

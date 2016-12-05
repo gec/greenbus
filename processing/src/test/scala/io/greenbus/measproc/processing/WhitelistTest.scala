@@ -21,13 +21,13 @@ package io.greenbus.measproc.processing
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.FunSuite
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import scala.collection.mutable
 import ProtoHelper._
 import io.greenbus.jmx.{ MetricsContainer, Metrics }
 
 @RunWith(classOf[JUnitRunner])
-class WhitelistTest extends FunSuite with ShouldMatchers {
+class WhitelistTest extends FunSuite with Matchers {
   test("Ignores meases") {
     val metrics = Metrics(MetricsContainer())
 

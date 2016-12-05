@@ -23,12 +23,12 @@ import io.greenbus.client.exception.BadRequestException
 import io.greenbus.client.service.proto.MeasurementRequests.PostMeasurementsRequest
 import io.greenbus.client.proto.Envelope
 import com.google.protobuf.InvalidProtocolBufferException
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import scala.collection.JavaConversions._
 import io.greenbus.client.service.proto.Measurements.Measurement
 import io.greenbus.jmx.Metrics
 
-class ProcessorService(endpoint: String, metrics: Metrics) extends Logging {
+class ProcessorService(endpoint: String, metrics: Metrics) extends LazyLogging {
 
   private val handleTime = metrics.average("BatchHandleTime")
   private val batchSize = metrics.average("BatchSize")

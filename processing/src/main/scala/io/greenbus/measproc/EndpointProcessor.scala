@@ -20,7 +20,7 @@ package io.greenbus.measproc
 
 import java.util.UUID
 
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.client.service.proto.EventRequests.EventTemplate
 import io.greenbus.client.service.proto.Measurements.Measurement
 import io.greenbus.client.service.proto.Model.{ Point, ModelUUID }
@@ -36,7 +36,7 @@ class EndpointProcessor(endpointName: String,
     triggerSets: Seq[(ModelUUID, TriggerSet)],
     store: MeasurementValueStore,
     notifications: Seq[(ModelUUID, String, Measurement)] => Unit,
-    publishEvents: Seq[EventTemplate.Builder] => Unit) extends Logging {
+    publishEvents: Seq[EventTemplate.Builder] => Unit) extends LazyLogging {
 
   private val endpointMetrics = new EndpointMetrics(endpointName)
   import endpointMetrics._

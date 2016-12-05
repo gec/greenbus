@@ -19,7 +19,7 @@
 package io.greenbus.app.actor
 
 import akka.actor._
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.client.ServiceConnection
 import io.greenbus.client.exception.ServiceException
 import io.greenbus.msg.Session
@@ -53,7 +53,7 @@ class SessionLoginManager(
   connection: ServiceConnection,
   loginRetryMs: Long,
   factory: (Session, AmqpServiceOperations) => Props)
-    extends Actor with MessageScheduling with Logging {
+    extends Actor with MessageScheduling with LazyLogging {
   import SessionLoginManager._
   import context.dispatcher
 

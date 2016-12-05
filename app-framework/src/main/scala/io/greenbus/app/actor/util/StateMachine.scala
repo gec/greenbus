@@ -19,7 +19,7 @@
 package io.greenbus.app.actor.util
 
 import akka.actor.Actor
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 
 trait StateMachine extends Actor {
   protected type StateType
@@ -56,7 +56,7 @@ object NestedStateMachine {
     }
   }
 }
-trait NestedStateMachine extends Actor with Logging {
+trait NestedStateMachine extends Actor with LazyLogging {
   import NestedStateMachine._
 
   protected def instanceId: Option[String] = None

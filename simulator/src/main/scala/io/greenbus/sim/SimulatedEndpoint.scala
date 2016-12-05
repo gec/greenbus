@@ -18,7 +18,7 @@
  */
 package io.greenbus.sim
 
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.client.service.proto.FrontEnd.FrontEndConnectionStatus
 import akka.actor.{ Actor, Props }
 import play.api.libs.json.Json
@@ -29,7 +29,7 @@ import io.greenbus.client.service.proto.Model.{ EntityKeyValue, ModelUUID, Endpo
 import io.greenbus.app.actor.frontend.{ StackStatusUpdated, MeasurementsPublished, ProtocolConfigurer }
 import scala.concurrent.Future
 
-object SimulatedEndpoint extends ProtocolConfigurer[SimulatorEndpointConfig] with Logging {
+object SimulatedEndpoint extends ProtocolConfigurer[SimulatorEndpointConfig] with LazyLogging {
 
   def extractConfig(config: EntityKeyValue): Option[SimulatorEndpointConfig] = {
     if (config.getValue.hasByteArrayValue) {
@@ -62,7 +62,7 @@ object SimulatedEndpoint extends ProtocolConfigurer[SimulatorEndpointConfig] wit
 
 }
 
-class SimulatedEndpoint(endpointUuid: ModelUUID, endpointName: String, config: SimulatorEndpointConfig, publish: (MeasurementsPublished) => Unit, statusUpdate: (StackStatusUpdated) => Unit) extends Actor with Logging {
+class SimulatedEndpoint(endpointUuid: ModelUUID, endpointName: String, config: SimulatorEndpointConfig, publish: (MeasurementsPublished) => Unit, statusUpdate: (StackStatusUpdated) => Unit) extends Actor with LazyLogging {
   import SimulatedEndpoint._
   import io.greenbus.app.actor.frontend.ActorProtocolManager.CommandIssued
 

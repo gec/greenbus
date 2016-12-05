@@ -18,7 +18,7 @@
  */
 package io.greenbus.services.framework
 
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.jmx.{ Metrics, MetricsManager, MetricsSource, Tag }
 import io.greenbus.msg.RequestDescriptor
 import io.greenbus.msg.amqp.AmqpServiceOperations
@@ -119,7 +119,7 @@ trait ServiceTransactionSource {
   def transaction[A](headers: Map[String, String])(handler: ServiceContext => A): A
 }
 
-object ServiceTransactionSource extends Logging {
+object ServiceTransactionSource extends LazyLogging {
 
   private object GlobalServiceMetrics {
     val metricsMgr = MetricsManager("io.greenbus.services")

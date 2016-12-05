@@ -20,7 +20,7 @@ package io.greenbus.app.actor.frontend
 
 import akka.actor._
 import akka.pattern.gracefulStop
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.app.actor.RestartConnection
 import io.greenbus.msg.Session
 import io.greenbus.msg.amqp.AmqpServiceOperations
@@ -44,7 +44,7 @@ object FrontEndSetManager {
     Props(classOf[FrontEndSetManager[ProtocolConfig]], connMgrFactory, childFactory, protFactory)
   }
 }
-class FrontEndSetManager[ProtocolConfig](connMgrFactory: ConnMgrFactory, childFactory: ChildFactory[ProtocolConfig], protFactory: ProtocolMgrFactory[ProtocolConfig]) extends Actor with Logging {
+class FrontEndSetManager[ProtocolConfig](connMgrFactory: ConnMgrFactory, childFactory: ChildFactory[ProtocolConfig], protFactory: ProtocolMgrFactory[ProtocolConfig]) extends Actor with LazyLogging {
 
   private val protocolMgr = protFactory(context)
 

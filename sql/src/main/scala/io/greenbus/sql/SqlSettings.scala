@@ -18,9 +18,9 @@
  */
 package io.greenbus.sql
 
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 
-object SqlSettings extends Logging {
+object SqlSettings extends LazyLogging {
   import io.greenbus.util.PropertyReading._
 
   def load(file: String): SqlSettings = {

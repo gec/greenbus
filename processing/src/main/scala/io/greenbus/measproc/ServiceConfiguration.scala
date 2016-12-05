@@ -18,7 +18,7 @@
  */
 package io.greenbus.measproc
 
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.msg.{ Session, Subscription }
 import io.greenbus.client.service.proto.Model._
 import io.greenbus.client.service.proto.ModelRequests._
@@ -37,7 +37,7 @@ case class EndpointConfiguration(points: Seq[(ModelUUID, String)],
   triggerSetSubscription: Subscription[EntityKeyValueNotification],
   edgeSubscription: Subscription[EntityEdgeNotification])
 
-object ServiceConfiguration extends Logging {
+object ServiceConfiguration extends LazyLogging {
 
   val triggerSetKey = "triggerSet"
 

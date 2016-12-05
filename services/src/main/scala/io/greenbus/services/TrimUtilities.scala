@@ -21,14 +21,14 @@ package io.greenbus.services
 import java.text.SimpleDateFormat
 import java.util.Date
 
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.mstore.sql.MeasurementStoreSchema
 import io.greenbus.services.data.ServicesSchema
 import io.greenbus.sql.{ DbConnector, SqlSettings, DbConnection }
 import org.apache.commons.cli
 import org.apache.commons.cli.{ CommandLine, HelpFormatter, Options }
 
-object TrimUtilities extends Logging {
+object TrimUtilities extends LazyLogging {
 
   val forceLongFlag = "force"
   val forceFlag = "f"
@@ -132,7 +132,7 @@ object TrimUtilities extends Logging {
   }
 }
 
-object MeasurementTrim extends Logging {
+object MeasurementTrim extends LazyLogging {
   import TrimUtilities._
 
   def main(args: Array[String]): Unit = {
@@ -155,7 +155,7 @@ object MeasurementTrim extends Logging {
   }
 }
 
-object EventTrim extends Logging {
+object EventTrim extends LazyLogging {
   import TrimUtilities._
 
   def main(args: Array[String]): Unit = {

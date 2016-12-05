@@ -20,7 +20,7 @@ package io.greenbus.app.actor.frontend
 
 import akka.actor._
 import akka.pattern.{ AskTimeoutException, ask }
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.app.actor.frontend.ActorProtocolManager.CommandIssued
 import io.greenbus.client.service.proto.Commands.{ CommandStatus, CommandResult, CommandRequest }
 import io.greenbus.client.service.proto.Model.Endpoint
@@ -29,7 +29,7 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
-class ActorRefCommandAcceptor(ref: ActorRef, endpoint: Endpoint) extends ProtocolCommandAcceptor with Logging {
+class ActorRefCommandAcceptor(ref: ActorRef, endpoint: Endpoint) extends ProtocolCommandAcceptor with LazyLogging {
 
   def issue(commandName: String, request: CommandRequest): Future[CommandResult] = {
     val askFut = ref.ask(CommandIssued(commandName, request))(4000.milliseconds)

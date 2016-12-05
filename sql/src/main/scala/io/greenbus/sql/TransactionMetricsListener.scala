@@ -20,7 +20,7 @@ package io.greenbus.sql
 
 import org.squeryl.logging.{ StatementInvocationEvent, StatisticsListener }
 import io.greenbus.jmx.Metrics
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 
 class TransactionMetrics(metrics: Metrics) {
 
@@ -29,7 +29,7 @@ class TransactionMetrics(metrics: Metrics) {
   val timePerQuery = metrics.average("SqlTimePerQuery")
 }
 
-class TransactionMetricsListener(requestId: String) extends StatisticsListener with Logging {
+class TransactionMetricsListener(requestId: String) extends StatisticsListener with LazyLogging {
 
   private var queryCount: Int = 0
   private var queryTime: Int = 0

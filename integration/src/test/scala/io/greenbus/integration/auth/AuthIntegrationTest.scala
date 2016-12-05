@@ -21,7 +21,7 @@ package io.greenbus.integration.auth
 import java.util.UUID
 
 import akka.actor.{ ActorRef, ActorSystem }
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.client.ServiceConnection
 import io.greenbus.client.exception.ForbiddenException
 import io.greenbus.client.service.ModelService
@@ -41,14 +41,14 @@ import io.greenbus.sql.{ DbConnector, SqlSettings }
 import io.greenbus.util.UserSettings
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.scalatest.{ BeforeAndAfterAll, BeforeAndAfterEach, FunSuite }
 
 import scala.concurrent.duration._
 import scala.concurrent.{ Await, Future }
 
 @RunWith(classOf[JUnitRunner])
-class AuthIntegrationTest extends FunSuite with ShouldMatchers with Logging with BeforeAndAfterEach with BeforeAndAfterAll {
+class AuthIntegrationTest extends FunSuite with Matchers with LazyLogging with BeforeAndAfterEach with BeforeAndAfterAll {
   import AuthModelHelpers._
   val testConfigPath = "io.greenbus.test.cfg"
   val amqpConfig = AmqpSettings.load(testConfigPath)

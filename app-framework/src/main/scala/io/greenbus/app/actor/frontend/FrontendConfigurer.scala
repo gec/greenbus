@@ -19,7 +19,7 @@
 package io.greenbus.app.actor.frontend
 
 import akka.actor.{ Props, ActorRef, Actor }
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.msg.{ SessionUnusableException, Subscription, Session }
 import io.greenbus.app.actor.MessageScheduling
 import io.greenbus.client.exception.UnauthorizedException
@@ -199,7 +199,7 @@ class FrontendConfigUpdater(
     endpoint: Endpoint,
     session: Session,
     config: FrontendConfiguration,
-    requestRetryMs: Long) extends Actor with MessageScheduling with Logging {
+    requestRetryMs: Long) extends Actor with MessageScheduling with LazyLogging {
   import FrontendConfigUpdater._
   import context.dispatcher
 

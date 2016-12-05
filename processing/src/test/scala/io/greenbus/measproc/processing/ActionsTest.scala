@@ -18,14 +18,14 @@
  */
 package io.greenbus.measproc.processing
 
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.scalatest.FunSuite
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import ProtoHelper._
 
 @RunWith(classOf[JUnitRunner])
-class ActionsTest extends FunSuite with ShouldMatchers {
+class ActionsTest extends FunSuite with Matchers {
 
   test("BoolTransform") {
     val transformer = new Actions.BoolEnumTransformer("CLOSED", "OPEN")

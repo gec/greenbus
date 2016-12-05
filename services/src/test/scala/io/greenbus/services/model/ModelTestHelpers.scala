@@ -26,14 +26,14 @@ import io.greenbus.client.service.proto.Auth.{ Permission, Agent, PermissionSet 
 import UUIDHelpers._
 import io.greenbus.client.service.proto.Model.{ EntityEdge, Entity }
 import scala.collection.JavaConversions._
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import io.greenbus.services.framework.{ ModelNotifier, ModelEvent }
 import scala.collection.mutable
 import io.greenbus.client.service.proto.Model._
 import io.greenbus.client.service.proto.Commands.CommandLock
 import io.greenbus.client.service.proto.Events.{ Event, Alarm, EventConfig }
 
-object ModelTestHelpers extends ShouldMatchers {
+object ModelTestHelpers extends Matchers {
 
   def createEntity(name: String, types: Seq[String]): EntityRow = {
     val ent = ServicesSchema.entities.insert(EntityRow(UUID.randomUUID(), name))
@@ -224,7 +224,7 @@ object ModelTestHelpers extends ShouldMatchers {
     (proto.getEndpointName, proto.getState)
   }
 
-  class TestModelNotifier extends ModelNotifier with ShouldMatchers {
+  class TestModelNotifier extends ModelNotifier with Matchers {
     private val map = mutable.Map.empty[Class[_], mutable.Queue[(ModelEvent, _)]]
 
     def notify[A](typ: ModelEvent, event: A) {

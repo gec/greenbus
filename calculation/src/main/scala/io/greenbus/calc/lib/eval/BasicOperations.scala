@@ -18,7 +18,7 @@
  */
 package io.greenbus.calc.lib.eval
 
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.calc.lib.eval.OperationPatterns._
 
 object BasicOperations {
@@ -167,7 +167,7 @@ object BasicOperations {
     }
   }
 
-  class Integrate extends AccumulatedNumericOperation with Logging {
+  class Integrate extends AccumulatedNumericOperation with LazyLogging {
     def eval(initialValue: AccumulatedValue, args: List[NumericMeas]) = {
       args.foldLeft(initialValue.copy(value = 0)) {
         case (state, meas) =>

@@ -19,7 +19,7 @@
 package io.greenbus.app.actor.frontend
 
 import akka.actor.{ PoisonPill, ActorRef, Props }
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.msg.{ Session, SessionUnusableException }
 import io.greenbus.app.actor.MessageScheduling
 import io.greenbus.app.actor.frontend.BusDrivenProtocolEndpoint.{ ProtocolFactory, ProxyFactory, RegisterFunc }
@@ -83,7 +83,7 @@ class BusDrivenProtocolEndpoint(
   proxyFactory: ProxyFactory,
   protocolFactory: ProtocolFactory,
   registrationRetryMs: Long)
-    extends NestedStateMachine with MessageScheduling with Logging {
+    extends NestedStateMachine with MessageScheduling with LazyLogging {
 
   import io.greenbus.app.actor.frontend.BusDrivenProtocolEndpoint._
 

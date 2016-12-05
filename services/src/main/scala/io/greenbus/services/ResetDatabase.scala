@@ -18,7 +18,7 @@
  */
 package io.greenbus.services
 
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.sql.{ DbConnector, SqlSettings, DbConnection }
 import io.greenbus.services.model.{ EventSeeding, ModelAuthSeeder, AuthSeedData }
 import io.greenbus.services.data.{ ProcessingLockSchema, ServicesSchema }
@@ -26,7 +26,7 @@ import io.greenbus.mstore.sql.MeasurementStoreSchema
 import org.apache.commons.cli
 import org.apache.commons.cli.{ HelpFormatter, Options }
 
-object ResetDatabase extends Logging {
+object ResetDatabase extends LazyLogging {
 
   val forceLongFlag = "force"
   val forceFlag = "f"

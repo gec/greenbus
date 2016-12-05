@@ -20,7 +20,7 @@ package io.greenbus.services.core
 
 import java.util.concurrent.TimeoutException
 
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.msg.Session
 import io.greenbus.client.exception.{ BadRequestException, LockedException, ServiceException }
 import io.greenbus.client.proto.Envelope
@@ -50,7 +50,7 @@ object CommandServices {
   val defaultLockPageSize = 200
 }
 
-class CommandServices(services: ServiceRegistry, session: Session, trans: ServiceTransactionSource, commandModel: CommandModel, frontEndModel: FrontEndModel, eventModel: EventAlarmModel) extends Logging {
+class CommandServices(services: ServiceRegistry, session: Session, trans: ServiceTransactionSource, commandModel: CommandModel, frontEndModel: FrontEndModel, eventModel: EventAlarmModel) extends LazyLogging {
   import io.greenbus.services.core.CommandServices._
 
   services.simpleAsync(Descriptors.IssueCommandRequest, issueCommandRequest)

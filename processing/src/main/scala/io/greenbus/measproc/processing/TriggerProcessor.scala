@@ -21,7 +21,7 @@ package io.greenbus.measproc.processing
 import collection.JavaConversions._
 import collection.immutable
 
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 
 import io.greenbus.client.service.proto.Measurements.Measurement
 import io.greenbus.client.service.proto.Processing.TriggerSet
@@ -33,7 +33,7 @@ class TriggerProcessor(
   protected val stateCache: ObjectCache[Boolean],
   metrics: Metrics)
     extends ProcessingStep
-    with Logging {
+    with LazyLogging {
 
   protected var map = immutable.Map[String, List[Trigger]]()
 

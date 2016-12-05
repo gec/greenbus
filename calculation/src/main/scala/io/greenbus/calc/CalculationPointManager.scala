@@ -19,7 +19,7 @@
 package io.greenbus.calc
 
 import akka.actor.{ Actor, Props }
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.msg.{ Session, Subscription, SubscriptionBinding }
 import io.greenbus.calc.lib.eval.OperationSource
 import io.greenbus.calc.lib.{ CalculationEvaluator, ErrorMeasurement, InputBucket }
@@ -35,7 +35,7 @@ import scala.concurrent.duration._
 
 class CalcConfigException(msg: String) extends Exception(msg)
 
-object CalculationPointManager extends Logging {
+object CalculationPointManager extends LazyLogging {
 
   case object OnPeriodUpdate
 
@@ -110,7 +110,7 @@ object CalculationPointManager extends Logging {
 
 }
 
-class CalculationPointManager(pointUuid: ModelUUID, config: CalculationDescriptor, session: Session, opSource: OperationSource, measSink: (ModelUUID, Measurement) => Unit) extends Actor with Logging {
+class CalculationPointManager(pointUuid: ModelUUID, config: CalculationDescriptor, session: Session, opSource: OperationSource, measSink: (ModelUUID, Measurement) => Unit) extends Actor with LazyLogging {
   import io.greenbus.calc.CalculationPointManager._
 
   private var inputPoints: Map[ModelUUID, InputBucket] = buildBuckets(config.getCalcInputsList.toSeq) //Map.empty[ModelUUID, InputBucket]

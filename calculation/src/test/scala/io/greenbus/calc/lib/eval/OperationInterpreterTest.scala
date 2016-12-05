@@ -21,10 +21,10 @@ package io.greenbus.calc.lib.eval
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.FunSuite
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 
 @RunWith(classOf[JUnitRunner])
-class OperationInterpreterTest extends FunSuite with ShouldMatchers {
+class OperationInterpreterTest extends FunSuite with Matchers {
   import OperationInterpreter._
 
   class OpMap(map: Map[String, Operation]) extends OperationSource {

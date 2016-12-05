@@ -20,7 +20,7 @@ package io.greenbus.ldr.event
 
 import java.io.File
 
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.client.ServiceConnection
 import io.greenbus.ldr.xml.events.Events
 import io.greenbus.loader.set.LoadingException
@@ -33,7 +33,7 @@ import org.apache.commons.io.FileUtils
 
 import scala.concurrent.duration._
 
-object Exporter extends Logging {
+object Exporter extends LazyLogging {
 
   val outputFlag = "output"
   val directoryFlag = "directory"

@@ -21,10 +21,10 @@ package io.greenbus.calc.lib.eval
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.FunSuite
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 
 @RunWith(classOf[JUnitRunner])
-class OperationIntegrationTest extends FunSuite with ShouldMatchers {
+class OperationIntegrationTest extends FunSuite with Matchers {
 
   def parseFormula(f: String): Formula = {
     Formula(OperationParser.parseFormula(f), BasicOperations.getSource)

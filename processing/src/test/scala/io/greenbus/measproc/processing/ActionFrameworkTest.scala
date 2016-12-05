@@ -19,7 +19,7 @@
 package io.greenbus.measproc.processing
 
 import org.scalatest.FunSuite
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.scalatest.junit.JUnitRunner
 import org.junit.runner.RunWith
 
@@ -28,7 +28,7 @@ import io.greenbus.client.service.proto.Measurements.Measurement
 import ProtoHelper._
 
 @RunWith(classOf[JUnitRunner])
-class ActionFrameworkTest extends FunSuite with ShouldMatchers {
+class ActionFrameworkTest extends FunSuite with Matchers {
   import Action._
 
   class TestRig {

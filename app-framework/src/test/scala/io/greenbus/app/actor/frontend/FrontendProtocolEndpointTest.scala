@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicReference
 import akka.actor.{ Actor, ActorRef, ActorSystem, Props }
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.scalatest.{ BeforeAndAfterEach, FunSuite }
 import io.greenbus.msg.amqp.{ AmqpAddressedMessage, AmqpServiceOperations }
 import io.greenbus.msg.service.{ ServiceHandler, ServiceHandlerSubscription }
@@ -309,7 +309,7 @@ object FrontendProtocolEndpointTest {
 }
 
 @RunWith(classOf[JUnitRunner])
-class FrontendProtocolEndpointTest extends FunSuite with ShouldMatchers with BeforeAndAfterEach {
+class FrontendProtocolEndpointTest extends FunSuite with Matchers with BeforeAndAfterEach {
   import io.greenbus.app.actor.frontend.FrontendProtocolEndpointTest._
 
   private var as = Option.empty[ActorSystem]

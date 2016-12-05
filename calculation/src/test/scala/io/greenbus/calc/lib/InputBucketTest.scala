@@ -19,14 +19,14 @@
 package io.greenbus.calc.lib
 
 import org.scalatest.FunSuite
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import io.greenbus.client.service.proto.Measurements.{ Quality, Measurement }
 import scala.collection.immutable.Queue
 
 @RunWith(classOf[JUnitRunner])
-class InputBucketTest extends FunSuite with ShouldMatchers {
+class InputBucketTest extends FunSuite with Matchers {
   import InputBucket._
 
   import CalcLibTestHelpers._

@@ -6,16 +6,23 @@
 	<groupId>io.greenbus</groupId>
 	<artifactId>greenbus-parent</artifactId>
 	<packaging>pom</packaging>
-	<version>3.0.1-SNAPSHOT</version>
+	<version>3.1.0-SNAPSHOT</version>
 
 	<properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <scala.version>2.10.1</scala.version>
-        <scala.annotation>2.10</scala.annotation>
+        <scala.version>2.11.8</scala.version>
+        <scala.annotation>2.11</scala.annotation>
         <scala-maven-plugin.version>3.1.0</scala-maven-plugin.version>
         <slf4j-api.version>1.7.2</slf4j-api.version>
-        <scalalogging.version>1.0.1</scalalogging.version>
-        <scalatest.version>1.9.1</scalatest.version>
+        <scalalogging.version>3.4.0</scalalogging.version>
+		<scalatest.version>3.0.0</scalatest.version>
+
+		<akka.version>2.4.11</akka.version>
+		<playjson.version>2.5.9</playjson.version>
+
+		<greenbus.version>3.1.0-SNAPSHOT</greenbus.version>
+		<greenbusmsg.version>1.1.0-SNAPSHOT</greenbusmsg.version>
+
         <scalariform-maven-plugin.version>0.1.4</scalariform-maven-plugin.version>
         <build-helper-maven-plugin.version>1.1</build-helper-maven-plugin.version>
         <maven-jar-plugin.version>2.2</maven-jar-plugin.version>
@@ -25,8 +32,7 @@
         <maven-protoc-plugin.version>0.1.11</maven-protoc-plugin.version>
         <qpid.version>0.20</qpid.version>
 
-		<greenbus.version>3.0.1-SNAPSHOT</greenbus.version>
-        <squeryl.version>0.9.5-6</squeryl.version>
+        <squeryl.version>0.9.5-7</squeryl.version>
         <cglib.version>2.2</cglib.version>
         <commons-dbcp.version>1.4</commons-dbcp.version>
         <commons-pool.version>1.5.4</commons-pool.version>

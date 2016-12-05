@@ -20,7 +20,7 @@ package io.greenbus.ldr.event
 
 import java.io.File
 
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.ldr.xml.events.Events
 import org.apache.commons.cli
 import org.apache.commons.cli.{ HelpFormatter, Options }
@@ -32,7 +32,7 @@ import io.greenbus.util.{ UserSettings, XmlHelper }
 
 import scala.concurrent.duration._
 
-object Importer extends Logging {
+object Importer extends LazyLogging {
 
   def buildOptions: Options = {
     val opts = new Options

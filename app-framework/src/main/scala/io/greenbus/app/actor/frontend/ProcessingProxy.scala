@@ -19,7 +19,7 @@
 package io.greenbus.app.actor.frontend
 
 import akka.actor.{ Actor, ActorRef, Props }
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.app.actor.MessageScheduling
 import io.greenbus.app.actor.frontend.ProcessingProxy.DoStackStatusHeartbeat
 import io.greenbus.app.actor.util.{ NestedStateMachine, TraceMessage }
@@ -34,7 +34,7 @@ import io.greenbus.msg.{ Session, SessionUnusableException }
 import scala.collection.JavaConversions._
 import scala.collection.immutable.VectorBuilder
 
-object ProcessingProxy extends Logging {
+object ProcessingProxy extends LazyLogging {
 
   case class LinkUp(session: Session, inputAddress: String)
   case class PointMapUpdated(pointMap: Map[String, ModelUUID])
@@ -175,7 +175,7 @@ object ProcessingProxy extends Logging {
   }
 }
 
-class ProcessingProxy(subject: ActorRef, endpoint: Endpoint, statusHeartbeatPeriodMs: Long, lapsedTimeMs: Long, statusRetryPeriodMs: Long, measRetryPeriodMs: Int, measQueueLimit: Int) extends NestedStateMachine with MessageScheduling with Logging {
+class ProcessingProxy(subject: ActorRef, endpoint: Endpoint, statusHeartbeatPeriodMs: Long, lapsedTimeMs: Long, statusRetryPeriodMs: Long, measRetryPeriodMs: Int, measQueueLimit: Int) extends NestedStateMachine with MessageScheduling with LazyLogging {
   import context.dispatcher
   import io.greenbus.app.actor.frontend.ProcessingProxy._
 
@@ -462,7 +462,7 @@ object HeartbeatActor {
     Props(classOf[HeartbeatActor], subject, intervalMs)
   }
 }
-class HeartbeatActor(subject: ActorRef, intervalMs: Long) extends Actor with MessageScheduling with Logging {
+class HeartbeatActor(subject: ActorRef, intervalMs: Long) extends Actor with MessageScheduling with LazyLogging {
   import HeartbeatActor._
 
   self ! Heartbeat

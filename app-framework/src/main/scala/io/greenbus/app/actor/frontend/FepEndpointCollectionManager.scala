@@ -21,7 +21,7 @@ package io.greenbus.app.actor.frontend
 import java.io.IOException
 
 import akka.actor._
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.app.actor.{ CollectionMembership, EndpointCollectionStrategy, OutOfEndpointCollectionException }
 import io.greenbus.client.exception.UnauthorizedException
 import io.greenbus.client.proto.Envelope.SubscriptionEventType
@@ -46,7 +46,7 @@ object FepEndpointCollectionManager {
 
 }
 
-class FepEndpointCollectionManager(strategy: EndpointCollectionStrategy, session: Session, serviceOps: AmqpServiceOperations, endpointObserver: Option[ActorRef], factory: (Endpoint, CollectionMembership, Session, AmqpServiceOperations) => Props) extends Actor with Logging {
+class FepEndpointCollectionManager(strategy: EndpointCollectionStrategy, session: Session, serviceOps: AmqpServiceOperations, endpointObserver: Option[ActorRef], factory: (Endpoint, CollectionMembership, Session, AmqpServiceOperations) => Props) extends Actor with LazyLogging {
   import FepEndpointCollectionManager._
 
   private var binding = Option.empty[SubscriptionBinding]

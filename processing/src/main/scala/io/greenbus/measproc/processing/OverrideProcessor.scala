@@ -18,7 +18,7 @@
  */
 package io.greenbus.measproc.processing
 
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.client.service.proto.Processing.MeasOverride
 import io.greenbus.client.service.proto.Measurements.{ DetailQual, Quality, Measurement }
 import io.greenbus.jmx.Metrics
@@ -54,7 +54,7 @@ class OverrideProcessor(
   maskedValueCache: ObjectCache[(Option[Measurement], Option[Measurement])],
   current: String => Option[Measurement],
   metrics: Metrics)
-    extends ProcessingStep with Logging {
+    extends ProcessingStep with LazyLogging {
 
   import OverrideProcessor._
 

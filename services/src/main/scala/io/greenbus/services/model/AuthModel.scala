@@ -20,7 +20,7 @@ package io.greenbus.services.model
 
 import java.util.UUID
 
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.client.service.proto.Auth.{ Agent, Permission, PermissionSet }
 import io.greenbus.client.service.proto.Model.ModelUUID
 import io.greenbus.services.SqlAuthenticationModule
@@ -96,7 +96,7 @@ class SquerylAuthModule extends SqlAuthenticationModule {
   }
 }
 
-object SquerylAuthModel extends AuthModel with Logging {
+object SquerylAuthModel extends AuthModel with LazyLogging {
   import io.greenbus.services.model.AuthModel._
 
   def agentIdForName(name: String): Option[UUID] = {

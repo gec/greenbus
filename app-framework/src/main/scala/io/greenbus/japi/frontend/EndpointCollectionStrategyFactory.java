@@ -53,7 +53,7 @@ public class EndpointCollectionStrategyFactory {
      * @return Endpoint collection strategy
      */
     public static EndpointCollectionStrategy protocolStrategy(List<String> protocolNames, List<String> endpointNames) {
-        scala.collection.Iterable<String> stringIterable = JavaConversions.asScalaIterable(protocolNames);
+        scala.collection.Iterable<String> stringIterable = JavaConversions.collectionAsScalaIterable(protocolNames);
         scala.collection.immutable.Set<String> set = stringIterable.toSet();
         return new ProtocolsEndpointStrategy(set, convertToOptionalSet(endpointNames));
     }
@@ -63,7 +63,7 @@ public class EndpointCollectionStrategyFactory {
 
         if (objs != null) {
 
-            scala.collection.Iterable<A> stringIterable = JavaConversions.asScalaIterable(objs);
+            scala.collection.Iterable<A> stringIterable = JavaConversions.collectionAsScalaIterable(objs);
             scala.collection.immutable.Set<A> set = stringIterable.toSet();
             return Option.apply(set);
 

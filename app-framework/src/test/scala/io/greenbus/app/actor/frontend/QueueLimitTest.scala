@@ -21,11 +21,11 @@ package io.greenbus.app.actor.frontend
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import io.greenbus.client.service.proto.Measurements.Measurement
 
 @RunWith(classOf[JUnitRunner])
-class QueueLimitTest extends FunSuite with ShouldMatchers {
+class QueueLimitTest extends FunSuite with Matchers {
 
   def meas(t: Int) = Measurement.newBuilder().setType(Measurement.Type.INT).setIntVal(5).setTime(t).build()
 

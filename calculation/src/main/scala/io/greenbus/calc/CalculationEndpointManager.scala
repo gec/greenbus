@@ -19,7 +19,7 @@
 package io.greenbus.calc
 
 import akka.actor._
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.msg.{ Session, SessionUnusableException, Subscription, SubscriptionBinding }
 import io.greenbus.app.actor.frontend.{ MeasurementsPublished, StackStatusUpdated }
 import io.greenbus.calc.lib.eval.OperationSource
@@ -56,7 +56,7 @@ object CalculationEndpointManager {
 
 }
 
-class CalculationEndpointManager(endpoint: Endpoint, session: Session, publishMeasurements: MeasurementsPublished => Unit, updateStatus: StackStatusUpdated => Unit, opSource: OperationSource) extends Actor with Logging {
+class CalculationEndpointManager(endpoint: Endpoint, session: Session, publishMeasurements: MeasurementsPublished => Unit, updateStatus: StackStatusUpdated => Unit, opSource: OperationSource) extends Actor with LazyLogging {
   import io.greenbus.calc.CalculationEndpointManager._
 
   private var calcSubscription = Option.empty[SubscriptionBinding]

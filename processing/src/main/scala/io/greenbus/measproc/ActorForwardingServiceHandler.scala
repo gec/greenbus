@@ -19,14 +19,14 @@
 package io.greenbus.measproc
 
 import akka.actor.ActorRef
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.msg.service.ServiceHandler
 import io.greenbus.measproc.ActorForwardingServiceHandler.TypeFactory
 
 object ActorForwardingServiceHandler {
   type TypeFactory[A] = (Array[Byte], (Array[Byte]) => Unit) => A
 }
-class ActorForwardingServiceHandler[A](ref: ActorRef, factory: TypeFactory[A]) extends ServiceHandler with Logging {
+class ActorForwardingServiceHandler[A](ref: ActorRef, factory: TypeFactory[A]) extends ServiceHandler with LazyLogging {
   def handleMessage(msg: Array[Byte], responseHandler: (Array[Byte]) => Unit) {
     ref ! factory(msg, responseHandler)
   }

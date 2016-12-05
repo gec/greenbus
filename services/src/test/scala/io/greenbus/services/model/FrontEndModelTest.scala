@@ -28,11 +28,11 @@ import io.greenbus.services.framework._
 import io.greenbus.client.service.proto.Model._
 import io.greenbus.services.model.FrontEndModel._
 import java.util.UUID
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import io.greenbus.services.model.EntityModel.TypeParams
 import io.greenbus.client.service.proto.Model.ModelUUID
 
-object EntityBasedTestHelpers extends ShouldMatchers {
+object EntityBasedTestHelpers extends Matchers {
   import ModelTestHelpers._
 
   def genericPutTest[A, TupType, InfoType, ProtoType](

@@ -19,7 +19,7 @@
 package io.greenbus.services.framework
 
 import com.google.protobuf.{ ByteString, InvalidProtocolBufferException }
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.msg.service.ServiceHandler
 import io.greenbus.client.proto.Envelope
 import io.greenbus.client.proto.Envelope.{ ServiceRequest, ServiceResponse }
@@ -35,7 +35,7 @@ object EnvelopeParsingHandler {
   }
 }
 
-class EnvelopeParsingHandler(handler: ExtractedServiceHandler) extends ServiceHandler with Logging {
+class EnvelopeParsingHandler(handler: ExtractedServiceHandler) extends ServiceHandler with LazyLogging {
   import io.greenbus.services.framework.EnvelopeParsingHandler._
 
   def handleMessage(msg: Array[Byte], responseHandler: (Array[Byte]) => Unit) {

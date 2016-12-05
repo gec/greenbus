@@ -22,7 +22,7 @@ import java.io.File
 import java.util.UUID
 
 import akka.actor.{ ActorRef, ActorSystem }
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.client.ServiceConnection
 import io.greenbus.client.service.ModelService
 import io.greenbus.client.service.proto.Model.ModelUUID
@@ -37,7 +37,7 @@ import io.greenbus.services.{ CoreServices, ResetDatabase, ServiceManager }
 import io.greenbus.util.{ XmlHelper, UserSettings }
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.scalatest.{ BeforeAndAfterAll, FunSuite }
 
 import scala.concurrent.Await
@@ -45,7 +45,7 @@ import scala.concurrent.duration._
 import scala.collection.JavaConversions._
 
 @RunWith(classOf[JUnitRunner])
-class LoaderTest extends FunSuite with ShouldMatchers with Logging with BeforeAndAfterAll {
+class LoaderTest extends FunSuite with Matchers with LazyLogging with BeforeAndAfterAll {
   import io.greenbus.integration.tools.PollingUtils._
 
   val testConfigPath = "io.greenbus.test.cfg"

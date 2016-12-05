@@ -19,7 +19,7 @@
 package io.greenbus.app.actor.frontend
 
 import akka.actor._
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.app.actor._
 import io.greenbus.client.exception.UnauthorizedException
 import io.greenbus.client.service.ModelService
@@ -50,7 +50,7 @@ object FepEndpointMonitor {
 
 }
 
-class FepEndpointMonitor(endpoint: Endpoint, membership: CollectionMembership, session: Session) extends Actor with Logging {
+class FepEndpointMonitor(endpoint: Endpoint, membership: CollectionMembership, session: Session) extends Actor with LazyLogging {
   import FepEndpointMonitor._
 
   private var endpointBinding = Option.empty[SubscriptionBinding]

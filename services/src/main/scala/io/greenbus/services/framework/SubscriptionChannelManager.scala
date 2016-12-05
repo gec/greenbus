@@ -18,7 +18,7 @@
  */
 package io.greenbus.services.framework
 
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.client.proto.Envelope.SubscriptionEventType
 import io.greenbus.msg.amqp.{ AmqpAddressedMessage, AmqpMessage, AmqpServiceOperations }
 import io.greenbus.services.NotificationConversions
@@ -75,7 +75,7 @@ class SubscriptionChannelManager[Proto](descriptor: SubscriptionDescriptor[Proto
     extends SubscriptionChannelBinder
     with ChannelBinderImpl
     with ModelEventTransformer[Proto]
-    with Logging {
+    with LazyLogging {
 
   import NotificationConversions._
   import SubscriptionChannelManager._
@@ -94,7 +94,7 @@ class SubscriptionChannelBinderOnly(protected val ops: AmqpServiceOperations, pr
   ops.declareExchange(exchange)
 }
 
-trait ChannelBinderImpl extends Logging {
+trait ChannelBinderImpl extends LazyLogging {
   protected val ops: AmqpServiceOperations
   protected val exchange: String
 
@@ -173,7 +173,7 @@ class SimpleModelNotifier(mapper: ModelEventMapper, ops: AmqpServiceOperations, 
   }
 }
 
-class ModelEventMapper extends Logging {
+class ModelEventMapper extends LazyLogging {
 
   private val map = mutable.Map.empty[Class[_], ModelEventTransformer[_]]
   private val missed = mutable.Set.empty[Class[_]]

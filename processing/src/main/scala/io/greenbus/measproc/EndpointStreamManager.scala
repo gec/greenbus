@@ -21,7 +21,7 @@ package io.greenbus.measproc
 import java.util.UUID
 
 import akka.actor._
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.msg.amqp.{ AmqpMessage, AmqpAddressedMessage, AmqpServiceOperations }
 import io.greenbus.msg.{ Session, SessionUnusableException, SubscriptionBinding }
 import io.greenbus.app.actor.MessageScheduling
@@ -45,7 +45,7 @@ import scala.collection.JavaConversions._
 
 import scala.concurrent.duration._
 
-object EndpointStreamManager extends Logging {
+object EndpointStreamManager extends LazyLogging {
 
   def mergeableQualityElements(meas: Measurement): (Quality.Builder, DetailQual.Builder) = {
     if (meas.hasQuality) {
@@ -183,7 +183,7 @@ class EndpointStreamManager(
   markRetryPeriodMs: Long,
   standbyLockRetryPeriodMs: Long,
   standbyLockExpiryDurationMs: Long)
-    extends Actor with FSM[State, Data] with MessageScheduling with Logging {
+    extends Actor with FSM[State, Data] with MessageScheduling with LazyLogging {
 
   import context.dispatcher
 

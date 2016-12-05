@@ -20,14 +20,14 @@ package io.greenbus.app.actor.frontend
 
 import io.greenbus.client.service.proto.Commands.{ CommandResult, CommandRequest }
 import io.greenbus.msg.service.ServiceHandler
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.client.proto.Envelope.{ ServiceResponse, ServiceRequest }
 import io.greenbus.client.exception.{ ServiceException, BadRequestException }
 import io.greenbus.client.service.proto.CommandRequests.{ PostCommandRequestResponse, PostCommandRequestRequest }
 import io.greenbus.client.proto.Envelope
 import com.google.protobuf.InvalidProtocolBufferException
 
-class DelegatingCommandHandler(handler: (CommandRequest, CommandResult => Unit) => Unit) extends ServiceHandler with Logging {
+class DelegatingCommandHandler(handler: (CommandRequest, CommandResult => Unit) => Unit) extends ServiceHandler with LazyLogging {
 
   def handleMessage(msg: Array[Byte], responseHandler: (Array[Byte]) => Unit) {
 
