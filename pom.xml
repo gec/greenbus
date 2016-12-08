@@ -10,7 +10,7 @@
 
 	<properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <scala.version>2.10.1</scala.version>
+        <scala.version>2.10.6</scala.version>
         <scala.annotation>2.10</scala.annotation>
         <scala-maven-plugin.version>3.1.0</scala-maven-plugin.version>
         <slf4j-api.version>1.7.2</slf4j-api.version>
