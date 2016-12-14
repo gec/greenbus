@@ -18,14 +18,14 @@
  */
 package io.greenbus.mstore.sql.rotate
 
-import java.util.UUID
+import java.util.{ Date, UUID }
 
 import com.typesafe.scalalogging.slf4j.Logging
 import io.greenbus.client.service.proto.Measurements.Measurement
 import io.greenbus.mstore.{ MeasurementHistorySource, MeasurementValueStore }
 import io.greenbus.mstore.sql.{ CurrentValueOperations, HistoricalValueRow }
 import io.greenbus.sql.DbConnection
-import org.squeryl.{ Table, Schema }
+import org.squeryl.{ Schema, Table }
 
 import scala.annotation.tailrec
 import scala.collection.mutable
@@ -216,9 +216,11 @@ class RotatingHistorianStore(sliceCount: Int, sliceDurationMs: Long, tables: Vec
     currentSliceBegin: Long,
     invalidSliceIndex: Int,
     id: UUID,
-    begin: Option[Long],
-    end: Option[Long],
+    queryBegin: Option[Long],
+    queryEnd: Option[Long],
     limit: Int): Seq[Measurement] = {
+
+    val currentSliceEnd = currentSliceBegin + sliceDurationMs
 
     import org.squeryl.PrimitiveTypeMode._
 
@@ -226,11 +228,21 @@ class RotatingHistorianStore(sliceCount: Int, sliceDurationMs: Long, tables: Vec
 
     val table = tables(currentSliceIndex)
 
+    logger.debug("rightToLeftQuery: " +
+      s"\n\t - currentSliceIndex: $currentSliceIndex" +
+      s"\n\t - currentSliceBegin: $currentSliceBegin (${new Date(currentSliceBegin)})" +
+      s"\n\t - currentSliceEnd: $currentSliceEnd (${new Date(currentSliceEnd)})" +
+      s"\n\t - invalidSliceIndex: $invalidSliceIndex" +
+      s"\n\t - queryBegin: $queryBegin (${queryBegin.map(t => new Date(t))})" +
+      s"\n\t - queryEnd: $queryEnd (${queryEnd.map(t => new Date(t))}))")
+
     val bytes: Seq[Array[Byte]] =
       from(table)(hv =>
         where(hv.pointId === id and
-          (hv.time gt begin.?) and
-          (hv.time lte end.?))
+          (hv.time gte currentSliceBegin) and
+          (hv.time lt currentSliceEnd) and
+          (hv.time gt queryBegin.?) and
+          (hv.time lte queryEnd.?))
           select (hv.bytes)
           orderBy (hv.time).desc).page(0, remaining).toSeq
 
@@ -239,10 +251,10 @@ class RotatingHistorianStore(sliceCount: Int, sliceDurationMs: Long, tables: Vec
     val allResults = measResults ++ found
 
     val nextSliceIndex = (currentSliceIndex + sliceCount - 1) % sliceCount
-    val beginWasInThisWindow = begin.exists(_ > currentSliceBegin)
+    val beginWasInThisWindow = queryBegin.exists(_ > currentSliceBegin)
 
     if (allResults.size < limit && nextSliceIndex != invalidSliceIndex && !beginWasInThisWindow) {
-      rightToLeftQuery(allResults, nextSliceIndex, currentSliceBegin + sliceDurationMs, invalidSliceIndex, id, begin, end, limit)
+      rightToLeftQuery(allResults, nextSliceIndex, currentSliceBegin - sliceDurationMs, invalidSliceIndex, id, queryBegin, queryEnd, limit)
     } else {
       allResults
     }
@@ -254,21 +266,33 @@ class RotatingHistorianStore(sliceCount: Int, sliceDurationMs: Long, tables: Vec
     currentSliceBegin: Long,
     invalidSliceIndex: Int,
     id: UUID,
-    begin: Option[Long],
-    end: Option[Long],
+    queryBegin: Option[Long],
+    queryEnd: Option[Long],
     limit: Int): Seq[Measurement] = {
 
     import org.squeryl.PrimitiveTypeMode._
 
     val remaining = limit - found.size
 
+    val currentSliceEnd = currentSliceBegin + sliceDurationMs
+
     val table = tables(currentSliceIndex)
+
+    logger.debug("leftToRightQuery: " +
+      s"\n\t - currentSliceIndex: $currentSliceIndex" +
+      s"\n\t - currentSliceBegin: $currentSliceBegin (${new Date(currentSliceBegin)})" +
+      s"\n\t - currentSliceEnd: $currentSliceEnd (${new Date(currentSliceEnd)})" +
+      s"\n\t - invalidSliceIndex: $invalidSliceIndex" +
+      s"\n\t - queryBegin: $queryBegin (${queryBegin.map(t => new Date(t))})" +
+      s"\n\t - queryEnd: $queryEnd (${queryEnd.map(t => new Date(t))}))")
 
     val bytes: Seq[Array[Byte]] =
       from(table)(hv =>
         where(hv.pointId === id and
-          (hv.time gt begin.?) and
-          (hv.time lte end.?))
+          (hv.time gte currentSliceBegin) and
+          (hv.time lt currentSliceEnd) and
+          (hv.time gt queryBegin.?) and
+          (hv.time lte queryEnd.?))
           select (hv.bytes)
           orderBy (hv.time).asc).page(0, remaining).toSeq
 
@@ -277,10 +301,10 @@ class RotatingHistorianStore(sliceCount: Int, sliceDurationMs: Long, tables: Vec
     val allResults = found ++ measResults
 
     val nextSliceIndex = (currentSliceIndex + 1) % sliceCount
-    val endWasInThisWindow = end.exists(_ < currentSliceBegin + sliceDurationMs)
+    val endWasInThisWindow = queryEnd.exists(_ < currentSliceBegin + sliceDurationMs)
 
     if (allResults.size < limit && nextSliceIndex != invalidSliceIndex && !endWasInThisWindow) {
-      leftToRightQuery(allResults, nextSliceIndex, currentSliceBegin + sliceDurationMs, invalidSliceIndex, id, begin, end, limit)
+      leftToRightQuery(allResults, nextSliceIndex, currentSliceBegin + sliceDurationMs, invalidSliceIndex, id, queryBegin, queryEnd, limit)
     } else {
       allResults
     }
