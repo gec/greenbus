@@ -20,9 +20,10 @@ package io.greenbus.mstore.sql.rotate
 
 import java.util.UUID
 
-import io.greenbus.client.service.proto.Measurements.{ Quality, Measurement }
+import com.typesafe.scalalogging.slf4j.Logging
+import io.greenbus.client.service.proto.Measurements.{ Measurement, Quality }
 import io.greenbus.mstore.sql.{ HistoricalValueRow, MeasurementStoreSchema }
-import io.greenbus.sql.test.{ RunTestsInsideTransaction, DatabaseUsingTestBase }
+import io.greenbus.sql.test.{ DatabaseUsingTestBase, RunTestsInsideTransaction }
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.squeryl.Table
@@ -55,8 +56,8 @@ class RotationTest extends DatabaseUsingTestBase with RunTestsInsideTransaction 
 
   def checkHist(correct: Seq[(Long, Long)])(op: => Seq[Measurement]) {
     val results = op
-    results.size should equal(correct.size)
     results.map(simplify).toList should equal(correct)
+    results.size should equal(correct.size)
   }
 
   def hmeas(uuid: UUID, v: Int, time: Long): (UUID, Long, Array[Byte]) = {
@@ -97,6 +98,10 @@ class RotationTest extends DatabaseUsingTestBase with RunTestsInsideTransaction 
     ins(tables(0), pA, 3, 57)
     ins(tables(1), pA, 4, 62)
     ins(tables(2), pA, 99, 23)
+    ins(tables(1), pA, 61, 13) // OUT OF WINDOW
+    ins(tables(0), pA, 62, 8) // OUT OF WINDOW
+    ins(tables(3), pA, 63, 84) // OUT OF WINDOW
+    ins(tables(4), pA, 64, 93) // OUT OF WINDOW
 
     val pB = UUID.randomUUID()
     ins(tables(4), pB, 1, 43)
@@ -105,13 +110,31 @@ class RotationTest extends DatabaseUsingTestBase with RunTestsInsideTransaction 
     ins(tables(0), pB, 4, 55)
     ins(tables(0), pB, 5, 57)
     ins(tables(2), pB, 99, 23)
+    ins(tables(1), pB, 61, 14) // OUT OF WINDOW
+    ins(tables(0), pB, 62, 7) // OUT OF WINDOW
+    ins(tables(3), pB, 63, 84) // OUT OF WINDOW
+    ins(tables(4), pB, 64, 93) // OUT OF WINDOW
 
     val pC = UUID.randomUUID()
     ins(tables(4), pC, 1, 43)
     ins(tables(4), pC, 2, 48)
     ins(tables(1), pC, 3, 64)
     ins(tables(1), pC, 4, 67)
+    ins(tables(1), pC, 61, 15) // OUT OF WINDOW
+    ins(tables(0), pC, 62, 6) // OUT OF WINDOW
+    ins(tables(3), pC, 63, 84) // OUT OF WINDOW
+    ins(tables(4), pC, 64, 93) // OUT OF WINDOW
 
+    val uuidToName = Map(pA -> "A", pB -> "A", pC -> "C")
+
+    def printTables(nameMap: Map[UUID, String]): Unit = {
+      tables.zipWithIndex.foreach {
+        case (t, i) =>
+          import org.squeryl.PrimitiveTypeMode._
+          logger.info(s"Table $i: " + t.where(t => true === true).toVector.map(e => (nameMap.getOrElse(e.pointId, "?"), e.time)))
+      }
+
+    }
   }
 
   test("basic") {
@@ -257,6 +280,8 @@ class RotationTest extends DatabaseUsingTestBase with RunTestsInsideTransaction 
       hmeas(pR, 4, 61),
       hmeas(pR, 5, 62),
       hmeas(pR, 6, 63)))
+
+    //r.printTables(uuidToName ++ Map(pR -> "R"))
 
     checkHist(Seq((1, 58), (2, 59), (3, 60), (4, 61), (5, 62), (6, 63))) {
       r.store.getHistory(r.now, pR, None, None, 100, latest = false)
