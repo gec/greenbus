@@ -20,7 +20,7 @@ package io.greenbus.mstore.sql.rotate
 
 import java.util.{ Date, UUID }
 
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.client.service.proto.Measurements.Measurement
 import io.greenbus.mstore.{ MeasurementHistorySource, MeasurementValueStore }
 import io.greenbus.mstore.sql.{ CurrentValueOperations, HistoricalValueRow }
@@ -146,7 +146,7 @@ object RotatingHistorianStore {
   }
 
 }
-class RotatingHistorianStore(sliceCount: Int, sliceDurationMs: Long, tables: Vector[Table[HistoricalValueRow]]) extends Logging {
+class RotatingHistorianStore(sliceCount: Int, sliceDurationMs: Long, tables: Vector[Table[HistoricalValueRow]]) extends LazyLogging {
   import RotatingHistorianStore._
 
   def put(now: Long, entries: Seq[(UUID, Long, Array[Byte])]): Unit = {
