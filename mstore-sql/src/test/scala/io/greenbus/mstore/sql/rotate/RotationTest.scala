@@ -20,7 +20,6 @@ package io.greenbus.mstore.sql.rotate
 
 import java.util.UUID
 
-import com.typesafe.scalalogging.slf4j.Logging
 import io.greenbus.client.service.proto.Measurements.{ Measurement, Quality }
 import io.greenbus.mstore.sql.{ HistoricalValueRow, MeasurementStoreSchema }
 import io.greenbus.sql.test.{ DatabaseUsingTestBase, RunTestsInsideTransaction }

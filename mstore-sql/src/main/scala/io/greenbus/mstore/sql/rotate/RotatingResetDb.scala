@@ -21,15 +21,15 @@ package io.greenbus.mstore.sql.rotate
 import java.util.Date
 import java.util.concurrent.TimeUnit
 
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.mstore.{ MeasurementStoreSettings, RotationalStoreSettings }
-import io.greenbus.sql.{ SqlSettings, DbConnector, DbConnection }
+import io.greenbus.sql.{ DbConnection, DbConnector, SqlSettings }
 import org.apache.commons.cli
 import org.apache.commons.cli.{ CommandLine, HelpFormatter, Options }
 
 import scala.concurrent.duration.Duration
 
-object RotatingResetDb extends Logging {
+object RotatingResetDb extends LazyLogging {
 
   val infoLongFlag = "info"
 
