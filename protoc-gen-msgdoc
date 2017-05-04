@@ -2,4 +2,4 @@
 
 JAR=~/.m2/repository/io/greenbus/msg/greenbus-msg-compiler/1.1.0-SNAPSHOT/greenbus-msg-compiler-1.1.0-SNAPSHOT-jar-with-dependencies.jar
 
-java -Dapi.version="3.1.0-SNAPSHOT" -cp $JAR io.greenbus.msg.compiler.doc.Compiler 2> msgdocprotoc.log
+java -Dapi.version="3.2.0-SNAPSHOT" -cp $JAR io.greenbus.msg.compiler.doc.Compiler 2> msgdocprotoc.log

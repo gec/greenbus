@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.greenbus</groupId>
         <artifactId>greenbus-scala-base</artifactId>
-        <version>3.1.0-SNAPSHOT</version>
+        <version>3.2.0-SNAPSHOT</version>
         <relativePath>../scala-base</relativePath>
     </parent>
 
@@ -197,10 +197,15 @@
             <version>${greenbusmsg.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>${protobuf-java.version}</version>
+        </dependency>
+        <!--<dependency>
             <groupId>io.greenbus.msg</groupId>
             <artifactId>greenbus-msg-proto-ext</artifactId>
             <version>${greenbusmsg.version}</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>io.greenbus.msg</groupId>
             <artifactId>greenbus-msg-compiler</artifactId>
