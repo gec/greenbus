@@ -75,7 +75,7 @@ class ServiceAndProcessorTest extends FunSuite with Matchers with LazyLogging wi
     ResetDatabase.reset(testConfigPath)
 
     logger.info("starting services")
-    services = Some(system.actorOf(ServiceManager.props(testConfigPath, testConfigPath, CoreServices.runServices)))
+    services = Some(system.actorOf(ServiceManager.props(testConfigPath, testConfigPath, CoreServices.runServicesSql)))
 
     val amqpConfig = AmqpSettings.load(testConfigPath)
     val conn = ServiceConnection.connect(amqpConfig, QpidBroker, 5000)
