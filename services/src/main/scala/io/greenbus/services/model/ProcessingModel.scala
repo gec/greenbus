@@ -20,7 +20,7 @@ package io.greenbus.services.model
 
 import java.util.UUID
 
-import com.google.protobuf.GeneratedMessage
+import com.google.protobuf.Message
 import org.squeryl.PrimitiveTypeMode._
 import io.greenbus.client.service.proto.Model.ModelUUID
 import io.greenbus.client.service.proto.Processing.MeasOverride
@@ -81,7 +81,7 @@ object SquerylProcessingModel extends ProcessingModel {
     uuids ++ idsForNames
   }
 
-  def putPointBasedKeyValuesWithEndpoint[PayloadType <: GeneratedMessage, ResultType, NoteType](notifier: ModelNotifier,
+  def putPointBasedKeyValuesWithEndpoint[PayloadType <: Message, ResultType, NoteType](notifier: ModelNotifier,
     values: Seq[(UUID, PayloadType)],
     key: String,
     toResult: (UUID, Array[Byte], Option[UUID]) => ResultType,
@@ -124,7 +124,7 @@ object SquerylProcessingModel extends ProcessingModel {
     parsed.map(_._2)
   }
 
-  def putPointBasedKeyValues[A <: GeneratedMessage, NoteType](notifier: ModelNotifier,
+  def putPointBasedKeyValues[A <: Message, NoteType](notifier: ModelNotifier,
     values: Seq[(UUID, A)],
     key: String,
     parse: Array[Byte] => A,
@@ -176,7 +176,7 @@ object SquerylProcessingModel extends ProcessingModel {
     values
   }
 
-  def deleteKeyValuesWithEndpoint[PayloadType <: GeneratedMessage, ResultType, NoteType](
+  def deleteKeyValuesWithEndpoint[PayloadType <: Message, ResultType, NoteType](
     notifier: ModelNotifier,
     ids: Seq[UUID],
     key: String,
