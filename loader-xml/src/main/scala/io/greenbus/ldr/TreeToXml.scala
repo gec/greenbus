@@ -167,7 +167,18 @@ object TreeToXml {
       case desc: CommandDesc =>
         val xml = desc.commandCategory match {
           case CommandCategory.CONTROL => new Control
-          case _ => new Setpoint
+          case CommandCategory.SETPOINT_INT =>
+            val sp = new Setpoint
+            sp.setSetpointType(SetpointType.INTEGER)
+            sp
+          case CommandCategory.SETPOINT_DOUBLE =>
+            val sp = new Setpoint
+            sp.setSetpointType(SetpointType.DOUBLE)
+            sp
+          case CommandCategory.SETPOINT_STRING =>
+            val sp = new Setpoint
+            sp.setSetpointType(SetpointType.STRING)
+            sp
         }
 
         val (optUuid, optName) = set.EntityId.optional(desc.fields.id)
